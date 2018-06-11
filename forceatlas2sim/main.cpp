@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 
+#include "fileparser.h"
+
 int main(int argc, char** argv)
 {
 	std::string help = "Usage: forceatlas2sim.exe (-i INPUT) [-h]\n\n"\
@@ -33,6 +35,9 @@ int main(int argc, char** argv)
 		std::cout << help;
 		return 1;
 	}
+
+	FileParser fileParser;
+	fileParser.parse(inputFile);
 
 	return 0;
 }

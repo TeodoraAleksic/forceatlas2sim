@@ -5,10 +5,16 @@
 
 class FileParser
 {
+private:
+
+	bool endsWith(std::string str, std::string ending);
+
 public:
 
-	FileParser(std::string fileNae);
+	FileParser();
 	~FileParser();
+
+	void parse(std::string fileName);
 
 };
 

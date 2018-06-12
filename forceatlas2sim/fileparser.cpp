@@ -41,12 +41,85 @@ std::string FileParser::getGMLErrorMessage(GML_error_value error)
 	}
 }
 
-void FileParser::parseGEFX(std::string fileName)
+std::string FileParser::getGMLElementValue(GML_pair element)
 {
+	switch (element.kind)
+	{
+	case GML_STRING:
+		return element.value.string;
+	case GML_INT:
+		return std::to_string(element.value.integer);
+	case GML_DOUBLE:
+		return std::to_string(element.value.floating);
+	default:
+		throw "GML element value is not a primitive type";
+	}
+}
+
+void FileParser::processGMLNode(GML_pair* node, GraphObject* graphObject)
+{
+	while (node != nullptr)
+	{
+		if (std::strcmp(node->key, "id") == 0)
+			graphObject->addNode(getGMLElementValue(*node));
+
+		// TODO process other fields
+
+		node = node->next;
+	}
+}
+
+void FileParser::processGMLEdge(GML_pair* edge, GraphObject* graphObject)
+{
+	std::string source;
+	std::string target;
+
+	while (edge != nullptr)
+	{
+		if (std::strcmp(edge->key, "source") == 0)
+			source = getGMLElementValue(*edge);
+
+		if (std::strcmp(edge->key, "target") == 0)
+			target = getGMLElementValue(*edge);
+
+		// TODO process other fields
+
+		edge = edge->next;
+	}
+
+	graphObject->addEdge(source, target);
+}
+
+void FileParser::processGMLList(GML_pair* list, GraphObject* graphObject)
+{
+	GML_pair* tmp = list;
+
+	while (tmp != nullptr && std::strcmp(tmp->key, "graph") != 0)
+		tmp = tmp->next;
+
+	if (tmp != nullptr)
+	{
+		tmp = tmp->value.list;
+
+		while (tmp != nullptr)
+		{
+			if (std::strcmp(tmp->key, "node") == 0)
+				processGMLNode(tmp->value.list, graphObject);
+
+			else if (std::strcmp(tmp->key, "edge") == 0)
+				processGMLEdge(tmp->value.list, graphObject);
+
+			tmp = tmp->next;
+		}
+	}
+}
+
+void FileParser::parseGEFX(std::string fileName, GraphObject* graphObject)
+{	
 	// TODO
 }
 
-void FileParser::parseGML(std::string fileName)
+void FileParser::parseGML(std::string fileName, GraphObject* graphObject)
 {
 	struct GML_pair* list;
 	struct GML_stat* stat = (struct GML_stat*)malloc(sizeof(struct GML_stat));
@@ -65,24 +138,21 @@ void FileParser::parseGML(std::string fileName)
 		std::cout << "Error reading file line " << stat->err.line << " column " << stat->err.column << "\n";
 	}
 
-	// TODO
+	processGMLList(list, graphObject);
 
 	GML_free_list(list, stat->key_list);
 }
 
-void FileParser::parse(std::string fileName)
+GraphObject FileParser::parse(std::string fileName)
 {
+	GraphObject graphObject;
+
 	if (endsWith(fileName, ".gefx"))
-	{
-		parseGEFX(fileName);
-	}
+		parseGEFX(fileName, &graphObject);
 	else if (endsWith(fileName, ".gml"))
-	{
-		parseGML(fileName);
-	}
+		parseGML(fileName, &graphObject);
 	else 
-	{
-		// TODO
-		std::cout << "Unsupported file extension\n";
-	}
+		throw "Unsupported file extension";
+
+	return graphObject;
 }

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 
+#include "graphobject.h"
 #include "fileparser.h"
 
 int main(int argc, char** argv)
@@ -37,7 +38,7 @@ int main(int argc, char** argv)
 	}
 
 	FileParser fileParser;
-	fileParser.parse(inputFile);
+	GraphObject graphObject = fileParser.parse(inputFile);
 
 	return 0;
 }

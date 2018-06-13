@@ -16,8 +16,8 @@ private:
 	bool endsWith(std::string str, std::string ending);
 
 	std::string getGMLErrorMessage(GML_error_value error);
-	std::string getGMLElementValue(GML_pair element);
 
+	void processGMLGraphics(GML_pair* graphics, float* x, float* y, float* z);
 	void processGMLNode(GML_pair* node, GraphObject* graphObject);
 	void processGMLEdge(GML_pair* edge, GraphObject* graphObject);
 	void processGMLList(GML_pair* list, GraphObject* graphObject);

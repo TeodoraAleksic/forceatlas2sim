@@ -41,32 +41,42 @@ std::string FileParser::getGMLErrorMessage(GML_error_value error)
 	}
 }
 
-std::string FileParser::getGMLElementValue(GML_pair element)
+void FileParser::processGMLGraphics(GML_pair* graphics, float* x, float* y, float* z)
 {
-	switch (element.kind)
+	while (graphics != nullptr)
 	{
-	case GML_STRING:
-		return element.value.string;
-	case GML_INT:
-		return std::to_string(element.value.integer);
-	case GML_DOUBLE:
-		return std::to_string(element.value.floating);
-	default:
-		throw "GML element value is not a primitive type";
+		if (std::strcmp(graphics->key, "x") == 0)
+			*x = (float)graphics->value.floating;
+
+		if (std::strcmp(graphics->key, "y") == 0)
+			*y = (float)graphics->value.floating;
+
+		if (std::strcmp(graphics->key, "z") == 0)
+			*z = (float)graphics->value.floating;
+
+		graphics = graphics->next;
 	}
 }
 
 void FileParser::processGMLNode(GML_pair* node, GraphObject* graphObject)
 {
+	std::string id;
+	float x = 0.0;
+	float y = 0.0;
+	float z = 0.0;
+
 	while (node != nullptr)
 	{
 		if (std::strcmp(node->key, "id") == 0)
-			graphObject->addNode(getGMLElementValue(*node));
+			id = std::to_string(node->value.integer);
 
-		// TODO process other fields
+		if (std::strcmp(node->key, "graphics") == 0)
+			processGMLGraphics(node->value.list, &x, &y, &z);
 
 		node = node->next;
 	}
+
+	graphObject->addNode(id, x, y, z);
 }
 
 void FileParser::processGMLEdge(GML_pair* edge, GraphObject* graphObject)
@@ -77,10 +87,10 @@ void FileParser::processGMLEdge(GML_pair* edge, GraphObject* graphObject)
 	while (edge != nullptr)
 	{
 		if (std::strcmp(edge->key, "source") == 0)
-			source = getGMLElementValue(*edge);
+			source = std::to_string(edge->value.integer);
 
 		if (std::strcmp(edge->key, "target") == 0)
-			target = getGMLElementValue(*edge);
+			target = std::to_string(edge->value.integer);
 
 		// TODO process other fields
 

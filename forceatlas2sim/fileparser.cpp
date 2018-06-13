@@ -164,5 +164,7 @@ GraphObject FileParser::parse(std::string fileName)
 	else 
 		throw "Unsupported file extension";
 
+	graphObject.postprocessing();
+
 	return graphObject;
 }

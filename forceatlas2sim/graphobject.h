@@ -10,6 +10,9 @@ class GraphObject
 private:
 
 	int numOfNodes;
+	int maxDegree;
+
+	bool initedGraphics;
 
 	std::unordered_map<std::string, int> nodeIds;
 
@@ -28,6 +31,8 @@ public:
 
 	void addNode(std::string node, float x_ = 0.0, float y_ = 0.0, float z_ = 0.0);
 	void addEdge(std::string source, std::string target, float weight = 0.0);
+
+	void postprocessing();
 
 };
 

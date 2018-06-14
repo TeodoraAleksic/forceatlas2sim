@@ -2,6 +2,7 @@
 #define _GRAPHNODE_H_
 
 #include "globject.h"
+#include "graphobject.h"
 
 class GraphNode: public GLObject
 {
@@ -9,15 +10,19 @@ private:
 
 	static const int lats, longs;
 
+	const GraphObject& graphObject;
+
+	bool isInited;
+
 	unsigned int vao;
-	unsigned int vboVertex, vboIndex, vboOffset, vboScale;
+	unsigned int vboVertex, vboIndex, vboOffsetX, vboOffsetY, vboOffsetZ, vboScale;
 	unsigned int program;
 
 	void initNode(std::vector<float>* vertices, std::vector<unsigned int>* indices);
 
 public:
 
-	GraphNode();
+	GraphNode(const GraphObject& graphObject_);
 	~GraphNode();
 
 	void init();

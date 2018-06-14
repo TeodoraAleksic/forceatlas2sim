@@ -31,7 +31,6 @@ public:
 	~Camera();
 
 	glm::mat4 getPosition();
-
 	double getFOV();
 
 	void move(MoveDirection direction, double deltaTime);

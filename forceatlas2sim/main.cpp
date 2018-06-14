@@ -5,12 +5,15 @@
 #include <iostream>
 #include <string>
 
+#include "camera.h"
 #include "graphobject.h"
 #include "graphnode.h"
 #include "fileparser.h"
 
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HIGHT = 600;
+
+Camera camera{ glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f) };
 
 int main(int argc, char** argv)
 {
@@ -75,7 +78,7 @@ int main(int argc, char** argv)
 
 	glViewport(0, 0, 800, 600);
 
-	GraphNode graphNode(graphObject);
+	GraphNode graphNode(camera, graphObject);
 	graphNode.init();
 
 	// Rendering loop

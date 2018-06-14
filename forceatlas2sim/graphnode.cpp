@@ -1,14 +1,18 @@
 #include "graphnode.h"
 
+#include <glm/glm.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+using namespace glm;
 
 const int GraphNode::lats = 40;
 const int GraphNode::longs = 40;
 const int GraphNode::numOfIndices = (lats + 1) * (longs + 1) * 2 + (lats + 1);
 
-GraphNode::GraphNode(const GraphObject& graphObject_): graphObject(graphObject_)
+GraphNode::GraphNode(Camera& camera_, const GraphObject& graphObject_): camera(camera_), graphObject(graphObject_)
 {
 	isInited = false;
 	vao = 0;
@@ -75,6 +79,11 @@ void GraphNode::init()
 
 	for (auto iter = shaders.begin(); iter != shaders.end(); ++iter)
 		glDeleteShader(*iter);
+
+	// Gets uniform variable locations
+	uniformProjection = glGetUniformLocation(program, "projection");
+	uniformView = glGetUniformLocation(program, "view");
+	uniformModel = glGetUniformLocation(program, "model");
 
 	std::vector<float> vertices;
 	std::vector<unsigned int> indices;
@@ -147,9 +156,22 @@ void GraphNode::draw()
 		return;
 
 	glUseProgram(program);
+
+	const int SCREEN_WIDTH = 800;
+	const int SCREEN_HIGHT = 600;
+
+	glm::mat4 projection = glm::perspective((float)glm::radians(camera.getFOV()), (float)(SCREEN_WIDTH / SCREEN_HIGHT), 0.1f, 100.0f);
+	glm::mat4 view = camera.getPosition();
+	glm::mat4 model(1.0f);
+
+	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
+	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+
 	glBindVertexArray(vao);
 	glEnable(GL_PRIMITIVE_RESTART);
 	glPrimitiveRestartIndex(GL_PRIMITIVE_RESTART_FIXED_INDEX);
+
 	glDrawElementsInstanced(GL_TRIANGLE_STRIP, 2 * numOfIndices, GL_UNSIGNED_INT, NULL, graphObject.getNumOfNodes());
 }
 

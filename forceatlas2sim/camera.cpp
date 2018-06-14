@@ -9,7 +9,7 @@ Camera::~Camera()
 {
 }
 
-glm::mat4 Camera::getPosition()
+glm::mat4 Camera::getPosition() 
 {
 	glm::vec3 front;
 	front.x = (float)(cos(glm::radians(cameraPitch)) * cos(glm::radians(cameraYaw)));
@@ -21,7 +21,7 @@ glm::mat4 Camera::getPosition()
 	return glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 }
 
-double Camera::getFOV()
+double Camera::getFOV() 
 {
 	return fov;
 }

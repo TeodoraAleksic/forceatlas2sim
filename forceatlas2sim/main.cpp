@@ -6,6 +6,7 @@
 #include <string>
 
 #include "graphobject.h"
+#include "graphnode.h"
 #include "fileparser.h"
 
 const int SCREEN_WIDTH = 800;
@@ -74,6 +75,9 @@ int main(int argc, char** argv)
 
 	glViewport(0, 0, 800, 600);
 
+	GraphNode graphNode(graphObject);
+	graphNode.init();
+
 	// Rendering loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -81,6 +85,8 @@ int main(int argc, char** argv)
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		graphNode.draw();
 
 		glfwSwapBuffers(window);
 	}

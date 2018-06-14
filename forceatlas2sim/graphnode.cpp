@@ -6,6 +6,7 @@
 
 const int GraphNode::lats = 40;
 const int GraphNode::longs = 40;
+const int GraphNode::numOfIndices = (lats + 1) * (longs + 1) * 2 + (lats + 1);
 
 GraphNode::GraphNode(const GraphObject& graphObject_): graphObject(graphObject_)
 {
@@ -142,6 +143,14 @@ void GraphNode::init()
 
 void GraphNode::draw()
 {
+	if (!isInited)
+		return;
+
+	glUseProgram(program);
+	glBindVertexArray(vao);
+	glEnable(GL_PRIMITIVE_RESTART);
+	glPrimitiveRestartIndex(GL_PRIMITIVE_RESTART_FIXED_INDEX);
+	glDrawElementsInstanced(GL_TRIANGLE_STRIP, 2 * numOfIndices, GL_UNSIGNED_INT, NULL, graphObject.getNumOfNodes());
 }
 
 void GraphNode::cleanup()

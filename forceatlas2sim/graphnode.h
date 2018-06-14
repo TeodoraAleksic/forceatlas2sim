@@ -8,7 +8,7 @@ class GraphNode: public GLObject
 {
 private:
 
-	static const int lats, longs;
+	static const int lats, longs, numOfIndices;
 
 	const GraphObject& graphObject;
 

@@ -67,8 +67,8 @@ void GraphNode::init()
 {
 	// Builds shaders
 	std::vector<unsigned int> shaders;
-	shaders.push_back(buildShader("sphere.vert", GL_VERTEX_SHADER));
-	shaders.push_back(buildShader("sphere.frag", GL_FRAGMENT_SHADER));
+	shaders.push_back(buildShader("node.vert", GL_VERTEX_SHADER));
+	shaders.push_back(buildShader("node.frag", GL_FRAGMENT_SHADER));
 
 	// Builds program
 	program = buildProgram(shaders);

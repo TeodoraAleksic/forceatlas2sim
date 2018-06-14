@@ -13,7 +13,35 @@
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HIGHT = 600;
 
+double deltaTime = 0.0f;
+double lastFrame = 0.0f;
+
 Camera camera{ glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f) };
+
+void processInput(GLFWwindow* window)
+{
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE))
+		glfwSetWindowShouldClose(window, true);
+	else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		camera.move(MoveDirection::FWD, deltaTime);
+	else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		camera.move(MoveDirection::BWD, deltaTime);
+	else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		camera.move(MoveDirection::LEFT, deltaTime);
+	else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		camera.move(MoveDirection::RIGHT, deltaTime);
+
+}
+
+void mouseCallback(GLFWwindow* window, double posX, double posY)
+{
+	camera.turn(posX, posY, deltaTime);
+}
+
+void scrollCallback(GLFWwindow* window, double offsetX, double offsetY)
+{
+	camera.zoom(offsetX, offsetY);
+}
 
 int main(int argc, char** argv)
 {
@@ -78,13 +106,24 @@ int main(int argc, char** argv)
 
 	glViewport(0, 0, 800, 600);
 
+	// Sets callbacks for the GLFW window
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPosCallback(window, mouseCallback);
+	glfwSetScrollCallback(window, scrollCallback);
+
 	GraphNode graphNode(camera, graphObject);
 	graphNode.init();
 
 	// Rendering loop
 	while (!glfwWindowShouldClose(window))
 	{
+		double currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
 		glfwPollEvents();
+
+		processInput(window);
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

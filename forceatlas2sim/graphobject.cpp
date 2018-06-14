@@ -59,3 +59,28 @@ void GraphObject::postprocessing()
 		}
 	}
 }
+
+int GraphObject::getNumOfNodes() const
+{
+	return numOfNodes;
+}
+
+const std::vector<float>* GraphObject::getNodeX() const
+{
+	return &x;
+}
+
+const std::vector<float>* GraphObject::getNodeY() const
+{
+	return &y;
+}
+
+const std::vector<float>* GraphObject::getNodeZ() const
+{
+	return &z;
+}
+
+const std::vector<int>* GraphObject::getNodeDegree() const
+{
+	return &degree;
+}

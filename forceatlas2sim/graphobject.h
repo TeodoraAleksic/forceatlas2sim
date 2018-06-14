@@ -34,6 +34,14 @@ public:
 
 	void postprocessing();
 
+	int getNumOfNodes() const;
+
+	const std::vector<float>* getNodeX() const;
+	const std::vector<float>* getNodeY() const;
+	const std::vector<float>* getNodeZ() const;
+
+	const std::vector<int>* getNodeDegree() const;
+
 };
 
 #endif

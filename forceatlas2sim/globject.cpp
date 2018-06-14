@@ -39,8 +39,9 @@ unsigned int GLObject::buildShader(std::string filePath, GLenum shaderType)
 	shader = glCreateShader(shaderType);
 
 	// Builds shader from source
-	const char* shaderSource = readFile(filePath).c_str();
-	glShaderSource(shader, 1, &shaderSource, nullptr);
+	std::string shaderSourceStr = readFile(filePath);
+	const char* shaderSourceChr = shaderSourceStr.c_str();
+	glShaderSource(shader, 1, &shaderSourceChr, nullptr);
 	glCompileShader(shader);
 
 	// Gets build status

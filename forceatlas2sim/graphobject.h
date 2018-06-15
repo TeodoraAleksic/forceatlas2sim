@@ -9,18 +9,18 @@ class GraphObject
 {
 private:
 
-	int numOfNodes;
-	int maxDegree;
+	unsigned int numOfNodes;
+	unsigned int maxDegree;
 
 	bool initedGraphics;
 
-	std::unordered_map<std::string, int> nodeIds;
+	std::unordered_map<std::string, unsigned int> nodeIds;
 
 	std::vector<float> x;
 	std::vector<float> y;
 	std::vector<float> z;
 
-	std::vector<int> degree;
+	std::vector<unsigned int> degree;
 
 	void incDegree(std::string node);
 
@@ -34,13 +34,13 @@ public:
 
 	void postprocessing();
 
-	int getNumOfNodes() const;
+	unsigned int getNumOfNodes();
 
-	const std::vector<float>* getNodeX() const;
-	const std::vector<float>* getNodeY() const;
-	const std::vector<float>* getNodeZ() const;
+	std::vector<float> getNodeX();
+	std::vector<float> getNodeY();
+	std::vector<float> getNodeZ();
 
-	const std::vector<int>* getNodeDegree() const;
+	std::vector<unsigned int> getNodeDegree();
 
 };
 

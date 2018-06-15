@@ -16,7 +16,7 @@ GraphObject::~GraphObject()
 
 void GraphObject::incDegree(std::string node)
 {
-	int nodeIndex = nodeIds[node];
+	unsigned int nodeIndex = nodeIds[node];
 	++degree[nodeIndex];
 
 	if (degree[nodeIndex] > maxDegree)
@@ -51,36 +51,36 @@ void GraphObject::postprocessing()
 		srand((unsigned int)time(0));
 
 		// Generates random node coordinates if none were provided in the graph file
-		for (int i = 0; i < numOfNodes; ++i)
+		for (unsigned int i = 0; i < numOfNodes; ++i)
 		{
-			x[i] = rand() % (int)((float)(maxDegree * numOfNodes) / 3) - ((float)(maxDegree * numOfNodes) / 6);
-			y[i] = rand() % (int)((float)(maxDegree * numOfNodes) / 3) - ((float)(maxDegree * numOfNodes) / 6);
-			z[i] = rand() % (int)((float)(maxDegree * numOfNodes) / 3) - ((float)(maxDegree * numOfNodes) / 6);
+			x[i] = rand() % (int)((float)(maxDegree * numOfNodes) / 15) - ((float)(maxDegree * numOfNodes) / 30);
+			y[i] = rand() % (int)((float)(maxDegree * numOfNodes) / 15) - ((float)(maxDegree * numOfNodes) / 30);
+			z[i] = rand() % (int)((float)(maxDegree * numOfNodes) / 15) - ((float)(maxDegree * numOfNodes) / 30);
 		}
 	}
 }
 
-int GraphObject::getNumOfNodes() const
+unsigned int GraphObject::getNumOfNodes()
 {
 	return numOfNodes;
 }
 
-const std::vector<float>* GraphObject::getNodeX() const
+std::vector<float> GraphObject::getNodeX()
 {
-	return &x;
+	return x;
 }
 
-const std::vector<float>* GraphObject::getNodeY() const
+std::vector<float> GraphObject::getNodeY()
 {
-	return &y;
+	return y;
 }
 
-const std::vector<float>* GraphObject::getNodeZ() const
+std::vector<float> GraphObject::getNodeZ()
 {
-	return &z;
+	return z;
 }
 
-const std::vector<int>* GraphObject::getNodeDegree() const
+std::vector<unsigned int> GraphObject::getNodeDegree()
 {
-	return &degree;
+	return degree;
 }

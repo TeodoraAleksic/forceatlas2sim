@@ -12,7 +12,7 @@ const int GraphNode::lats = 40;
 const int GraphNode::longs = 40;
 const int GraphNode::numOfIndices = (lats + 1) * (longs + 1) * 2 + (lats + 1);
 
-GraphNode::GraphNode(Camera& camera_, const GraphObject& graphObject_): camera(camera_), graphObject(graphObject_)
+GraphNode::GraphNode(Camera& camera_, GraphObject& graphObject_): camera(camera_), graphObject(graphObject_)
 {
 	isInited = false;
 	vao = 0;
@@ -108,13 +108,13 @@ void GraphNode::init()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
 
 	// Binds offsets
-	const std::vector<float>* x = graphObject.getNodeX();
-	const std::vector<float>* y = graphObject.getNodeY();
-	const std::vector<float>* z = graphObject.getNodeZ();
+	std::vector<float> x = graphObject.getNodeX();
+	std::vector<float> y = graphObject.getNodeY();
+	std::vector<float> z = graphObject.getNodeZ();
 
 	glGenBuffers(1, &vboOffsetX);
 	glBindBuffer(GL_ARRAY_BUFFER, vboOffsetX);
-	glBufferData(GL_ARRAY_BUFFER, x->size() * sizeof(GLfloat), x, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, x.size() * sizeof(GLfloat), &x[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 0, NULL);
@@ -122,7 +122,7 @@ void GraphNode::init()
 
 	glGenBuffers(1, &vboOffsetY);
 	glBindBuffer(GL_ARRAY_BUFFER, vboOffsetY);
-	glBufferData(GL_ARRAY_BUFFER, y->size() * sizeof(GLfloat), y, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, y.size() * sizeof(GLfloat), &y[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 0, NULL);
@@ -130,18 +130,18 @@ void GraphNode::init()
 
 	glGenBuffers(1, &vboOffsetZ);
 	glBindBuffer(GL_ARRAY_BUFFER, vboOffsetZ);
-	glBufferData(GL_ARRAY_BUFFER, z->size() * sizeof(GLfloat), z, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, z.size() * sizeof(GLfloat), &z[0], GL_STATIC_DRAW);
 	
 	glEnableVertexAttribArray(3);
 	glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 0, NULL);
 	glVertexAttribDivisor(3, 1);
 
-	// Binds degrees
-	const std::vector<int>* degrees = graphObject.getNodeDegree();
+	// Binds scale
+	std::vector<unsigned int> scale = graphObject.getNodeDegree();
 
 	glGenBuffers(1, &vboScale);
 	glBindBuffer(GL_ARRAY_BUFFER, vboScale);
-	glBufferData(GL_ARRAY_BUFFER, degrees->size() * sizeof(GLfloat), degrees, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, scale.size() * sizeof(GLuint), &scale[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(4);
 	glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, 0, NULL);
@@ -160,7 +160,7 @@ void GraphNode::draw()
 	const int SCREEN_WIDTH = 800;
 	const int SCREEN_HIGHT = 600;
 
-	glm::mat4 projection = glm::perspective((float)glm::radians(camera.getFOV()), (float)(SCREEN_WIDTH / SCREEN_HIGHT), 0.1f, 100.0f);
+	glm::mat4 projection = glm::perspective((float)glm::radians(camera.getFOV()), (float)(SCREEN_WIDTH / SCREEN_HIGHT), 0.1f, 200.0f);
 	glm::mat4 view = camera.getPosition();
 	glm::mat4 model(1.0f);
 

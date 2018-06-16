@@ -9,6 +9,7 @@
 #include "graphobject.h"
 #include "graphnode.h"
 #include "fileparser.h"
+#include "nbody.h"
 
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HIGHT = 600;
@@ -113,6 +114,11 @@ int main(int argc, char** argv)
 
 	GraphNode graphNode(camera, graphObject);
 	graphNode.init();
+
+	NBody nbody;
+	nbody.init();
+	nbody.setArguments(graphNode);
+	nbody.run();
 
 	// Rendering loop
 	while (!glfwWindowShouldClose(window))

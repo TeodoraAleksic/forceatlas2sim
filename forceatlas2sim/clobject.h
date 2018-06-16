@@ -13,8 +13,6 @@ class CLObject
 {
 protected:
 
-	bool isInited;
-
 	cl::Platform platform;
 	cl::Device device;
 

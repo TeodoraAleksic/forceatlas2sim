@@ -214,3 +214,28 @@ void GraphNode::cleanup()
 	vboScale = 0;
 	program = 0;
 }
+
+unsigned int GraphNode::getNumOfNodes() const
+{
+	return graphObject.getNumOfNodes();
+}
+
+unsigned int GraphNode::getOffsetX() const
+{
+	return vboOffsetX;
+}
+
+unsigned int GraphNode::getOffsetY() const
+{
+	return vboOffsetY;
+}
+
+unsigned int GraphNode::getOffsetZ() const
+{
+	return vboOffsetZ;
+}
+
+unsigned int GraphNode::getScale() const
+{
+	return vboScale;
+}

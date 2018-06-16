@@ -6,7 +6,6 @@
 
 CLObject::CLObject()
 {
-	isInited = false;
 }
 
 CLObject::~CLObject()

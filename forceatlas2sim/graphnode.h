@@ -33,6 +33,12 @@ public:
 	void draw();
 	void cleanup();
 
+	unsigned int getNumOfNodes() const;
+	unsigned int getOffsetX() const;
+	unsigned int getOffsetY() const;
+	unsigned int getOffsetZ() const;
+	unsigned int getScale() const;
+
 };
 
 #endif

@@ -3,13 +3,18 @@
 
 #include "clobject.h"
 
+#include "graphnode.h"
+
 class NBody: public CLObject
 {
 private:
 
+	bool isInited, isSet;
+
 	int localWorkSize, globalWorkSize;
 
 	std::vector<cl::Memory> glBuffers;
+	cl::BufferGL x, y, z, degree;
 
 public:
 
@@ -18,6 +23,8 @@ public:
 
 	void init();
 	void run();
+
+	void setArguments(const GraphNode& graphNode);
 
 };
 

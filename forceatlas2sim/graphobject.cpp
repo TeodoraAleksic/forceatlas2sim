@@ -1,12 +1,10 @@
 #include "graphobject.h"
 
-#include <stdlib.h>
-#include <time.h>
+#include <cmath>
 
 GraphObject::GraphObject()
 {
 	numOfNodes = 0;
-	maxDegree = 0;
 	initedGraphics = false;
 }
 
@@ -18,9 +16,6 @@ void GraphObject::incDegree(std::string node)
 {
 	unsigned int nodeIndex = nodeIds[node];
 	++degree[nodeIndex];
-
-	if (degree[nodeIndex] > maxDegree)
-		maxDegree = degree[nodeIndex];
 }
 
 void GraphObject::addNode(std::string node, float x_, float y_, float z_)
@@ -48,14 +43,27 @@ void GraphObject::postprocessing()
 {
 	if (!initedGraphics)
 	{
-		srand((unsigned int)time(0));
+		float meanDegree = 0.0;
 
-		// Generates random node coordinates if none were provided in the graph file
+		for (unsigned int i = 0; i < numOfNodes; ++i)
+			meanDegree += degree[i];
+
+		meanDegree /= numOfNodes;
+
+		float max = meanDegree * (float)pow(numOfNodes, 1.0 / 3.0);
+		float x_ = 0.0f;
+		float y_ = 0.0f;
+		float z_ = 0.0f;
+
 		for (unsigned int i = 0; i < numOfNodes; ++i)
 		{
-			x[i] = rand() % (int)((float)(maxDegree * numOfNodes) / 15) - ((float)(maxDegree * numOfNodes) / 30);
-			y[i] = rand() % (int)((float)(maxDegree * numOfNodes) / 15) - ((float)(maxDegree * numOfNodes) / 30);
-			z[i] = rand() % (int)((float)(maxDegree * numOfNodes) / 15) - ((float)(maxDegree * numOfNodes) / 30);
+			x[i] = x_ - max / 2;
+			y[i] = y_ - max / 2;
+			z[i] = z_ - max / 2;
+
+			z_ = (z_ + meanDegree <= max) ? (z_ + meanDegree) : 0.0f;
+			y_ = (z_ == 0.0) ? ((y_ + meanDegree <= max) ? (y_ + meanDegree) : 0.0f) : y_;
+			x_ = (y_ == 0.0 && z_ == 0.0) ? (x_ + meanDegree) : x_;
 		}
 	}
 }

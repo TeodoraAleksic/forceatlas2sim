@@ -10,7 +10,6 @@ class GraphObject
 private:
 
 	unsigned int numOfNodes;
-	unsigned int maxDegree;
 
 	bool initedGraphics;
 

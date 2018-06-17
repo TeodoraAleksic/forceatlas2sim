@@ -13,6 +13,6 @@ uniform mat4 model;
 void main ()
 {
 	vec3 offset = vec3(offsetX, offsetY, offsetZ);
-	vec3 newPos = position * (float(scale) * 0.5) + offset;
+	vec3 newPos = position * (float(scale) * 0.5 + 0.5) + offset;
 	gl_Position = projection * view * model * vec4(newPos, 1);
 }

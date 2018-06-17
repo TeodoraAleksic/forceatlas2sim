@@ -11,6 +11,8 @@ private:
 
 	bool isInited, isSet;
 
+	unsigned int numOfBodies;
+
 	int localWorkSize, globalWorkSize;
 
 	std::vector<cl::Memory> glBuffers;

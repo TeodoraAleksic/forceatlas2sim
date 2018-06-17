@@ -71,10 +71,11 @@ void NBody::run()
 
 	cmdQueue.enqueueAcquireGLObjects(&glBuffers);
 
-	kernel.setArg(0, x);
-	kernel.setArg(1, y);
-	kernel.setArg(2, z);
-	kernel.setArg(3, degree);
+	kernel.setArg(0, numOfBodies);
+	kernel.setArg(1, x);
+	kernel.setArg(2, y);
+	kernel.setArg(3, z);
+	kernel.setArg(4, degree);
 
 	try
 	{
@@ -94,8 +95,8 @@ void NBody::setArguments(const GraphNode& graphNode)
 	if (!isInited) 
 		return;
 
-	unsigned int numOfNodes = graphNode.getNumOfNodes();
-	globalWorkSize = (numOfNodes % 64) > 0 ? 64 * ((int)std::ceil(numOfNodes / 64) + 1) : numOfNodes;
+	numOfBodies = graphNode.getNumOfNodes();
+	globalWorkSize = (numOfBodies % 64) > 0 ? 64 * ((int)std::ceil(numOfBodies / 64) + 1) : numOfBodies;
 	localWorkSize = 64;
 
 	x = cl::BufferGL(context, CL_MEM_WRITE_ONLY, graphNode.getOffsetX(), nullptr);

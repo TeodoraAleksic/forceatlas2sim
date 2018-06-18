@@ -94,18 +94,20 @@ void CLObject::printDevice(cl::Device device)
 	std::cout << "Version: " << device.getInfo<CL_DEVICE_VERSION>() << "\n";
 }
 
-void CLObject::buildProgram()
+cl::Kernel CLObject::buildProgram(std::string fileName, std::string kernelName)
 {
+	cl::Program program;
+
 	try
 	{
-		std::string source = readFile(kernelName);
+		std::string source = readFile(fileName);
 		cl::Program::Sources sources(1, std::make_pair(source.c_str(), source.length()));
-		program = cl::Program(context, sources);
-		program.build({ device });
-		kernel = cl::Kernel(program, funcName.c_str());
+		cl::Program program = cl::Program(context, sources);
+		program.build({ device });	
+		return cl::Kernel(program, kernelName.c_str());
 	}
 	catch (cl::Error error) {
-		std::cout << getErrorCode(error.err()) << " " << error.what() << "\n";
+		std::cout << kernelName << " " << getErrorCode(error.err()) << " " << error.what() << "\n";
 		std::string strDirect = program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device);
 		std::cout << strDirect << "\n";
 	}

@@ -16,20 +16,15 @@ protected:
 	cl::Platform platform;
 	cl::Device device;
 
-	std::string kernelName, funcName;
-
-	cl::Program program;
-	cl::Kernel kernel;
-
 	cl::Context context;
-	cl::CommandQueue cmdQueue;
+	cl::CommandQueue queue;
 
 	std::string getErrorCode(cl_int error);
 
 	void printPlatform(cl::Platform platform);
 	void printDevice(cl::Device device);
 
-	void buildProgram();
+	cl::Kernel buildProgram(std::string fileName, std::string kernelName);
 
 public:
 

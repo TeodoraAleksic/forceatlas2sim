@@ -15,6 +15,8 @@ private:
 
 	int localWorkSize, globalWorkSize;
 
+	cl::Kernel kernelCalc, kernelUpdate;
+
 	std::vector<cl::Memory> glBuffers;
 	cl::BufferGL x, y, z, degree;
 

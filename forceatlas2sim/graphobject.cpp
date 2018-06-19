@@ -5,6 +5,7 @@
 GraphObject::GraphObject()
 {
 	numOfNodes = 0;
+	numOfEdges = 0;
 	initedGraphics = false;
 }
 
@@ -12,31 +13,37 @@ GraphObject::~GraphObject()
 {
 }
 
-void GraphObject::incDegree(std::string node)
-{
-	unsigned int nodeIndex = nodeIds[node];
-	++degree[nodeIndex];
-}
-
-void GraphObject::addNode(std::string node, float x_, float y_, float z_)
+void GraphObject::addNode(std::string node, float x, float y, float z)
 {
 	nodeIds[node] = numOfNodes++;
 
-	if (!initedGraphics && (x_ != 0.0 || y_ != 0.0 || z_ != 0.0))
+	if (!initedGraphics && (x != 0.0 || y != 0.0 || z != 0.0))
 		initedGraphics = true;
 	
-	x.push_back(x_);
-	y.push_back(y_);
-	z.push_back(z_);
+	nodeX.push_back(x);
+	nodeY.push_back(y);
+	nodeZ.push_back(z);
 
 	degree.push_back(0);
 }
 
 void GraphObject::addEdge(std::string source, std::string target, float weight)
 {
-	incDegree(source);
-	incDegree(target);
-	// TODO
+	unsigned int sourceIndex = nodeIds[source];
+	++degree[sourceIndex];
+	sourceId.push_back(sourceIndex);
+	sourceX.push_back(nodeX[sourceIndex]);
+	sourceY.push_back(nodeY[sourceIndex]);
+	sourceZ.push_back(nodeZ[sourceIndex]);
+
+	unsigned int targetIndex = nodeIds[target];
+	++degree[targetIndex];
+	targetId.push_back(targetIndex);
+	targetX.push_back(nodeX[targetIndex]);
+	targetY.push_back(nodeY[targetIndex]);
+	targetZ.push_back(nodeZ[targetIndex]);
+
+	++numOfEdges;
 }
 
 void GraphObject::postprocessing()
@@ -51,19 +58,19 @@ void GraphObject::postprocessing()
 		meanDegree /= numOfNodes;
 
 		float max = meanDegree * (float)pow(numOfNodes, 1.0 / 3.0);
-		float x_ = 0.0f;
-		float y_ = 0.0f;
-		float z_ = 0.0f;
+		float x = 0.0f;
+		float y = 0.0f;
+		float z = 0.0f;
 
 		for (unsigned int i = 0; i < numOfNodes; ++i)
 		{
-			x[i] = x_ - max / 2;
-			y[i] = y_ - max / 2;
-			z[i] = z_ - max / 2;
+			nodeX[i] = x - max / 2;
+			nodeY[i] = y - max / 2;
+			nodeZ[i] = z - max / 2;
 
-			z_ = (z_ + meanDegree <= max) ? (z_ + meanDegree) : 0.0f;
-			y_ = (z_ == 0.0) ? ((y_ + meanDegree <= max) ? (y_ + meanDegree) : 0.0f) : y_;
-			x_ = (y_ == 0.0 && z_ == 0.0) ? (x_ + meanDegree) : x_;
+			z = (z + meanDegree <= max) ? (z + meanDegree) : 0.0f;
+			y = (z == 0.0) ? ((y + meanDegree <= max) ? (y + meanDegree) : 0.0f) : y;
+			x = (y == 0.0 && z == 0.0) ? (x + meanDegree) : x;
 		}
 	}
 }
@@ -73,22 +80,67 @@ unsigned int GraphObject::getNumOfNodes()
 	return numOfNodes;
 }
 
+unsigned int GraphObject::getNumOfEdges()
+{
+	return numOfEdges;
+}
+
 std::vector<float> GraphObject::getNodeX()
 {
-	return x;
+	return nodeX;
 }
 
 std::vector<float> GraphObject::getNodeY()
 {
-	return y;
+	return nodeY;
 }
 
 std::vector<float> GraphObject::getNodeZ()
 {
-	return z;
+	return nodeZ;
 }
 
 std::vector<unsigned int> GraphObject::getNodeDegree()
 {
 	return degree;
+}
+
+std::vector<unsigned int> GraphObject::getSourceId()
+{
+	return sourceId;
+}
+
+std::vector<unsigned int> GraphObject::getTargetId()
+{
+	return targetId;
+}
+
+std::vector<float> GraphObject::getSourceX()
+{
+	return sourceX;
+}
+
+std::vector<float> GraphObject::getSourceY()
+{
+	return sourceY;
+}
+
+std::vector<float> GraphObject::getSourceZ() 
+{
+	return sourceZ;
+}
+
+std::vector<float> GraphObject::getTargetX()
+{
+	return targetX;
+}
+
+std::vector<float> GraphObject::getTargetY()
+{
+	return targetY;
+}
+
+std::vector<float> GraphObject::getTargetZ()
+{
+	return targetZ;
 }

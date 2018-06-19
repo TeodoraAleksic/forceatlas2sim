@@ -92,8 +92,6 @@ void FileParser::processGMLEdge(GML_pair* edge, GraphObject* graphObject)
 		if (std::strcmp(edge->key, "target") == 0)
 			target = std::to_string(edge->value.integer);
 
-		// TODO process other fields
-
 		edge = edge->next;
 	}
 

@@ -69,6 +69,9 @@ void GraphNode::initNode(std::vector<float>* vertices, std::vector<unsigned int>
 
 void GraphNode::init()
 {
+	if (isInited)
+		return;
+
 	// Builds shaders
 	std::vector<unsigned int> shaders;
 	shaders.push_back(buildShader("node.vert", GL_VERTEX_SHADER));

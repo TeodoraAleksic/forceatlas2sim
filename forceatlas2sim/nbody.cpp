@@ -19,6 +19,9 @@ NBody::~NBody()
 
 void NBody::init()
 {
+	if (isInited)
+		return;
+
 	std::vector<cl::Platform> platforms;
 	cl::Platform::get(&platforms);
 

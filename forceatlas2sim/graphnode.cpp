@@ -176,6 +176,8 @@ void GraphNode::draw()
 	glPrimitiveRestartIndex(GL_PRIMITIVE_RESTART_FIXED_INDEX);
 
 	glDrawElementsInstanced(GL_TRIANGLE_STRIP, 2 * numOfIndices, GL_UNSIGNED_INT, NULL, graphObject.getNumOfNodes());
+
+	glFinish();
 }
 
 void GraphNode::cleanup()

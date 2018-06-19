@@ -19,6 +19,8 @@ double lastFrame = 0.0f;
 
 Camera camera{ glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f) };
 
+NBody nbody;
+
 void processInput(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE))
@@ -31,7 +33,8 @@ void processInput(GLFWwindow* window)
 		camera.move(MoveDirection::LEFT, deltaTime);
 	else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		camera.move(MoveDirection::RIGHT, deltaTime);
-
+	else if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+		nbody.run();
 }
 
 void mouseCallback(GLFWwindow* window, double posX, double posY)
@@ -115,10 +118,8 @@ int main(int argc, char** argv)
 	GraphNode graphNode(camera, graphObject);
 	graphNode.init();
 
-	NBody nbody;
 	nbody.init();
 	nbody.setArguments(graphNode);
-	nbody.run();
 
 	// Rendering loop
 	while (!glfwWindowShouldClose(window))

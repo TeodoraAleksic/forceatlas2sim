@@ -97,6 +97,7 @@ void CLObject::printDevice(cl::Device device)
 cl::Kernel CLObject::buildProgram(std::string fileName, std::string kernelName)
 {
 	cl::Program program;
+	cl::Kernel kernel;
 
 	try
 	{
@@ -104,11 +105,13 @@ cl::Kernel CLObject::buildProgram(std::string fileName, std::string kernelName)
 		cl::Program::Sources sources(1, std::make_pair(source.c_str(), source.length()));
 		cl::Program program = cl::Program(context, sources);
 		program.build({ device });	
-		return cl::Kernel(program, kernelName.c_str());
+		kernel = cl::Kernel(program, kernelName.c_str());
 	}
 	catch (cl::Error error) {
 		std::cout << kernelName << " " << getErrorCode(error.err()) << " " << error.what() << "\n";
 		std::string strDirect = program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device);
 		std::cout << strDirect << "\n";
 	}
+
+	return kernel;
 }

@@ -160,7 +160,7 @@ void GraphNode::draw()
 	const int SCREEN_WIDTH = 800;
 	const int SCREEN_HIGHT = 600;
 
-	glm::mat4 projection = glm::perspective((float)glm::radians(camera.getFOV()), (float)(SCREEN_WIDTH / SCREEN_HIGHT), 0.1f, 200.0f);
+	glm::mat4 projection = glm::perspective((float)glm::radians(camera.getFOV()), (float)(SCREEN_WIDTH / SCREEN_HIGHT), 0.1f, 1000.0f);
 	glm::mat4 view = camera.getPosition();
 	glm::mat4 model(1.0f);
 

@@ -6,6 +6,7 @@
 #include <string>
 
 #include "camera.h"
+#include "graphedge.h"
 #include "graphobject.h"
 #include "graphnode.h"
 #include "fileparser.h"
@@ -118,8 +119,11 @@ int main(int argc, char** argv)
 	GraphNode graphNode(camera, graphObject);
 	graphNode.init();
 
+	GraphEdge graphEdge(camera, graphObject);
+	graphEdge.init();
+
 	nbody.init();
-	nbody.setArguments(graphNode);
+	nbody.setArguments(graphObject, graphNode, graphEdge);
 
 	// Rendering loop
 	while (!glfwWindowShouldClose(window))
@@ -135,6 +139,7 @@ int main(int argc, char** argv)
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		graphEdge.draw();
 		graphNode.draw();
 
 		glfwSwapBuffers(window);

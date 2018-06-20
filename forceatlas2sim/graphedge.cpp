@@ -148,6 +148,8 @@ void GraphEdge::init()
 	glEnableVertexAttribArray(6);
 	glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE, 0, NULL);
 	glVertexAttribDivisor(6, 1);
+
+	isInited = true;
 }
 
 void GraphEdge::draw()

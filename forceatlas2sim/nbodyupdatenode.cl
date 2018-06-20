@@ -1,4 +1,4 @@
-__kernel void nbodyUpdate(__const uint n, __global float* x, __global float* y, __global float* z, __global uint* degree,
+__kernel void nbodyUpdateNode(__const uint n, __global float* x, __global float* y, __global float* z, __global uint* degree,
 	__global float* fx, __global float* fy, __global float* fz)
 {
 	int id = get_global_id(0);

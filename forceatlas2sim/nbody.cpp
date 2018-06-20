@@ -61,7 +61,8 @@ void NBody::init()
 	queue = cl::CommandQueue(context, device);
 
 	kernelCalc = buildProgram("nbodycalc.cl", "nbodyCalc");
-	kernelUpdate = buildProgram("nbodyupdate.cl", "nbodyUpdate");
+	kernelUpdateNode = buildProgram("nbodyupdatenode.cl", "nbodyUpdateNode");
+	kernelUpdateEdge = buildProgram("nbodyupdateedge.cl", "nbodyUpdateEdge");
 
 	isInited = true;
 }
@@ -75,33 +76,58 @@ void NBody::run()
 
 	try
 	{
-		cl::Buffer fx = cl::Buffer(context, CL_MEM_READ_WRITE, sizeof(cl_float) * numOfBodies);
-		cl::Buffer fy = cl::Buffer(context, CL_MEM_READ_WRITE, sizeof(cl_float) * numOfBodies);
-		cl::Buffer fz = cl::Buffer(context, CL_MEM_READ_WRITE, sizeof(cl_float) * numOfBodies);
+		cl::Buffer fx = cl::Buffer(context, CL_MEM_READ_WRITE, sizeof(cl_float) * numOfNodes);
+		cl::Buffer fy = cl::Buffer(context, CL_MEM_READ_WRITE, sizeof(cl_float) * numOfNodes);
+		cl::Buffer fz = cl::Buffer(context, CL_MEM_READ_WRITE, sizeof(cl_float) * numOfNodes);
 
-		kernelCalc.setArg(0, numOfBodies);
-		kernelCalc.setArg(1, x);
-		kernelCalc.setArg(2, y);
-		kernelCalc.setArg(3, z);
+		kernelCalc.setArg(0, numOfNodes);
+		kernelCalc.setArg(1, nodeX);
+		kernelCalc.setArg(2, nodeY);
+		kernelCalc.setArg(3, nodeZ);
 		kernelCalc.setArg(4, degree);
 		kernelCalc.setArg(5, fx);
 		kernelCalc.setArg(6, fy);
 		kernelCalc.setArg(7, fz);
 
+		globalWorkSize = (numOfNodes % 64) > 0 ? 64 * ((int)std::ceil(numOfNodes / 64) + 1) : numOfNodes;
+		localWorkSize = 64;
+
 		// Runs calculate kernel
 		queue.enqueueNDRangeKernel(kernelCalc, cl::NDRange(), cl::NDRange(globalWorkSize), cl::NDRange(localWorkSize));
 
-		kernelUpdate.setArg(0, numOfBodies);
-		kernelUpdate.setArg(1, x);
-		kernelUpdate.setArg(2, y);
-		kernelUpdate.setArg(3, z);
-		kernelUpdate.setArg(4, degree);
-		kernelUpdate.setArg(5, fx);
-		kernelUpdate.setArg(6, fy);
-		kernelUpdate.setArg(7, fz);
+		kernelUpdateNode.setArg(0, numOfNodes);
+		kernelUpdateNode.setArg(1, nodeX);
+		kernelUpdateNode.setArg(2, nodeY);
+		kernelUpdateNode.setArg(3, nodeZ);
+		kernelUpdateNode.setArg(4, degree);
+		kernelUpdateNode.setArg(5, fx);
+		kernelUpdateNode.setArg(6, fy);
+		kernelUpdateNode.setArg(7, fz);
 
-		// Runs update kernel
-		queue.enqueueNDRangeKernel(kernelUpdate, cl::NDRange(), cl::NDRange(globalWorkSize), cl::NDRange(localWorkSize));
+		globalWorkSize = (numOfNodes % 64) > 0 ? 64 * ((int)std::ceil(numOfNodes / 64) + 1) : numOfNodes;
+		localWorkSize = 64;
+
+		// Runs update nodes kernel
+		queue.enqueueNDRangeKernel(kernelUpdateNode, cl::NDRange(), cl::NDRange(globalWorkSize), cl::NDRange(localWorkSize));
+
+		kernelUpdateEdge.setArg(0, numOfEdges);
+		kernelUpdateEdge.setArg(1, nodeX);
+		kernelUpdateEdge.setArg(2, nodeY);
+		kernelUpdateEdge.setArg(3, nodeZ);
+		kernelUpdateEdge.setArg(4, sourceId);
+		kernelUpdateEdge.setArg(5, sourceX);
+		kernelUpdateEdge.setArg(6, sourceY);
+		kernelUpdateEdge.setArg(7, sourceZ);
+		kernelUpdateEdge.setArg(8, targetId);
+		kernelUpdateEdge.setArg(9, targetX);
+		kernelUpdateEdge.setArg(10, targetY);
+		kernelUpdateEdge.setArg(11, targetZ);
+
+		globalWorkSize = (numOfEdges % 64) > 0 ? 64 * ((int)std::ceil(numOfEdges / 64) + 1) : numOfEdges;
+		localWorkSize = 64;
+
+		// Runs update edges kernel
+		queue.enqueueNDRangeKernel(kernelUpdateEdge, cl::NDRange(), cl::NDRange(globalWorkSize), cl::NDRange(localWorkSize));
 	}
 	catch (cl::Error error) {
 		std::cout << getErrorCode(error.err()) << " " << error.what() << "\n";
@@ -111,24 +137,44 @@ void NBody::run()
 	queue.finish();
 }
 
-void NBody::setArguments(const GraphNode& graphNode)
+void NBody::setArguments(GraphObject& graphObject, const GraphNode& graphNode, const GraphEdge& graphEdge)
 {
 	if (!isInited) 
 		return;
 
-	numOfBodies = graphNode.getNumOfNodes();
-	globalWorkSize = (numOfBodies % 64) > 0 ? 64 * ((int)std::ceil(numOfBodies / 64) + 1) : numOfBodies;
-	localWorkSize = 64;
+	numOfNodes = graphNode.getNumOfNodes();
+	numOfEdges = graphEdge.getNumOfEdges();
 
-	x = cl::BufferGL(context, CL_MEM_READ_WRITE, graphNode.getOffsetX(), nullptr);
-	y = cl::BufferGL(context, CL_MEM_READ_WRITE, graphNode.getOffsetY(), nullptr);
-	z = cl::BufferGL(context, CL_MEM_READ_WRITE, graphNode.getOffsetZ(), nullptr);
+	nodeX = cl::BufferGL(context, CL_MEM_READ_WRITE, graphNode.getOffsetX(), nullptr);
+	nodeY = cl::BufferGL(context, CL_MEM_READ_WRITE, graphNode.getOffsetY(), nullptr);
+	nodeZ = cl::BufferGL(context, CL_MEM_READ_WRITE, graphNode.getOffsetZ(), nullptr);
+
 	degree = cl::BufferGL(context, CL_MEM_READ_WRITE, graphNode.getScale(), nullptr);
+
+	sourceX = cl::BufferGL(context, CL_MEM_READ_WRITE, graphEdge.getSourceX(), nullptr);
+	sourceY = cl::BufferGL(context, CL_MEM_READ_WRITE, graphEdge.getSourceY(), nullptr);
+	sourceZ = cl::BufferGL(context, CL_MEM_READ_WRITE, graphEdge.getSourceZ(), nullptr);
+
+	targetX = cl::BufferGL(context, CL_MEM_READ_WRITE, graphEdge.getTargetX(), nullptr);
+	targetY = cl::BufferGL(context, CL_MEM_READ_WRITE, graphEdge.getTargetY(), nullptr);
+	targetZ = cl::BufferGL(context, CL_MEM_READ_WRITE, graphEdge.getTargetZ(), nullptr);
 	
-	glBuffers.push_back(x);
-	glBuffers.push_back(y);
-	glBuffers.push_back(z);
+	glBuffers.push_back(nodeX);
+	glBuffers.push_back(nodeY);
+	glBuffers.push_back(nodeZ);
+
 	glBuffers.push_back(degree);
+
+	glBuffers.push_back(sourceX);
+	glBuffers.push_back(sourceY);
+	glBuffers.push_back(sourceZ);
+
+	glBuffers.push_back(targetX);
+	glBuffers.push_back(targetY);
+	glBuffers.push_back(targetZ);
+
+	sourceId = cl::Buffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(cl_uint) * numOfEdges, &(graphObject.getSourceId())[0]);
+	targetId = cl::Buffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(cl_uint) * numOfEdges, &(graphObject.getTargetId())[0]);
 
 	isSet = true;
 }

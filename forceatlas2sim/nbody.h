@@ -3,6 +3,8 @@
 
 #include "clobject.h"
 
+#include "graphedge.h"
+#include "graphobject.h"
 #include "graphnode.h"
 
 class NBody: public CLObject
@@ -11,14 +13,18 @@ private:
 
 	bool isInited, isSet;
 
-	unsigned int numOfBodies;
+	unsigned int numOfNodes, numOfEdges;
 
 	int localWorkSize, globalWorkSize;
 
-	cl::Kernel kernelCalc, kernelUpdate;
+	cl::Kernel kernelCalc, kernelUpdateNode, kernelUpdateEdge;
 
 	std::vector<cl::Memory> glBuffers;
-	cl::BufferGL x, y, z, degree;
+	cl::BufferGL nodeX, nodeY, nodeZ, degree;
+	cl::BufferGL sourceX, sourceY, sourceZ;
+	cl::BufferGL targetX, targetY, targetZ;
+
+	cl::Buffer sourceId, targetId;
 
 public:
 
@@ -28,7 +34,7 @@ public:
 	void init();
 	void run();
 
-	void setArguments(const GraphNode& graphNode);
+	void setArguments(GraphObject& graphObject, const GraphNode& graphNode, const GraphEdge& graphEdge);
 
 };
 

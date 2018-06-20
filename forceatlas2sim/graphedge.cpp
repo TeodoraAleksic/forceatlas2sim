@@ -91,7 +91,63 @@ void GraphEdge::init()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIndex);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
 
-	// TODO
+	// Binds source offsets
+	std::vector<float> sourceX = graphObject.getSourceX();
+	std::vector<float> sourceY = graphObject.getSourceY();
+	std::vector<float> sourceZ = graphObject.getSourceZ();
+
+	glGenBuffers(1, &vboSourceX);
+	glBindBuffer(GL_ARRAY_BUFFER, vboSourceX);
+	glBufferData(GL_ARRAY_BUFFER, sourceX.size() * sizeof(GLfloat), &sourceX[0], GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 0, NULL);
+	glVertexAttribDivisor(1, 1);
+
+	glGenBuffers(1, &vboSourceY);
+	glBindBuffer(GL_ARRAY_BUFFER, vboSourceY);
+	glBufferData(GL_ARRAY_BUFFER, sourceY.size() * sizeof(GLfloat), &sourceY[0], GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 0, NULL);
+	glVertexAttribDivisor(2, 1);
+
+	glGenBuffers(1, &vboSourceZ);
+	glBindBuffer(GL_ARRAY_BUFFER, vboSourceZ);
+	glBufferData(GL_ARRAY_BUFFER, sourceZ.size() * sizeof(GLfloat), &sourceZ[0], GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 0, NULL);
+	glVertexAttribDivisor(3, 1);
+
+	// Binds target offsets
+	std::vector<float> targetX = graphObject.getTargetX();
+	std::vector<float> targetY = graphObject.getTargetY();
+	std::vector<float> targetZ = graphObject.getTargetZ();
+
+	glGenBuffers(1, &vboTargetX);
+	glBindBuffer(GL_ARRAY_BUFFER, vboTargetX);
+	glBufferData(GL_ARRAY_BUFFER, targetX.size() * sizeof(GLfloat), &targetX[0], GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(4);
+	glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, 0, NULL);
+	glVertexAttribDivisor(4, 1);
+
+	glGenBuffers(1, &vboTargetY);
+	glBindBuffer(GL_ARRAY_BUFFER, vboTargetY);
+	glBufferData(GL_ARRAY_BUFFER, targetY.size() * sizeof(GLfloat), &targetY[0], GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(5);
+	glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE, 0, NULL);
+	glVertexAttribDivisor(5, 1);
+
+	glGenBuffers(1, &vboTargetZ);
+	glBindBuffer(GL_ARRAY_BUFFER, vboTargetZ);
+	glBufferData(GL_ARRAY_BUFFER, targetZ.size() * sizeof(GLfloat), &targetZ[0], GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(6);
+	glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE, 0, NULL);
+	glVertexAttribDivisor(6, 1);
 }
 
 void GraphEdge::draw()
@@ -116,7 +172,7 @@ void GraphEdge::draw()
 	glEnable(GL_PRIMITIVE_RESTART);
 	glPrimitiveRestartIndex(GL_PRIMITIVE_RESTART_FIXED_INDEX);
 
-	//  TODO glDrawElementsInstanced(GL_TRIANGLE_STRIP, 36, GL_UNSIGNED_INT, NULL, graphObject.getNumOfEdges());
+	glDrawElementsInstanced(GL_TRIANGLE_STRIP, 36, GL_UNSIGNED_INT, NULL, graphObject.getNumOfEdges());
 
 	glFinish();
 }
@@ -171,7 +227,7 @@ void GraphEdge::cleanup()
 
 unsigned int GraphEdge::getNumOfEdges() const
 {
-	return 0; // TODO graphObject.getNumOfEdges()
+	return graphObject.getNumOfEdges();
 }
 
 unsigned int GraphEdge::getSourceX() const

@@ -1,5 +1,5 @@
 #ifndef _GRAPHEDGE_H_
-#define _GRAPHEdge_H_
+#define _GRAPHEDGE_H_
 
 #include "camera.h"
 #include "globject.h"

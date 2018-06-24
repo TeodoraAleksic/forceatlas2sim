@@ -4,6 +4,9 @@
 
 CLObject::CLObject()
 {
+	ndRange = 0;
+	localWorkSize = 0;
+	globalWorkSize = 0;
 }
 
 CLObject::~CLObject()
@@ -92,11 +95,8 @@ void CLObject::printDevice(cl::Device device)
 	std::cout << "Version: " << device.getInfo<CL_DEVICE_VERSION>() << "\n";
 }
 
-cl::Kernel CLObject::buildProgram(std::string kernelName, std::string kernelBody)
+void CLObject::buildProgram(std::string kernelName, std::string kernelBody)
 {
-	cl::Program program;
-	cl::Kernel kernel;
-
 	try
 	{
 		cl::Program::Sources sources(1, std::make_pair(kernelBody.c_str(), kernelBody.length()));
@@ -109,6 +109,4 @@ cl::Kernel CLObject::buildProgram(std::string kernelName, std::string kernelBody
 		std::string strDirect = program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device);
 		std::cout << strDirect << "\n";
 	}
-
-	return kernel;
 }

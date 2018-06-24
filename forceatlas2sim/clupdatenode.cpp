@@ -1,25 +1,18 @@
-#include "clnbody.h"
-
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include "clupdatenode.h"
 
 #include <iostream>
 
 #include "kernel.h"
 
-CLNbody::CLNbody()
-{
-	isInited = false;
-	isSet = false;
-	localWorkSize = 0;
-	globalWorkSize = 0;
-}
-
-CLNbody::~CLNbody()
+CLUpdateNode::CLUpdateNode()
 {
 }
 
-void CLNbody::init()
+CLUpdateNode::~CLUpdateNode()
+{
+}
+
+void CLUpdateNode::init()
 {
 	if (isInited)
 		return;
@@ -62,14 +55,14 @@ void CLNbody::init()
 	context = cl::Context(device, properties);
 	queue = cl::CommandQueue(context, device);
 
-	buildProgram("nBody", nBody);
+	buildProgram("updateNode", updateNode);
 
 	isInited = true;
 }
 
-void CLNbody::run()
+void CLUpdateNode::run()
 {
-	if (!isSet) 
+	if (!isSet)
 		return;
 
 	queue.enqueueAcquireGLObjects(&glBuffers);
@@ -100,9 +93,9 @@ void CLNbody::run()
 	queue.finish();
 }
 
-void CLNbody::setArguments(const GLGraphNode& graphNode)
+void CLUpdateNode::setArguments(const GLGraphNode& graphNode)
 {
-	if (!isInited) 
+	if (!isInited)
 		return;
 
 	ndRange = graphNode.getNumOfNodes();
@@ -114,7 +107,7 @@ void CLNbody::setArguments(const GLGraphNode& graphNode)
 	nodeZ = cl::BufferGL(context, CL_MEM_READ_WRITE, graphNode.getOffsetZ(), nullptr);
 
 	degree = cl::BufferGL(context, CL_MEM_READ_WRITE, graphNode.getScale(), nullptr);
-	
+
 	glBuffers.push_back(nodeX);
 	glBuffers.push_back(nodeY);
 	glBuffers.push_back(nodeZ);

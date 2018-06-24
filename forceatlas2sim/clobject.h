@@ -19,12 +19,17 @@ protected:
 	cl::Context context;
 	cl::CommandQueue queue;
 
+	cl::Program program;
+	cl::Kernel kernel;
+
+	int ndRange, localWorkSize, globalWorkSize;
+
 	std::string getErrorCode(cl_int error);
 
 	void printPlatform(cl::Platform platform);
 	void printDevice(cl::Device device);
 
-	cl::Kernel buildProgram(std::string kernelName, std::string kernelBody);
+	void buildProgram(std::string kernelName, std::string kernelBody);
 
 public:
 

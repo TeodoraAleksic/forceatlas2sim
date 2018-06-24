@@ -1,11 +1,11 @@
-#ifndef _CLNBODY_H_
-#define _CLNBODY_H_
+#ifndef _CLUPDATENODE_H_
+#define _CLUPDATENODE_H_
 
 #include "clobject.h"
 
 #include "glgraphnode.h"
 
-class CLNbody: public CLObject
+class CLUpdateNode: public CLObject
 {
 private:
 
@@ -16,8 +16,8 @@ private:
 
 public:
 
-	CLNbody();
-	~CLNbody();
+	CLUpdateNode();
+	~CLUpdateNode();
 
 	void init();
 	void run();

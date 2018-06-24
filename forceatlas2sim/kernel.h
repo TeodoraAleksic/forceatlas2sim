@@ -3,9 +3,9 @@
 
 #include <string>
 
-const std::string nBodyCalc =
+const std::string nBody =
 " \
-__kernel void nBodyCalc(__const uint n, __global float* x, __global float* y, __global float* z, __global uint* degree, \
+__kernel void nBody(__const uint n, __global float* x, __global float* y, __global float* z, __global uint* degree, \
 	__global float* fx, __global float* fy, __global float* fz) \
 { \
 	int id = get_global_id(0); \
@@ -32,9 +32,9 @@ __kernel void nBodyCalc(__const uint n, __global float* x, __global float* y, __
 } \
 ";
 
-const std::string nBodyUpdateNode =
+const std::string updateNode =
 " \
-__kernel void nBodyUpdateNode(__const uint n, __global float* x, __global float* y, __global float* z, __global uint* degree, \
+__kernel void updateNode(__const uint n, __global float* x, __global float* y, __global float* z, __global uint* degree, \
 	__global float* fx, __global float* fy, __global float* fz) \
 { \
 	int id = get_global_id(0); \
@@ -48,9 +48,9 @@ __kernel void nBodyUpdateNode(__const uint n, __global float* x, __global float*
 } \
 ";
 
-const std::string nBodyUpdateEdge = 
+const std::string updateEdge = 
 " \
-__kernel void nBodyUpdateEdge(__const uint n, __global float* x, __global float* y, __global float* z, \
+__kernel void updateEdge(__const uint n, __global float* x, __global float* y, __global float* z, \
 	__global uint* sid, __global float* sx, __global float* sy, __global float* sz, \
 	__global uint* tid, __global float* tx, __global float* ty, __global float* tz) \
 { \

@@ -12,7 +12,7 @@ const int GraphNode::lats = 40;
 const int GraphNode::longs = 40;
 const int GraphNode::numOfIndices = (lats + 1) * (longs + 1) * 2 + (lats + 1);
 
-GraphNode::GraphNode(Camera& camera_, GraphObject& graphObject_): camera(camera_), graphObject(graphObject_)
+GraphNode::GraphNode(const Camera& camera_, GraphObject& graphObject_): camera(camera_), graphObject(graphObject_)
 {
 	isInited = false;
 	vao = 0;

@@ -25,13 +25,15 @@ private:
 
 	double fov;
 
+	void update();
+
 public:
 
 	Camera(glm::vec3 cameraPos_, glm::vec3 cameraFront_, glm::vec3 cameraUp_);
 	~Camera();
 
-	glm::mat4 getPosition();
-	double getFOV();
+	glm::mat4 getPosition() const;
+	double getFOV() const;
 
 	void move(MoveDirection direction, double deltaTime);
 	void turn(double posX, double posY, double deltaTime);

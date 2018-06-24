@@ -9,7 +9,7 @@ Camera::~Camera()
 {
 }
 
-glm::mat4 Camera::getPosition() 
+void Camera::update()
 {
 	glm::vec3 front;
 	front.x = (float)(cos(glm::radians(cameraPitch)) * cos(glm::radians(cameraYaw)));
@@ -17,11 +17,14 @@ glm::mat4 Camera::getPosition()
 	front.z = (float)(cos(glm::radians(cameraPitch)) * sin(glm::radians(cameraYaw)));
 
 	cameraFront = glm::normalize(front);
+}
 
+glm::mat4 Camera::getPosition() const
+{
 	return glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 }
 
-double Camera::getFOV() 
+double Camera::getFOV() const
 {
 	return fov;
 }
@@ -47,6 +50,8 @@ void Camera::move(MoveDirection direction, double deltaTime)
 	default:
 		break;
 	}
+
+	update();
 }
 
 void Camera::turn(double posX, double posY, double deltaTime)
@@ -78,6 +83,8 @@ void Camera::turn(double posX, double posY, double deltaTime)
 	// Restricts camera up/down movements
 	if (cameraPitch > 89.0f) cameraPitch = 89.0f;
 	if (cameraPitch < -89.0f) cameraPitch = -89.0f;
+
+	update();
 }
 
 void Camera::zoom(double offsetX, double offsetY)

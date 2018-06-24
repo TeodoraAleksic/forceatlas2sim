@@ -9,7 +9,7 @@ class GraphEdge : public GLObject
 {
 private:
 
-	Camera& camera;
+	const Camera& camera;
 	GraphObject& graphObject;
 
 	bool isInited;
@@ -22,7 +22,7 @@ private:
 
 public:
 
-	GraphEdge(Camera& camera_, GraphObject& graphObject_);
+	GraphEdge(const Camera& camera_, GraphObject& graphObject_);
 	~GraphEdge();
 
 	void init();

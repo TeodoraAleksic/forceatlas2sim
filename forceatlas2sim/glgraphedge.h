@@ -1,11 +1,11 @@
-#ifndef _GRAPHEDGE_H_
-#define _GRAPHEDGE_H_
+#ifndef _GLGRAPHEDGE_H_
+#define _GLGRAPHEDGE_H_
 
 #include "camera.h"
 #include "globject.h"
 #include "graphobject.h"
 
-class GraphEdge : public GLObject
+class GLGraphEdge : public GLObject
 {
 private:
 
@@ -22,8 +22,8 @@ private:
 
 public:
 
-	GraphEdge(const Camera& camera_, const GraphObject& graphObject_);
-	~GraphEdge();
+	GLGraphEdge(const Camera& camera_, const GraphObject& graphObject_);
+	~GLGraphEdge();
 
 	void init();
 	void draw();

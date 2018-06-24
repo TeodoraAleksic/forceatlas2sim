@@ -6,11 +6,11 @@
 #include <string>
 
 #include "camera.h"
-#include "graphedge.h"
+#include "glgraphedge.h"
 #include "graphobject.h"
-#include "graphnode.h"
+#include "glgraphnode.h"
 #include "fileparser.h"
-#include "nbody.h"
+#include "clnbody.h"
 
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HIGHT = 600;
@@ -20,7 +20,7 @@ double lastFrame = 0.0f;
 
 Camera camera{ glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f) };
 
-NBody nbody;
+CLNbody nbody;
 
 void processInput(GLFWwindow* window)
 {
@@ -116,10 +116,10 @@ int main(int argc, char** argv)
 	glfwSetCursorPosCallback(window, mouseCallback);
 	glfwSetScrollCallback(window, scrollCallback);
 
-	GraphNode graphNode(camera, graphObject);
+	GLGraphNode graphNode(camera, graphObject);
 	graphNode.init();
 
-	GraphEdge graphEdge(camera, graphObject);
+	GLGraphEdge graphEdge(camera, graphObject);
 	graphEdge.init();
 
 	nbody.init();

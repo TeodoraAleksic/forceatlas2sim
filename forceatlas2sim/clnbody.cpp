@@ -1,11 +1,11 @@
-#include "nbody.h"
+#include "clnbody.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include <iostream>
 
-NBody::NBody()
+CLNbody::CLNbody()
 {
 	isInited = false;
 	isSet = false;
@@ -13,11 +13,11 @@ NBody::NBody()
 	globalWorkSize = 0;
 }
 
-NBody::~NBody()
+CLNbody::~CLNbody()
 {
 }
 
-void NBody::init()
+void CLNbody::init()
 {
 	if (isInited)
 		return;
@@ -67,7 +67,7 @@ void NBody::init()
 	isInited = true;
 }
 
-void NBody::run()
+void CLNbody::run()
 {
 	if (!isSet) 
 		return;
@@ -137,7 +137,7 @@ void NBody::run()
 	queue.finish();
 }
 
-void NBody::setArguments(const GraphObject& graphObject, const GraphNode& graphNode, const GraphEdge& graphEdge)
+void CLNbody::setArguments(const GraphObject& graphObject, const GLGraphNode& graphNode, const GLGraphEdge& graphEdge)
 {
 	if (!isInited) 
 		return;

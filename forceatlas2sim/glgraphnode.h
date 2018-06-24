@@ -1,11 +1,11 @@
-#ifndef _GRAPHNODE_H_
-#define _GRAPHNODE_H_
+#ifndef _GLGRAPHNODE_H_
+#define _GLGRAPHNODE_H_
 
 #include "camera.h"
 #include "globject.h"
 #include "graphobject.h"
 
-class GraphNode: public GLObject
+class GLGraphNode: public GLObject
 {
 private:
 
@@ -26,8 +26,8 @@ private:
 
 public:
 
-	GraphNode(const Camera& camera_, const GraphObject& graphObject_);
-	~GraphNode();
+	GLGraphNode(const Camera& camera_, const GraphObject& graphObject_);
+	~GLGraphNode();
 
 	void init();
 	void draw();

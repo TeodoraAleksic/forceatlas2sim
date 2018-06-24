@@ -1,4 +1,4 @@
-#include "graphedge.h"
+#include "glgraphedge.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
@@ -8,7 +8,7 @@
 
 using namespace glm;
 
-GraphEdge::GraphEdge(const Camera& camera_, const GraphObject& graphObject_) : camera(camera_), graphObject(graphObject_)
+GLGraphEdge::GLGraphEdge(const Camera& camera_, const GraphObject& graphObject_) : camera(camera_), graphObject(graphObject_)
 {
 	isInited = false;
 	vao = 0;
@@ -23,12 +23,12 @@ GraphEdge::GraphEdge(const Camera& camera_, const GraphObject& graphObject_) : c
 	program = 0;
 }
 
-GraphEdge::~GraphEdge()
+GLGraphEdge::~GLGraphEdge()
 {
 	cleanup();
 }
 
-void GraphEdge::init()
+void GLGraphEdge::init()
 {
 	if (isInited)
 		return;
@@ -152,7 +152,7 @@ void GraphEdge::init()
 	isInited = true;
 }
 
-void GraphEdge::draw()
+void GLGraphEdge::draw()
 {
 	if (!isInited)
 		return;
@@ -179,7 +179,7 @@ void GraphEdge::draw()
 	glFinish();
 }
 
-void GraphEdge::cleanup()
+void GLGraphEdge::cleanup()
 {
 	if (!isInited)
 		return;
@@ -227,37 +227,37 @@ void GraphEdge::cleanup()
 	program = 0;
 }
 
-unsigned int GraphEdge::getNumOfEdges() const
+unsigned int GLGraphEdge::getNumOfEdges() const
 {
 	return graphObject.getNumOfEdges();
 }
 
-unsigned int GraphEdge::getSourceX() const
+unsigned int GLGraphEdge::getSourceX() const
 {
 	return vboSourceX;
 }
 
-unsigned int GraphEdge::getSourceY() const
+unsigned int GLGraphEdge::getSourceY() const
 {
 	return vboSourceY;
 }
 
-unsigned int GraphEdge::getSourceZ() const
+unsigned int GLGraphEdge::getSourceZ() const
 {
 	return vboSourceZ;
 }
 
-unsigned int GraphEdge::getTargetX() const
+unsigned int GLGraphEdge::getTargetX() const
 {
 	return vboTargetX;
 }
 
-unsigned int GraphEdge::getTargetY() const
+unsigned int GLGraphEdge::getTargetY() const
 {
 	return vboTargetY;
 }
 
-unsigned int GraphEdge::getTargetZ() const
+unsigned int GLGraphEdge::getTargetZ() const
 {
 	return vboTargetZ;
 }

@@ -1,13 +1,13 @@
-#ifndef _NBODY_H_
-#define _NBODY_H_
+#ifndef _CLNBODY_H_
+#define _CLNBODY_H_
 
 #include "clobject.h"
 
-#include "graphedge.h"
+#include "glgraphedge.h"
 #include "graphobject.h"
-#include "graphnode.h"
+#include "glgraphnode.h"
 
-class NBody: public CLObject
+class CLNbody: public CLObject
 {
 private:
 
@@ -28,13 +28,13 @@ private:
 
 public:
 
-	NBody();
-	~NBody();
+	CLNbody();
+	~CLNbody();
 
 	void init();
 	void run();
 
-	void setArguments(const GraphObject& graphObject, const GraphNode& graphNode, const GraphEdge& graphEdge);
+	void setArguments(const GraphObject& graphObject, const GLGraphNode& graphNode, const GLGraphEdge& graphEdge);
 
 };
 

@@ -1,4 +1,4 @@
-#include "graphnode.h"
+#include "glgraphnode.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
@@ -8,11 +8,11 @@
 
 using namespace glm;
 
-const int GraphNode::lats = 40;
-const int GraphNode::longs = 40;
-const int GraphNode::numOfIndices = (lats + 1) * (longs + 1) * 2 + (lats + 1);
+const int GLGraphNode::lats = 40;
+const int GLGraphNode::longs = 40;
+const int GLGraphNode::numOfIndices = (lats + 1) * (longs + 1) * 2 + (lats + 1);
 
-GraphNode::GraphNode(const Camera& camera_, const GraphObject& graphObject_): camera(camera_), graphObject(graphObject_)
+GLGraphNode::GLGraphNode(const Camera& camera_, const GraphObject& graphObject_): camera(camera_), graphObject(graphObject_)
 {
 	isInited = false;
 	vao = 0;
@@ -25,12 +25,12 @@ GraphNode::GraphNode(const Camera& camera_, const GraphObject& graphObject_): ca
 	program = 0;
 }
 
-GraphNode::~GraphNode()
+GLGraphNode::~GLGraphNode()
 {
 	cleanup();
 }
 
-void GraphNode::initNode(std::vector<float>* vertices, std::vector<unsigned int>* indices)
+void GLGraphNode::initNode(std::vector<float>* vertices, std::vector<unsigned int>* indices)
 {
 	int indexCount = 0;
 
@@ -67,7 +67,7 @@ void GraphNode::initNode(std::vector<float>* vertices, std::vector<unsigned int>
 	}
 }
 
-void GraphNode::init()
+void GLGraphNode::init()
 {
 	if (isInited)
 		return;
@@ -153,7 +153,7 @@ void GraphNode::init()
 	isInited = true;
 }
 
-void GraphNode::draw()
+void GLGraphNode::draw()
 {
 	if (!isInited)
 		return;
@@ -180,7 +180,7 @@ void GraphNode::draw()
 	glFinish();
 }
 
-void GraphNode::cleanup()
+void GLGraphNode::cleanup()
 {
 	if (!isInited)
 		return;
@@ -220,27 +220,27 @@ void GraphNode::cleanup()
 	program = 0;
 }
 
-unsigned int GraphNode::getNumOfNodes() const
+unsigned int GLGraphNode::getNumOfNodes() const
 {
 	return graphObject.getNumOfNodes();
 }
 
-unsigned int GraphNode::getOffsetX() const
+unsigned int GLGraphNode::getOffsetX() const
 {
 	return vboOffsetX;
 }
 
-unsigned int GraphNode::getOffsetY() const
+unsigned int GLGraphNode::getOffsetY() const
 {
 	return vboOffsetY;
 }
 
-unsigned int GraphNode::getOffsetZ() const
+unsigned int GLGraphNode::getOffsetZ() const
 {
 	return vboOffsetZ;
 }
 
-unsigned int GraphNode::getScale() const
+unsigned int GLGraphNode::getScale() const
 {
 	return vboScale;
 }

@@ -24,7 +24,7 @@ protected:
 	void printPlatform(cl::Platform platform);
 	void printDevice(cl::Device device);
 
-	cl::Kernel buildProgram(std::string fileName, std::string kernelName);
+	cl::Kernel buildProgram(std::string kernelName, std::string kernelBody);
 
 public:
 

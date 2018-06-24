@@ -6,6 +6,8 @@
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "shader.h"
+
 using namespace glm;
 
 GLGraphEdge::GLGraphEdge(const Camera& camera_, const GraphObject& graphObject_) : camera(camera_), graphObject(graphObject_)
@@ -35,8 +37,8 @@ void GLGraphEdge::init()
 
 	// Builds shaders
 	std::vector<unsigned int> shaders;
-	shaders.push_back(buildShader("edge.vert", GL_VERTEX_SHADER));
-	shaders.push_back(buildShader("edge.frag", GL_FRAGMENT_SHADER));
+	shaders.push_back(buildShader(GL_VERTEX_SHADER, edgeVert));
+	shaders.push_back(buildShader(GL_FRAGMENT_SHADER, edgeFrag));
 
 	// Builds program
 	program = buildProgram(shaders);

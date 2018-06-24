@@ -13,7 +13,7 @@ protected:
 
 	std::string getShaderName(GLenum shaderType);
 
-	unsigned int buildShader(std::string fileName, GLenum shaderType);
+	unsigned int buildShader(GLenum shaderType, std::string shaderBody);
 	unsigned int buildProgram(std::vector<unsigned int> shaders);
 
 public:

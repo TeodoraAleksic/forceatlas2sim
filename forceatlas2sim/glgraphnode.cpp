@@ -6,6 +6,8 @@
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "shader.h"
+
 using namespace glm;
 
 const int GLGraphNode::lats = 40;
@@ -74,8 +76,8 @@ void GLGraphNode::init()
 
 	// Builds shaders
 	std::vector<unsigned int> shaders;
-	shaders.push_back(buildShader("node.vert", GL_VERTEX_SHADER));
-	shaders.push_back(buildShader("node.frag", GL_FRAGMENT_SHADER));
+	shaders.push_back(buildShader(GL_VERTEX_SHADER, nodeVert));
+	shaders.push_back(buildShader(GL_FRAGMENT_SHADER, nodeFrag));
 
 	// Builds program
 	program = buildProgram(shaders);

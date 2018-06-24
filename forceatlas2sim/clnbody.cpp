@@ -5,6 +5,8 @@
 
 #include <iostream>
 
+#include "kernel.h"
+
 CLNbody::CLNbody()
 {
 	isInited = false;
@@ -60,9 +62,9 @@ void CLNbody::init()
 	context = cl::Context(device, properties);
 	queue = cl::CommandQueue(context, device);
 
-	kernelCalc = buildProgram("nbodycalc.cl", "nbodyCalc");
-	kernelUpdateNode = buildProgram("nbodyupdatenode.cl", "nbodyUpdateNode");
-	kernelUpdateEdge = buildProgram("nbodyupdateedge.cl", "nbodyUpdateEdge");
+	kernelCalc = buildProgram("nBodyCalc", nBodyCalc);
+	kernelUpdateNode = buildProgram("nBodyUpdateNode", nBodyUpdateNode);
+	kernelUpdateEdge = buildProgram("nBodyUpdateEdge", nBodyUpdateEdge);
 
 	isInited = true;
 }

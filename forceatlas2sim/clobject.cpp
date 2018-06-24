@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-#include "utility.h"
-
 CLObject::CLObject()
 {
 }
@@ -94,15 +92,14 @@ void CLObject::printDevice(cl::Device device)
 	std::cout << "Version: " << device.getInfo<CL_DEVICE_VERSION>() << "\n";
 }
 
-cl::Kernel CLObject::buildProgram(std::string fileName, std::string kernelName)
+cl::Kernel CLObject::buildProgram(std::string kernelName, std::string kernelBody)
 {
 	cl::Program program;
 	cl::Kernel kernel;
 
 	try
 	{
-		std::string source = readFile(fileName);
-		cl::Program::Sources sources(1, std::make_pair(source.c_str(), source.length()));
+		cl::Program::Sources sources(1, std::make_pair(kernelBody.c_str(), kernelBody.length()));
 		cl::Program program = cl::Program(context, sources);
 		program.build({ device });	
 		kernel = cl::Kernel(program, kernelName.c_str());

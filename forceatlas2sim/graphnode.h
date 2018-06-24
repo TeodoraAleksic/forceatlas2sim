@@ -12,7 +12,7 @@ private:
 	static const int lats, longs, numOfIndices;
 
 	const Camera& camera;
-	GraphObject& graphObject;
+	const GraphObject& graphObject;
 
 	bool isInited;
 
@@ -26,7 +26,7 @@ private:
 
 public:
 
-	GraphNode(const Camera& camera_, GraphObject& graphObject_);
+	GraphNode(const Camera& camera_, const GraphObject& graphObject_);
 	~GraphNode();
 
 	void init();

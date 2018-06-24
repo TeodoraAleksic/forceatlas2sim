@@ -75,72 +75,72 @@ void GraphObject::postprocessing()
 	}
 }
 
-unsigned int GraphObject::getNumOfNodes()
+unsigned int GraphObject::getNumOfNodes() const
 {
 	return numOfNodes;
 }
 
-unsigned int GraphObject::getNumOfEdges()
+unsigned int GraphObject::getNumOfEdges() const
 {
 	return numOfEdges;
 }
 
-std::vector<float> GraphObject::getNodeX()
+std::vector<float> GraphObject::getNodeX() const
 {
 	return nodeX;
 }
 
-std::vector<float> GraphObject::getNodeY()
+std::vector<float> GraphObject::getNodeY() const
 {
 	return nodeY;
 }
 
-std::vector<float> GraphObject::getNodeZ()
+std::vector<float> GraphObject::getNodeZ() const
 {
 	return nodeZ;
 }
 
-std::vector<unsigned int> GraphObject::getNodeDegree()
+std::vector<unsigned int> GraphObject::getNodeDegree() const
 {
 	return degree;
 }
 
-std::vector<unsigned int> GraphObject::getSourceId()
+std::vector<unsigned int> GraphObject::getSourceId() const
 {
 	return sourceId;
 }
 
-std::vector<unsigned int> GraphObject::getTargetId()
+std::vector<unsigned int> GraphObject::getTargetId() const
 {
 	return targetId;
 }
 
-std::vector<float> GraphObject::getSourceX()
+std::vector<float> GraphObject::getSourceX() const
 {
 	return sourceX;
 }
 
-std::vector<float> GraphObject::getSourceY()
+std::vector<float> GraphObject::getSourceY() const
 {
 	return sourceY;
 }
 
-std::vector<float> GraphObject::getSourceZ() 
+std::vector<float> GraphObject::getSourceZ() const
 {
 	return sourceZ;
 }
 
-std::vector<float> GraphObject::getTargetX()
+std::vector<float> GraphObject::getTargetX() const
 {
 	return targetX;
 }
 
-std::vector<float> GraphObject::getTargetY()
+std::vector<float> GraphObject::getTargetY() const
 {
 	return targetY;
 }
 
-std::vector<float> GraphObject::getTargetZ()
+std::vector<float> GraphObject::getTargetZ() const
 {
 	return targetZ;
 }

@@ -33,25 +33,25 @@ public:
 
 	void postprocessing();
 
-	unsigned int getNumOfNodes();
-	unsigned int getNumOfEdges();
+	unsigned int getNumOfNodes() const;
+	unsigned int getNumOfEdges() const;
 
-	std::vector<float> getNodeX();
-	std::vector<float> getNodeY();
-	std::vector<float> getNodeZ();
+	std::vector<float> getNodeX() const;
+	std::vector<float> getNodeY() const;
+	std::vector<float> getNodeZ() const;
 
-	std::vector<unsigned int> getNodeDegree();
+	std::vector<unsigned int> getNodeDegree() const;
 
-	std::vector<unsigned int> getSourceId();
-	std::vector<unsigned int> getTargetId();
+	std::vector<unsigned int> getSourceId() const;
+	std::vector<unsigned int> getTargetId() const;
 
-	std::vector<float> getSourceX();
-	std::vector<float> getSourceY();
-	std::vector<float> getSourceZ();
+	std::vector<float> getSourceX() const;
+	std::vector<float> getSourceY() const;
+	std::vector<float> getSourceZ() const;
 
-	std::vector<float> getTargetX();
-	std::vector<float> getTargetY();
-	std::vector<float> getTargetZ();
+	std::vector<float> getTargetX() const;
+	std::vector<float> getTargetY() const;
+	std::vector<float> getTargetZ() const;
 
 };
 

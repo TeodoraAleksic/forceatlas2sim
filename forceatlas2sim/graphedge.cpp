@@ -8,7 +8,7 @@
 
 using namespace glm;
 
-GraphEdge::GraphEdge(const Camera& camera_, GraphObject& graphObject_) : camera(camera_), graphObject(graphObject_)
+GraphEdge::GraphEdge(const Camera& camera_, const GraphObject& graphObject_) : camera(camera_), graphObject(graphObject_)
 {
 	isInited = false;
 	vao = 0;

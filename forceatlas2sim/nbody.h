@@ -34,7 +34,7 @@ public:
 	void init();
 	void run();
 
-	void setArguments(GraphObject& graphObject, const GraphNode& graphNode, const GraphEdge& graphEdge);
+	void setArguments(const GraphObject& graphObject, const GraphNode& graphNode, const GraphEdge& graphEdge);
 
 };
 

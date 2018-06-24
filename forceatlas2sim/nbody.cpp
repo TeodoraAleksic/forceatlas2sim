@@ -137,7 +137,7 @@ void NBody::run()
 	queue.finish();
 }
 
-void NBody::setArguments(GraphObject& graphObject, const GraphNode& graphNode, const GraphEdge& graphEdge)
+void NBody::setArguments(const GraphObject& graphObject, const GraphNode& graphNode, const GraphEdge& graphEdge)
 {
 	if (!isInited) 
 		return;

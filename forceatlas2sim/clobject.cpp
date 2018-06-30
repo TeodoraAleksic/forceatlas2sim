@@ -1,6 +1,6 @@
-#include "clobject.h"
-
 #include <iostream>
+
+#include "clobject.h"
 
 CLObject::CLObject(const cl::Device& device_, const cl::Context& context_): 
 	device(device_), context(context_)

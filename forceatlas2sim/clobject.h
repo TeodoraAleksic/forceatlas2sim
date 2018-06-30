@@ -1,6 +1,8 @@
 #ifndef _CLOBJECT_H_
 #define _CLOBJECT_H_
 
+#include <string>
+
 #define CL_USE_DEPRECATED_OPENCL_1_2_APIS
 #define __CL_ENABLE_EXCEPTIONS
 
@@ -9,8 +11,6 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
-#include <string>
 
 class CLObject
 {

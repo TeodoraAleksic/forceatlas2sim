@@ -1,7 +1,5 @@
 #include "graphobject.h"
 
-#include <cmath>
-
 GraphObject::GraphObject()
 {
 	numOfNodes = 0;

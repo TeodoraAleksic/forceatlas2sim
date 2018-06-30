@@ -3,10 +3,6 @@
 
 #include "clobject.h"
 
-#include "glgraphedge.h"
-#include "glgraphnode.h"
-#include "graphobject.h"
-
 class CLUpdateEdge : public CLObject
 {
 public:

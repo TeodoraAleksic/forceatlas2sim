@@ -1,14 +1,11 @@
-#include "glgraphedge.h"
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "glgraphedge.h"
 #include "shader.h"
-
-using namespace glm;
 
 GLGraphEdge::GLGraphEdge(const Camera& camera_, const GraphObject& graphObject_) : camera(camera_), graphObject(graphObject_)
 {

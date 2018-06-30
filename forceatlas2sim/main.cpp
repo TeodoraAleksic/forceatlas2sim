@@ -1,19 +1,18 @@
-#include <glad\glad.h>
-#include <GLFW\glfw3.h>
-#include <GLFW\glfw3native.h>
-
 #include <iostream>
 #include <string>
+
+#include <glad\glad.h>
+#include <GLFW\glfw3.h>
 
 #include "camera.h"
 #include "clcontext.h"
 #include "clnbody.h"
 #include "clupdateedge.h"
 #include "clupdatenode.h"
-#include "glgraphedge.h"
-#include "graphobject.h"
-#include "glgraphnode.h"
 #include "fileparser.h"
+#include "glgraphedge.h"
+#include "glgraphnode.h"
+#include "graphobject.h"
 
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HIGHT = 600;
@@ -151,7 +150,7 @@ int main(int argc, char** argv)
 	updateNode.setArg(0, graphObject.getNumOfNodes());
 	updateNode.setArg(1, graphNode.getOffsetX(), CL_MEM_READ_WRITE);
 	updateNode.setArg(2, graphNode.getOffsetY(), CL_MEM_READ_WRITE);
-	updateNode.setArg(3, graphNode.getOffsetZ(), CL_MEM_READ_WRITE);
+	updateNode.setArg(3, graphNode.getOffsetZ(), CL_MEM_READ_WRITE);   
 	updateNode.setArg(4, graphNode.getScale(), CL_MEM_READ_ONLY);
 	updateNode.setArg(5, fx);
 	updateNode.setArg(6, fy);

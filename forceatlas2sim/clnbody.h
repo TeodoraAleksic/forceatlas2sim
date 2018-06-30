@@ -3,8 +3,6 @@
 
 #include "clobject.h"
 
-#include "glgraphnode.h"
-
 class CLNbody: public CLObject
 {
 public:

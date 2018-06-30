@@ -1,14 +1,11 @@
-#include "glgraphnode.h"
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "glgraphnode.h"
 #include "shader.h"
-
-using namespace glm;
 
 const int GLGraphNode::lats = 40;
 const int GLGraphNode::longs = 40;

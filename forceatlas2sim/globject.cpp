@@ -1,6 +1,6 @@
-#include "globject.h"
-
 #include <iostream>
+
+#include "globject.h"
 
 GLObject::GLObject()
 {

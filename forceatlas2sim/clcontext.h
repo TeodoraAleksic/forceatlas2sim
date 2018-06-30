@@ -2,7 +2,6 @@
 #define _CLCONTEXT_H_
 
 #define CL_USE_DEPRECATED_OPENCL_1_2_APIS
-#define __CL_ENABLE_EXCEPTIONS
 
 #include <CL/cl.h>
 #include <CL/cl.hpp>

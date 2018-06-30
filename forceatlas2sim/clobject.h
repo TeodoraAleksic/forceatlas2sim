@@ -47,9 +47,9 @@ public:
 	void setWorkSize(unsigned int ndRange);
 
 	template <class T> void setArg(unsigned int argId, T data);
-	template <class T> void setArg(unsigned int argId, unsigned int size, T* data, cl_mem_flags memFlags = CL_MEM_COPY_HOST_PTR);
+	template <class T> void setArg(unsigned int argId, unsigned int size, T* data, cl_mem_flags memFlags);
 
-	void setArg(unsigned int argId, GLuint glBufferId, cl_mem_flags memFlags = CL_MEM_READ_ONLY);
+	void setArg(unsigned int argId, GLuint glBufferId, cl_mem_flags memFlags);
 	void setArg(unsigned int argId, cl::Buffer clBuffer);
 
 };

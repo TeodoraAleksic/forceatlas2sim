@@ -110,3 +110,16 @@ void CLObject::buildProgram(std::string kernelName, std::string kernelBody)
 		std::cout << strDirect << "\n";
 	}
 }
+
+void CLObject::setArg(unsigned int argId, GLuint glBufferId, cl_mem_flags memFlags)
+{
+	cl::BufferGL glBuffer = cl::BufferGL(context, memFlags, glBufferId, nullptr);
+	glBuffers.push_back(glBuffer);
+	kernel.setArg(argId, glBuffer);
+}
+
+void CLObject::setArg(unsigned int argId, cl::Buffer clBuffer)
+{
+	clBuffers.push_back(clBuffer);
+	kernel.setArg(argId, clBuffer);
+}

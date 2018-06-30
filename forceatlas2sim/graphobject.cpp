@@ -1,7 +1,5 @@
 #include "graphobject.h"
 
-#include <cmath>
-
 GraphObject::GraphObject()
 {
 	numOfNodes = 0;
@@ -15,11 +13,14 @@ GraphObject::~GraphObject()
 
 void GraphObject::addNode(std::string node, float x, float y, float z)
 {
+	// Sets and increments node Id
 	nodeIds[node] = numOfNodes++;
 
+	// Sets flag if input file contains graphics info
 	if (!initedGraphics && (x != 0.0 || y != 0.0 || z != 0.0))
 		initedGraphics = true;
 	
+	// Sets node info
 	nodeX.push_back(x);
 	nodeY.push_back(y);
 	nodeZ.push_back(z);
@@ -29,6 +30,7 @@ void GraphObject::addNode(std::string node, float x, float y, float z)
 
 void GraphObject::addEdge(std::string source, std::string target, float weight)
 {
+	// Gets and saves source node info
 	unsigned int sourceIndex = nodeIds[source];
 	++degree[sourceIndex];
 	sourceId.push_back(sourceIndex);
@@ -36,6 +38,7 @@ void GraphObject::addEdge(std::string source, std::string target, float weight)
 	sourceY.push_back(nodeY[sourceIndex]);
 	sourceZ.push_back(nodeZ[sourceIndex]);
 
+	// Gets and saves target node info
 	unsigned int targetIndex = nodeIds[target];
 	++degree[targetIndex];
 	targetId.push_back(targetIndex);
@@ -48,26 +51,31 @@ void GraphObject::addEdge(std::string source, std::string target, float weight)
 
 void GraphObject::postprocessing()
 {
+	// Initializes node positions if node were provided
 	if (!initedGraphics)
 	{
 		float meanDegree = 0.0;
 
+		// Calculates mean node degree
 		for (unsigned int i = 0; i < numOfNodes; ++i)
 			meanDegree += degree[i];
 
 		meanDegree /= numOfNodes;
 
-		float max = meanDegree * (float)pow(numOfNodes, 1.0 / 3.0);
+		float max = meanDegree * (float)pow(numOfNodes, 1.0 / 3.0); // Length of cube side
 		float x = 0.0f;
 		float y = 0.0f;
 		float z = 0.0f;
 
+		// Packs nodes in a cube structure
 		for (unsigned int i = 0; i < numOfNodes; ++i)
 		{
+			// Sets node positions
 			nodeX[i] = x - max / 2;
 			nodeY[i] = y - max / 2;
 			nodeZ[i] = z - max / 2;
 
+			// Calculates next node positions
 			z = (z + meanDegree <= max) ? (z + meanDegree) : 0.0f;
 			y = (z == 0.0) ? ((y + meanDegree <= max) ? (y + meanDegree) : 0.0f) : y;
 			x = (y == 0.0 && z == 0.0) ? (x + meanDegree) : x;

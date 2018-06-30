@@ -1,18 +1,17 @@
-#include "graphnode.h"
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-using namespace glm;
+#include "glgraphnode.h"
+#include "shader.h"
 
-const int GraphNode::lats = 40;
-const int GraphNode::longs = 40;
-const int GraphNode::numOfIndices = (lats + 1) * (longs + 1) * 2 + (lats + 1);
+const int GLGraphNode::lats = 40;
+const int GLGraphNode::longs = 40;
+const int GLGraphNode::numOfIndices = (lats + 1) * (longs + 1) * 2 + (lats + 1);
 
-GraphNode::GraphNode(const Camera& camera_, const GraphObject& graphObject_): camera(camera_), graphObject(graphObject_)
+GLGraphNode::GLGraphNode(const Camera& camera_, const GraphObject& graphObject_): camera(camera_), graphObject(graphObject_)
 {
 	isInited = false;
 	vao = 0;
@@ -25,15 +24,16 @@ GraphNode::GraphNode(const Camera& camera_, const GraphObject& graphObject_): ca
 	program = 0;
 }
 
-GraphNode::~GraphNode()
+GLGraphNode::~GLGraphNode()
 {
 	cleanup();
 }
 
-void GraphNode::initNode(std::vector<float>* vertices, std::vector<unsigned int>* indices)
+void GLGraphNode::initNode(std::vector<float>* vertices, std::vector<unsigned int>* indices)
 {
 	int indexCount = 0;
 
+	// Calculates vertices and indices for drawing a sphere
 	for (int i = 0; i <= lats; i++) {
 		double lat0 = glm::pi<double>() * (-0.5 + (double)(i - 1) / lats);
 		double z0 = sin(lat0);
@@ -67,15 +67,15 @@ void GraphNode::initNode(std::vector<float>* vertices, std::vector<unsigned int>
 	}
 }
 
-void GraphNode::init()
+void GLGraphNode::init()
 {
 	if (isInited)
 		return;
 
 	// Builds shaders
 	std::vector<unsigned int> shaders;
-	shaders.push_back(buildShader("node.vert", GL_VERTEX_SHADER));
-	shaders.push_back(buildShader("node.frag", GL_FRAGMENT_SHADER));
+	shaders.push_back(buildShader(GL_VERTEX_SHADER, shader::nodeVert));
+	shaders.push_back(buildShader(GL_FRAGMENT_SHADER, shader::nodeFrag));
 
 	// Builds program
 	program = buildProgram(shaders);
@@ -153,7 +153,7 @@ void GraphNode::init()
 	isInited = true;
 }
 
-void GraphNode::draw()
+void GLGraphNode::draw()
 {
 	if (!isInited)
 		return;
@@ -167,20 +167,23 @@ void GraphNode::draw()
 	glm::mat4 view = camera.getPosition();
 	glm::mat4 model(1.0f);
 
+	// Sets uniforms for camera position
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 
+	// Binds buffers
 	glBindVertexArray(vao);
 	glEnable(GL_PRIMITIVE_RESTART);
 	glPrimitiveRestartIndex(GL_PRIMITIVE_RESTART_FIXED_INDEX);
 
+	// Draws nodes
 	glDrawElementsInstanced(GL_TRIANGLE_STRIP, 2 * numOfIndices, GL_UNSIGNED_INT, NULL, graphObject.getNumOfNodes());
 
 	glFinish();
 }
 
-void GraphNode::cleanup()
+void GLGraphNode::cleanup()
 {
 	if (!isInited)
 		return;
@@ -220,27 +223,27 @@ void GraphNode::cleanup()
 	program = 0;
 }
 
-unsigned int GraphNode::getNumOfNodes() const
+unsigned int GLGraphNode::getNumOfNodes() const
 {
 	return graphObject.getNumOfNodes();
 }
 
-unsigned int GraphNode::getOffsetX() const
+unsigned int GLGraphNode::getOffsetX() const
 {
 	return vboOffsetX;
 }
 
-unsigned int GraphNode::getOffsetY() const
+unsigned int GLGraphNode::getOffsetY() const
 {
 	return vboOffsetY;
 }
 
-unsigned int GraphNode::getOffsetZ() const
+unsigned int GLGraphNode::getOffsetZ() const
 {
 	return vboOffsetZ;
 }
 
-unsigned int GraphNode::getScale() const
+unsigned int GLGraphNode::getScale() const
 {
 	return vboScale;
 }

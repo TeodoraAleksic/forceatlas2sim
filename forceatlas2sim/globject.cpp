@@ -1,8 +1,6 @@
-#include "globject.h"
-
 #include <iostream>
 
-#include "utility.h"
+#include "globject.h"
 
 GLObject::GLObject()
 {
@@ -33,15 +31,14 @@ std::string GLObject::getShaderName(GLenum shaderType)
 	}
 }
 
-unsigned int GLObject::buildShader(std::string filePath, GLenum shaderType)
+unsigned int GLObject::buildShader(GLenum shaderType, std::string shaderBody)
 {
 	unsigned int shader;
 	shader = glCreateShader(shaderType);
 
 	// Builds shader from source
-	std::string shaderSourceStr = readFile(filePath);
-	const char* shaderSourceChr = shaderSourceStr.c_str();
-	glShaderSource(shader, 1, &shaderSourceChr, nullptr);
+	const char* shaderSource = shaderBody.c_str();
+	glShaderSource(shader, 1, &shaderSource, nullptr);
 	glCompileShader(shader);
 
 	// Gets build status
@@ -63,9 +60,11 @@ unsigned int GLObject::buildProgram(std::vector<unsigned int> shaders)
 	unsigned int program;
 	program = glCreateProgram();
 
+	// Attaches shaders to program
 	for (auto iter = shaders.begin(); iter != shaders.end(); ++iter)
 		glAttachShader(program, *iter);
 
+	// Builds program
 	glLinkProgram(program);
 
 	// Gets build status

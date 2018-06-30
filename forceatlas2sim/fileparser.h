@@ -3,11 +3,12 @@
 
 #include <string>
 
-#include "graphobject.h"
-
-extern "C" { 
+extern "C" 
+{
 	#include "gml_parser.h" 
 }
+
+#include "graphobject.h"
 
 class FileParser
 {

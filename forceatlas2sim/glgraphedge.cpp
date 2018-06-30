@@ -1,14 +1,13 @@
-#include "graphedge.h"
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-using namespace glm;
+#include "glgraphedge.h"
+#include "shader.h"
 
-GraphEdge::GraphEdge(const Camera& camera_, const GraphObject& graphObject_) : camera(camera_), graphObject(graphObject_)
+GLGraphEdge::GLGraphEdge(const Camera& camera_, const GraphObject& graphObject_) : camera(camera_), graphObject(graphObject_)
 {
 	isInited = false;
 	vao = 0;
@@ -23,20 +22,20 @@ GraphEdge::GraphEdge(const Camera& camera_, const GraphObject& graphObject_) : c
 	program = 0;
 }
 
-GraphEdge::~GraphEdge()
+GLGraphEdge::~GLGraphEdge()
 {
 	cleanup();
 }
 
-void GraphEdge::init()
+void GLGraphEdge::init()
 {
 	if (isInited)
 		return;
 
 	// Builds shaders
 	std::vector<unsigned int> shaders;
-	shaders.push_back(buildShader("edge.vert", GL_VERTEX_SHADER));
-	shaders.push_back(buildShader("edge.frag", GL_FRAGMENT_SHADER));
+	shaders.push_back(buildShader(GL_VERTEX_SHADER, shader::edgeVert));
+	shaders.push_back(buildShader(GL_FRAGMENT_SHADER, shader::edgeFrag));
 
 	// Builds program
 	program = buildProgram(shaders);
@@ -49,6 +48,7 @@ void GraphEdge::init()
 	uniformView = glGetUniformLocation(program, "view");
 	uniformModel = glGetUniformLocation(program, "model");
 
+	// Rectangle vertices
 	float vertices[] = {
 		1.0f, 0.025f, 0.025f,
 		1.0f, -0.025f, 0.025f,
@@ -60,6 +60,7 @@ void GraphEdge::init()
 		1.0f, -0.025f, -0.025f
 	};
 
+	// Rectangle indices
 	unsigned int indices[] = {
 		0, 1, 2,
 		0, 2, 3,
@@ -152,7 +153,7 @@ void GraphEdge::init()
 	isInited = true;
 }
 
-void GraphEdge::draw()
+void GLGraphEdge::draw()
 {
 	if (!isInited)
 		return;
@@ -166,20 +167,23 @@ void GraphEdge::draw()
 	glm::mat4 view = camera.getPosition();
 	glm::mat4 model(1.0f);
 
+	// Sets uniforms for camera position
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 
+	// Binds buffers
 	glBindVertexArray(vao);
 	glEnable(GL_PRIMITIVE_RESTART);
 	glPrimitiveRestartIndex(GL_PRIMITIVE_RESTART_FIXED_INDEX);
 
+	// Draws edges
 	glDrawElementsInstanced(GL_TRIANGLE_STRIP, 36, GL_UNSIGNED_INT, NULL, graphObject.getNumOfEdges());
 
 	glFinish();
 }
 
-void GraphEdge::cleanup()
+void GLGraphEdge::cleanup()
 {
 	if (!isInited)
 		return;
@@ -227,37 +231,37 @@ void GraphEdge::cleanup()
 	program = 0;
 }
 
-unsigned int GraphEdge::getNumOfEdges() const
+unsigned int GLGraphEdge::getNumOfEdges() const
 {
 	return graphObject.getNumOfEdges();
 }
 
-unsigned int GraphEdge::getSourceX() const
+unsigned int GLGraphEdge::getSourceX() const
 {
 	return vboSourceX;
 }
 
-unsigned int GraphEdge::getSourceY() const
+unsigned int GLGraphEdge::getSourceY() const
 {
 	return vboSourceY;
 }
 
-unsigned int GraphEdge::getSourceZ() const
+unsigned int GLGraphEdge::getSourceZ() const
 {
 	return vboSourceZ;
 }
 
-unsigned int GraphEdge::getTargetX() const
+unsigned int GLGraphEdge::getTargetX() const
 {
 	return vboTargetX;
 }
 
-unsigned int GraphEdge::getTargetY() const
+unsigned int GLGraphEdge::getTargetY() const
 {
 	return vboTargetY;
 }
 
-unsigned int GraphEdge::getTargetZ() const
+unsigned int GLGraphEdge::getTargetZ() const
 {
 	return vboTargetZ;
 }

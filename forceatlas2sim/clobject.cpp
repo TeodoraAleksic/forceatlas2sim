@@ -1,11 +1,13 @@
-#include "clobject.h"
-
 #include <iostream>
 
-#include "utility.h"
+#include "clobject.h"
 
-CLObject::CLObject()
+CLObject::CLObject(const cl::Device& device_, const cl::Context& context_): 
+	device(device_), context(context_)
 {
+	isInited = false;
+	localWorkSize = 0;
+	globalWorkSize = 0;
 }
 
 CLObject::~CLObject()
@@ -80,38 +82,70 @@ std::string CLObject::getErrorCode(cl_int error)
 	}
 }
 
-void CLObject::printPlatform(cl::Platform platform)
+void CLObject::build()
 {
-	std::cout << "Name:	" << platform.getInfo<CL_PLATFORM_NAME>() << "\n";
-	std::cout << "Vendor: " << platform.getInfo<CL_PLATFORM_VENDOR>() << "\n";
-	std::cout << "Version: " << platform.getInfo<CL_PLATFORM_VERSION>() << "\n";
-}
-
-void CLObject::printDevice(cl::Device device)
-{
-	std::cout << "Name: " << device.getInfo<CL_DEVICE_NAME>() << "\n";
-	std::cout << "Vendor: " << device.getInfo<CL_DEVICE_VENDOR>() << "\n";
-	std::cout << "Version: " << device.getInfo<CL_DEVICE_VERSION>() << "\n";
-}
-
-cl::Kernel CLObject::buildProgram(std::string fileName, std::string kernelName)
-{
-	cl::Program program;
-	cl::Kernel kernel;
-
 	try
 	{
-		std::string source = readFile(fileName);
-		cl::Program::Sources sources(1, std::make_pair(source.c_str(), source.length()));
+		// Builds CL kernel from source and initializes command queue
+		cl::Program::Sources sources(1, std::make_pair(kernelBody.c_str(), kernelBody.length()));
 		cl::Program program = cl::Program(context, sources);
 		program.build({ device });	
 		kernel = cl::Kernel(program, kernelName.c_str());
+		queue = cl::CommandQueue(context, device);
 	}
 	catch (cl::Error error) {
+		// Handles build error
 		std::cout << kernelName << " " << getErrorCode(error.err()) << " " << error.what() << "\n";
 		std::string strDirect = program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device);
 		std::cout << strDirect << "\n";
 	}
+}
 
-	return kernel;
+void CLObject::init()
+{
+	if (isInited)
+		return;
+
+	build();
+
+	isInited = true;
+}
+
+void CLObject::run()
+{
+	if (!isInited)
+		return;
+
+	queue.enqueueAcquireGLObjects(&glBuffers);
+
+	try
+	{
+		// Runs kernel
+		queue.enqueueNDRangeKernel(kernel, cl::NDRange(), cl::NDRange(globalWorkSize), cl::NDRange(localWorkSize));
+	}
+	catch (cl::Error error) {
+		std::cout << getErrorCode(error.err()) << " " << error.what() << "\n";
+	}
+
+	queue.enqueueReleaseGLObjects(&glBuffers);
+	queue.finish();
+}
+
+void CLObject::setWorkSize(unsigned int ndRange)
+{
+	globalWorkSize = (ndRange % 64) > 0 ? 64 * ((int)std::ceil(ndRange / 64) + 1) : ndRange;
+	localWorkSize = 64;
+}
+
+void CLObject::setArg(unsigned int argId, GLuint glBufferId, cl_mem_flags memFlags)
+{
+	cl::BufferGL glBuffer = cl::BufferGL(context, memFlags, glBufferId, nullptr);
+	glBuffers.push_back(glBuffer);
+	kernel.setArg(argId, glBuffer);
+}
+
+void CLObject::setArg(unsigned int argId, cl::Buffer clBuffer)
+{
+	clBuffers.push_back(clBuffer);
+	kernel.setArg(argId, clBuffer);
 }

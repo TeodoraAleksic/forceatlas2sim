@@ -11,6 +11,7 @@ Camera::~Camera()
 
 void Camera::update()
 {
+	// Updates camera vectors
 	glm::vec3 front;
 	front.x = (float)(cos(glm::radians(cameraPitch)) * cos(glm::radians(cameraYaw)));
 	front.y = (float)(sin(glm::radians(cameraPitch)));
@@ -33,6 +34,7 @@ void Camera::move(MoveDirection direction, double deltaTime)
 {
 	float cameraSpeed = (float)(5.0f * deltaTime);
 
+	// Moves camera in given direction
 	switch (direction)
 	{
 	case FWD:
@@ -89,6 +91,7 @@ void Camera::turn(double posX, double posY, double deltaTime)
 
 void Camera::zoom(double offsetX, double offsetY)
 {
+	// Increases/decreases field of view
 	if (fov >= 1.0f && fov <= 45.0f)
 		fov -= offsetY;
 	if (fov <= 1.0f)

@@ -7,22 +7,10 @@
 
 class CLNbody: public CLObject
 {
-private:
-
-	bool isInited, isSet;
-
-	std::vector<cl::Memory> glBuffers;
-	cl::BufferGL nodeX, nodeY, nodeZ, degree;
-
 public:
 
-	CLNbody();
+	CLNbody(const cl::Device& device_, const cl::Context& context_);
 	~CLNbody();
-
-	void init();
-	void run();
-
-	void setArguments(const GLGraphNode& graphNode);
 
 };
 

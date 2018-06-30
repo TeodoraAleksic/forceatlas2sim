@@ -34,8 +34,8 @@ void GLGraphEdge::init()
 
 	// Builds shaders
 	std::vector<unsigned int> shaders;
-	shaders.push_back(buildShader(GL_VERTEX_SHADER, edgeVert));
-	shaders.push_back(buildShader(GL_FRAGMENT_SHADER, edgeFrag));
+	shaders.push_back(buildShader(GL_VERTEX_SHADER, shader::edgeVert));
+	shaders.push_back(buildShader(GL_FRAGMENT_SHADER, shader::edgeFrag));
 
 	// Builds program
 	program = buildProgram(shaders);

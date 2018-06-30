@@ -4,7 +4,7 @@
 CLUpdateNode::CLUpdateNode(const cl::Device& device_, const cl::Context& context_): CLObject(device_, context_)
 {
 	kernelName = "updateNode";
-	kernelBody = updateNode;
+	kernelBody = kernel::updateNode;
 }
 
 CLUpdateNode::~CLUpdateNode()

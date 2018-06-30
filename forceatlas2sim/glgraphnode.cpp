@@ -73,8 +73,8 @@ void GLGraphNode::init()
 
 	// Builds shaders
 	std::vector<unsigned int> shaders;
-	shaders.push_back(buildShader(GL_VERTEX_SHADER, nodeVert));
-	shaders.push_back(buildShader(GL_FRAGMENT_SHADER, nodeFrag));
+	shaders.push_back(buildShader(GL_VERTEX_SHADER, shader::nodeVert));
+	shaders.push_back(buildShader(GL_FRAGMENT_SHADER, shader::nodeFrag));
 
 	// Builds program
 	program = buildProgram(shaders);

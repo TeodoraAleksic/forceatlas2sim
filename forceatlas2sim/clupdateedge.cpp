@@ -4,7 +4,7 @@
 CLUpdateEdge::CLUpdateEdge(const cl::Device& device_, const cl::Context& context_) : CLObject(device_, context_)
 {
 	kernelName = "updateEdge";
-	kernelBody = updateEdge;
+	kernelBody = kernel::updateEdge;
 }
 
 CLUpdateEdge::~CLUpdateEdge()

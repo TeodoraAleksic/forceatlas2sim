@@ -7,22 +7,10 @@
 
 class CLUpdateNode: public CLObject
 {
-private:
-
-	bool isInited, isSet;
-
-	std::vector<cl::Memory> glBuffers;
-	cl::BufferGL nodeX, nodeY, nodeZ, degree;
-
 public:
 
-	CLUpdateNode();
+	CLUpdateNode(const cl::Device& device_, const cl::Context& context_);
 	~CLUpdateNode();
-
-	void init();
-	void run();
-
-	void setArguments(const GLGraphNode& graphNode);
 
 };
 

@@ -27,7 +27,7 @@ protected:
 	cl::Program program;
 	cl::Kernel kernel;
 
-	int ndRange, localWorkSize, globalWorkSize;
+	int localWorkSize, globalWorkSize;
 
 	std::vector<cl::Memory> clBuffers;
 	std::vector<cl::Memory> glBuffers;
@@ -43,6 +43,8 @@ public:
 
 	void init();
 	void run();
+
+	void setWorkSize(unsigned int ndRange);
 
 	template <class T> void setArg(unsigned int argId, T data);
 	template <class T> void setArg(unsigned int argId, unsigned int size, T* data, cl_mem_flags memFlags = CL_MEM_COPY_HOST_PTR);

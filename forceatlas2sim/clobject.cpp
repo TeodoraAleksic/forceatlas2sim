@@ -6,7 +6,6 @@ CLObject::CLObject(const cl::Device& device_, const cl::Context& context_):
 	device(device_), context(context_)
 {
 	isInited = false;
-	ndRange = 0;
 	localWorkSize = 0;
 	globalWorkSize = 0;
 }
@@ -128,6 +127,12 @@ void CLObject::run()
 
 	queue.enqueueReleaseGLObjects(&glBuffers);
 	queue.finish();
+}
+
+void CLObject::setWorkSize(unsigned int ndRange)
+{
+	globalWorkSize = (ndRange % 64) > 0 ? 64 * ((int)std::ceil(ndRange / 64) + 1) : ndRange;
+	localWorkSize = 64;
 }
 
 void CLObject::setArg(unsigned int argId, GLuint glBufferId, cl_mem_flags memFlags)

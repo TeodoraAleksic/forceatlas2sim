@@ -33,6 +33,7 @@ void GLGraphNode::initNode(std::vector<float>* vertices, std::vector<unsigned in
 {
 	int indexCount = 0;
 
+	// Calculates vertices and indices for drawing a sphere
 	for (int i = 0; i <= lats; i++) {
 		double lat0 = glm::pi<double>() * (-0.5 + (double)(i - 1) / lats);
 		double z0 = sin(lat0);
@@ -166,14 +167,17 @@ void GLGraphNode::draw()
 	glm::mat4 view = camera.getPosition();
 	glm::mat4 model(1.0f);
 
+	// Sets uniforms for camera position
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 
+	// Binds buffers
 	glBindVertexArray(vao);
 	glEnable(GL_PRIMITIVE_RESTART);
 	glPrimitiveRestartIndex(GL_PRIMITIVE_RESTART_FIXED_INDEX);
 
+	// Draws nodes
 	glDrawElementsInstanced(GL_TRIANGLE_STRIP, 2 * numOfIndices, GL_UNSIGNED_INT, NULL, graphObject.getNumOfNodes());
 
 	glFinish();

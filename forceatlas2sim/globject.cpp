@@ -60,9 +60,11 @@ unsigned int GLObject::buildProgram(std::vector<unsigned int> shaders)
 	unsigned int program;
 	program = glCreateProgram();
 
+	// Attaches shaders to program
 	for (auto iter = shaders.begin(); iter != shaders.end(); ++iter)
 		glAttachShader(program, *iter);
 
+	// Builds program
 	glLinkProgram(program);
 
 	// Gets build status

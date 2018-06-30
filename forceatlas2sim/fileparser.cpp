@@ -13,6 +13,7 @@ FileParser::~FileParser()
 bool FileParser::endsWith(std::string str, std::string ending)
 {
 	if (str.length() >= ending.length()) 
+		// Returns true if first string ends with the second string
 		return str.compare(str.length() - ending.length(), ending.length(), ending) == 0;
 	else 
 		return false;
@@ -41,6 +42,7 @@ std::string FileParser::getGMLErrorMessage(GML_error_value error)
 
 void FileParser::processGMLGraphics(GML_pair* graphics, float* x, float* y, float* z)
 {
+	// Processes graphics sections of GML file
 	while (graphics != nullptr)
 	{
 		if (std::strcmp(graphics->key, "x") == 0)
@@ -63,6 +65,7 @@ void FileParser::processGMLNode(GML_pair* node, GraphObject* graphObject)
 	float y = 0.0;
 	float z = 0.0;
 
+	// Processes node section of GML file
 	while (node != nullptr)
 	{
 		if (std::strcmp(node->key, "id") == 0)
@@ -82,6 +85,7 @@ void FileParser::processGMLEdge(GML_pair* edge, GraphObject* graphObject)
 	std::string source;
 	std::string target;
 
+	// Processes edge section of GML file
 	while (edge != nullptr)
 	{
 		if (std::strcmp(edge->key, "source") == 0)
@@ -100,6 +104,7 @@ void FileParser::processGMLList(GML_pair* list, GraphObject* graphObject)
 {
 	GML_pair* tmp = list;
 
+	// Finds the graph section of a GML file
 	while (tmp != nullptr && std::strcmp(tmp->key, "graph") != 0)
 		tmp = tmp->next;
 
@@ -107,6 +112,7 @@ void FileParser::processGMLList(GML_pair* list, GraphObject* graphObject)
 	{
 		tmp = tmp->value.list;
 
+		// Processes graph section of GML file
 		while (tmp != nullptr)
 		{
 			if (std::strcmp(tmp->key, "node") == 0)
@@ -153,6 +159,7 @@ GraphObject FileParser::parse(std::string fileName)
 {
 	GraphObject graphObject;
 
+	// Parses input file based on extension
 	if (endsWith(fileName, ".gefx"))
 		parseGEFX(fileName, &graphObject);
 	else if (endsWith(fileName, ".gml"))

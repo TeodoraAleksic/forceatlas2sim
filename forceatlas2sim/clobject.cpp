@@ -86,6 +86,7 @@ void CLObject::build()
 {
 	try
 	{
+		// Builds CL kernel from source and initializes command queue
 		cl::Program::Sources sources(1, std::make_pair(kernelBody.c_str(), kernelBody.length()));
 		cl::Program program = cl::Program(context, sources);
 		program.build({ device });	
@@ -93,6 +94,7 @@ void CLObject::build()
 		queue = cl::CommandQueue(context, device);
 	}
 	catch (cl::Error error) {
+		// Handles build error
 		std::cout << kernelName << " " << getErrorCode(error.err()) << " " << error.what() << "\n";
 		std::string strDirect = program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device);
 		std::cout << strDirect << "\n";

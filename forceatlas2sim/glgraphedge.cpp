@@ -48,6 +48,7 @@ void GLGraphEdge::init()
 	uniformView = glGetUniformLocation(program, "view");
 	uniformModel = glGetUniformLocation(program, "model");
 
+	// Rectangle vertices
 	float vertices[] = {
 		1.0f, 0.025f, 0.025f,
 		1.0f, -0.025f, 0.025f,
@@ -59,6 +60,7 @@ void GLGraphEdge::init()
 		1.0f, -0.025f, -0.025f
 	};
 
+	// Rectangle indices
 	unsigned int indices[] = {
 		0, 1, 2,
 		0, 2, 3,
@@ -165,14 +167,17 @@ void GLGraphEdge::draw()
 	glm::mat4 view = camera.getPosition();
 	glm::mat4 model(1.0f);
 
+	// Sets uniforms for camera position
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 
+	// Binds buffers
 	glBindVertexArray(vao);
 	glEnable(GL_PRIMITIVE_RESTART);
 	glPrimitiveRestartIndex(GL_PRIMITIVE_RESTART_FIXED_INDEX);
 
+	// Draws edges
 	glDrawElementsInstanced(GL_TRIANGLE_STRIP, 36, GL_UNSIGNED_INT, NULL, graphObject.getNumOfEdges());
 
 	glFinish();

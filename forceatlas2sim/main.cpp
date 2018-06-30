@@ -116,26 +116,27 @@ int main(int argc, char** argv)
 	glfwSetCursorPosCallback(window, mouseCallback);
 	glfwSetScrollCallback(window, scrollCallback);
 
+	// Initializes graph node
 	GLGraphNode graphNode(camera, graphObject);
 	graphNode.init();
 
+	// Initializes graph edge
 	GLGraphEdge graphEdge(camera, graphObject);
 	graphEdge.init();
 
+	// Initializes OpenCL context
 	CLContext clContext;
 
-	CLNbody nbody(clContext.getDevice(), clContext.getContext());
-	CLUpdateNode updateNode(clContext.getDevice(), clContext.getContext());
-	CLUpdateEdge updateEdge(clContext.getDevice(), clContext.getContext());
-
-	nbody.init();
-	updateNode.init();
-	updateEdge.init();
-
+	// Allocates force buffers shared by CL objects
 	cl::Buffer fx = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE, sizeof(cl_float) * graphObject.getNumOfNodes());
 	cl::Buffer fy = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE, sizeof(cl_float) * graphObject.getNumOfNodes());
 	cl::Buffer fz = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE, sizeof(cl_float) * graphObject.getNumOfNodes());
 
+	// Initializes n-body kernel
+	CLNbody nbody(clContext.getDevice(), clContext.getContext());
+	nbody.init();
+
+	// Sets arguments for n-body
 	nbody.setWorkSize(graphObject.getNumOfNodes());
 	nbody.setArg(0, graphObject.getNumOfNodes());
 	nbody.setArg(1, graphNode.getOffsetX(), CL_MEM_READ_ONLY);
@@ -146,16 +147,26 @@ int main(int argc, char** argv)
 	nbody.setArg(6, fy);
 	nbody.setArg(7, fz);
 
+	// Initializes update node kernel
+	CLUpdateNode updateNode(clContext.getDevice(), clContext.getContext());
+	updateNode.init();
+
+	// Sets arguments for update node
 	updateNode.setWorkSize(graphObject.getNumOfNodes());
 	updateNode.setArg(0, graphObject.getNumOfNodes());
 	updateNode.setArg(1, graphNode.getOffsetX(), CL_MEM_READ_WRITE);
 	updateNode.setArg(2, graphNode.getOffsetY(), CL_MEM_READ_WRITE);
-	updateNode.setArg(3, graphNode.getOffsetZ(), CL_MEM_READ_WRITE);   
+	updateNode.setArg(3, graphNode.getOffsetZ(), CL_MEM_READ_WRITE);
 	updateNode.setArg(4, graphNode.getScale(), CL_MEM_READ_ONLY);
 	updateNode.setArg(5, fx);
 	updateNode.setArg(6, fy);
 	updateNode.setArg(7, fz);
 
+	// Initializes update edge kernel
+	CLUpdateEdge updateEdge(clContext.getDevice(), clContext.getContext());
+	updateEdge.init();
+
+	// Sets arguments for update edge
 	updateEdge.setWorkSize(graphObject.getNumOfEdges());
 	updateEdge.setArg(0, graphObject.getNumOfEdges());
 	updateEdge.setArg(1, graphNode.getOffsetX(), CL_MEM_READ_ONLY);
@@ -170,13 +181,15 @@ int main(int argc, char** argv)
 	updateEdge.setArg(10, graphEdge.getTargetY(), CL_MEM_READ_WRITE);
 	updateEdge.setArg(11, graphEdge.getTargetZ(), CL_MEM_READ_WRITE);
 
+	// Runs n-body and updates graph nodes and edges
 	nbody.run();
 	updateNode.run();
 	updateEdge.run();
 
-	// Rendering loop
+	// Runs rendering loop
 	while (!glfwWindowShouldClose(window))
 	{
+		// Calculates time since last loop
 		double currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
@@ -188,6 +201,7 @@ int main(int argc, char** argv)
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		// Draws graph
 		graphEdge.draw();
 		graphNode.draw();
 

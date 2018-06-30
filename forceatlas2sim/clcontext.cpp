@@ -42,7 +42,7 @@ void CLContext::init()
 
 	auto deviceIter = devices.begin();
 
-	// Searches for cl/gl compatible device
+	// Searches for CL/GL compatible device
 	for (; deviceIter != devices.end(); ++deviceIter) {
 		std::string clDeviceName = deviceIter->getInfo<CL_DEVICE_NAME>();
 		std::string clDeviceVendor = deviceIter->getInfo<CL_DEVICE_VENDOR>();
@@ -65,6 +65,7 @@ void CLContext::init()
 		0
 	};
 
+	// Creates CL context
 	context = cl::Context(device, properties);
 }
 

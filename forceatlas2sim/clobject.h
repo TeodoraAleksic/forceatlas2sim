@@ -16,12 +16,14 @@ class CLObject
 {
 protected:
 
-	cl::Platform platform;
-	cl::Device device;
+	bool isInited;
 
-	cl::Context context;
+	const cl::Device& device;
+	const cl::Context& context;
+
+	std::string kernelName, kernelBody;
+
 	cl::CommandQueue queue;
-
 	cl::Program program;
 	cl::Kernel kernel;
 
@@ -32,18 +34,15 @@ protected:
 
 	std::string getErrorCode(cl_int error);
 
-	void printPlatform(cl::Platform platform);
-	void printDevice(cl::Device device);
-
-	void buildProgram(std::string kernelName, std::string kernelBody);
+	void build();
 
 public:
 
-	CLObject();
+	CLObject(const cl::Device& device_, const cl::Context& context_);
 	~CLObject();
 
-	virtual void init() = 0;
-	virtual void run() = 0;
+	void init();
+	void run();
 
 	template <class T> void setArg(unsigned int argId, T data);
 	template <class T> void setArg(unsigned int argId, unsigned int size, T* data, cl_mem_flags memFlags = CL_MEM_COPY_HOST_PTR);

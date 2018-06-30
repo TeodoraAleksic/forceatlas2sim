@@ -2,8 +2,10 @@
 
 #include <iostream>
 
-CLObject::CLObject()
+CLObject::CLObject(const cl::Device& device_, const cl::Context& context_): 
+	device(device_), context(context_)
 {
+	isInited = false;
 	ndRange = 0;
 	localWorkSize = 0;
 	globalWorkSize = 0;
@@ -81,21 +83,7 @@ std::string CLObject::getErrorCode(cl_int error)
 	}
 }
 
-void CLObject::printPlatform(cl::Platform platform)
-{
-	std::cout << "Name:	" << platform.getInfo<CL_PLATFORM_NAME>() << "\n";
-	std::cout << "Vendor: " << platform.getInfo<CL_PLATFORM_VENDOR>() << "\n";
-	std::cout << "Version: " << platform.getInfo<CL_PLATFORM_VERSION>() << "\n";
-}
-
-void CLObject::printDevice(cl::Device device)
-{
-	std::cout << "Name: " << device.getInfo<CL_DEVICE_NAME>() << "\n";
-	std::cout << "Vendor: " << device.getInfo<CL_DEVICE_VENDOR>() << "\n";
-	std::cout << "Version: " << device.getInfo<CL_DEVICE_VERSION>() << "\n";
-}
-
-void CLObject::buildProgram(std::string kernelName, std::string kernelBody)
+void CLObject::build()
 {
 	try
 	{
@@ -103,12 +91,43 @@ void CLObject::buildProgram(std::string kernelName, std::string kernelBody)
 		cl::Program program = cl::Program(context, sources);
 		program.build({ device });	
 		kernel = cl::Kernel(program, kernelName.c_str());
+		queue = cl::CommandQueue(context, device);
 	}
 	catch (cl::Error error) {
 		std::cout << kernelName << " " << getErrorCode(error.err()) << " " << error.what() << "\n";
 		std::string strDirect = program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device);
 		std::cout << strDirect << "\n";
 	}
+}
+
+void CLObject::init()
+{
+	if (isInited)
+		return;
+
+	build();
+
+	isInited = true;
+}
+
+void CLObject::run()
+{
+	if (!isInited)
+		return;
+
+	queue.enqueueAcquireGLObjects(&glBuffers);
+
+	try
+	{
+		// Runs kernel
+		queue.enqueueNDRangeKernel(kernel, cl::NDRange(), cl::NDRange(globalWorkSize), cl::NDRange(localWorkSize));
+	}
+	catch (cl::Error error) {
+		std::cout << getErrorCode(error.err()) << " " << error.what() << "\n";
+	}
+
+	queue.enqueueReleaseGLObjects(&glBuffers);
+	queue.finish();
 }
 
 void CLObject::setArg(unsigned int argId, GLuint glBufferId, cl_mem_flags memFlags)

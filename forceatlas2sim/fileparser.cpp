@@ -1,4 +1,7 @@
 #include <iostream>
+#include <stdio.h>
+
+#include <libxml/parser.h>
 
 #include "fileparser.h"
 
@@ -17,6 +20,135 @@ bool FileParser::endsWith(std::string str, std::string ending)
 		return str.compare(str.length() - ending.length(), ending.length(), ending) == 0;
 	else 
 		return false;
+}
+
+void FileParser::processGEXFNodeAttr(xmlAttr* attr, std::string* id)
+{
+	// Processes node attribute section of GEXF file
+	while (attr != nullptr)
+	{
+		if (attr->type == XML_ATTRIBUTE_NODE) 
+		{
+			if (std::strcmp((const char*)attr->name, "id") == 0)
+				*id = (const char*)attr->children->content;
+		}
+
+		attr = attr->next;
+	}
+}
+
+void FileParser::processGEXFEdgeAttr(xmlAttr* attr, std::string* source, std::string* target)
+{
+	// Processes edge attribute section of GEXF file
+	while (attr != nullptr)
+	{
+		if (attr->type == XML_ATTRIBUTE_NODE)
+		{
+			if (std::strcmp((const char*)attr->name, "source") == 0)
+				*source = (const char*)attr->children->content;
+
+			if (std::strcmp((const char*)attr->name, "target") == 0)
+				*target = (const char*)attr->children->content;
+		}
+
+		attr = attr->next;
+	}
+}
+
+void FileParser::processGEXFNode(xmlNode* node, GraphObject* graphObject)
+{
+	// Processes node section of GEXF file
+	while (node != nullptr)
+	{
+		if (node->type == XML_ELEMENT_NODE && std::strcmp((const char*)node->name, "node") == 0)
+		{
+			std::string id;
+			float x = 0.0;
+			float y = 0.0;
+			float z = 0.0;
+
+			processGEXFNodeAttr(node->properties, &id);
+			// TODO graphics attributes
+
+			graphObject->addNode(id, x, y, z);
+		}
+
+		node = node->next;
+	}
+}
+
+void FileParser::processGEXFEdge(xmlNode* edge, GraphObject* graphObject)
+{
+	// Processes edge section of GEXF file
+	while (edge != nullptr)
+	{
+		if (edge->type == XML_ELEMENT_NODE && std::strcmp((const char*)edge->name, "edge") == 0)
+		{
+			std::string source;
+			std::string target;
+
+			processGEXFEdgeAttr(edge->properties, &source, &target);
+
+			graphObject->addEdge(source, target);
+		}
+
+		edge = edge->next;
+	}
+}
+
+void FileParser::processGEXFList(xmlNode* list, GraphObject* graphObject)
+{
+	xmlNode* tmp = list->children;
+
+	// Finds the graph section of a GEXF file
+	while (tmp != nullptr && 
+		   (tmp->type != XML_ELEMENT_NODE || 
+		    (tmp->type == XML_ELEMENT_NODE && std::strcmp((const char*)tmp->name, "graph") != 0)))
+		tmp = tmp->next;
+
+	if (tmp != nullptr)
+	{
+		tmp = tmp->children;
+
+		// Processes graph section of GEXF file
+		while (tmp != nullptr)
+		{
+			if (tmp->type == XML_ELEMENT_NODE)
+			{
+				if (std::strcmp((const char*)tmp->name, "nodes") == 0)
+					processGEXFNode(tmp->children, graphObject);
+
+				else if (std::strcmp((const char*)tmp->name, "edges") == 0)
+					processGEXFEdge(tmp->children, graphObject);
+			}
+
+			tmp = tmp->next;
+		}
+	}
+}
+
+void FileParser::parseGEXF(std::string fileName, GraphObject* graphObject)
+{
+#ifdef LIBXML_TREE_ENABLED
+	xmlDoc *doc = nullptr;
+	xmlNode *rootElement = nullptr;
+
+	LIBXML_TEST_VERSION
+
+	doc = xmlReadFile(fileName.c_str(), nullptr, 0);
+
+	if (doc == nullptr)
+		throw "Could not parse GEXF file";
+
+	rootElement = xmlDocGetRootElement(doc);
+
+	processGEXFList(rootElement, graphObject);
+
+	xmlFreeDoc(doc);
+	xmlCleanupParser();
+#else
+	throw "GEXF tree support not compiled";
+#endif
 }
 
 std::string FileParser::getGMLErrorMessage(GML_error_value error)
@@ -126,11 +258,6 @@ void FileParser::processGMLList(GML_pair* list, GraphObject* graphObject)
 	}
 }
 
-void FileParser::parseGEFX(std::string fileName, GraphObject* graphObject)
-{	
-	// TODO
-}
-
 void FileParser::parseGML(std::string fileName, GraphObject* graphObject)
 {
 	struct GML_pair* list;
@@ -160,8 +287,8 @@ GraphObject FileParser::parse(std::string fileName)
 	GraphObject graphObject;
 
 	// Parses input file based on extension
-	if (endsWith(fileName, ".gefx"))
-		parseGEFX(fileName, &graphObject);
+	if (endsWith(fileName, ".gexf"))
+		parseGEXF(fileName, &graphObject);
 	else if (endsWith(fileName, ".gml"))
 		parseGML(fileName, &graphObject);
 	else 

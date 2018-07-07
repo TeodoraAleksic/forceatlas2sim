@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include <libxml/tree.h>
+
 extern "C" 
 {
 	#include "gml_parser.h" 
@@ -16,6 +18,15 @@ private:
 
 	bool endsWith(std::string str, std::string ending);
 
+	void processGEXFVizAttr(xmlAttr* attr, float* x, float* y, float* z);
+	void processGEXFNodeAttr(xmlAttr* attr, std::string* id);
+	void processGEXFEdgeAttr(xmlAttr* attr, std::string* source, std::string* target);
+	void processGEXFNode(xmlNode* node, GraphObject* graphObject);
+	void processGEXFEdge(xmlNode* edge, GraphObject* graphObject);
+	void processGEXFList(xmlNode* list, GraphObject* graphObject);
+
+	void parseGEXF(std::string fileName, GraphObject* graphObject);
+
 	std::string getGMLErrorMessage(GML_error_value error);
 
 	void processGMLGraphics(GML_pair* graphics, float* x, float* y, float* z);
@@ -23,7 +34,6 @@ private:
 	void processGMLEdge(GML_pair* edge, GraphObject* graphObject);
 	void processGMLList(GML_pair* list, GraphObject* graphObject);
 
-	void parseGEFX(std::string fileName, GraphObject* graphObject);
 	void parseGML(std::string fileName, GraphObject* graphObject);
 
 public:

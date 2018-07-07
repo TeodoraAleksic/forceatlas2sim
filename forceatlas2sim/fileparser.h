@@ -18,6 +18,7 @@ private:
 
 	bool endsWith(std::string str, std::string ending);
 
+	void processGEXFVizAttr(xmlAttr* attr, float* x, float* y, float* z);
 	void processGEXFNodeAttr(xmlAttr* attr, std::string* id);
 	void processGEXFEdgeAttr(xmlAttr* attr, std::string* source, std::string* target);
 	void processGEXFNode(xmlNode* node, GraphObject* graphObject);

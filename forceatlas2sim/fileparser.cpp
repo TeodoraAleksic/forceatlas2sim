@@ -22,6 +22,27 @@ bool FileParser::endsWith(std::string str, std::string ending)
 		return false;
 }
 
+void FileParser::processGEXFVizAttr(xmlAttr* attr, float* x, float* y, float* z)
+{
+	// Processes visualization attribute section of GEXF file
+	while (attr != nullptr)
+	{
+		if (attr->type == XML_ATTRIBUTE_NODE)
+		{
+			if (std::strcmp((const char*)attr->name, "x") == 0)
+				*x = std::stof((const char*)attr->children->content);
+
+			if (std::strcmp((const char*)attr->name, "y") == 0)
+				*y = std::stof((const char*)attr->children->content);
+
+			if (std::strcmp((const char*)attr->name, "z") == 0)
+				*z = std::stof((const char*)attr->children->content);
+		}
+
+		attr = attr->next;
+	}
+}
+
 void FileParser::processGEXFNodeAttr(xmlAttr* attr, std::string* id)
 {
 	// Processes node attribute section of GEXF file
@@ -68,7 +89,23 @@ void FileParser::processGEXFNode(xmlNode* node, GraphObject* graphObject)
 			float z = 0.0;
 
 			processGEXFNodeAttr(node->properties, &id);
-			// TODO graphics attributes
+			
+			xmlNode* temp = node->children;
+
+			while (temp != nullptr)
+			{
+				if (temp->type == XML_ELEMENT_NODE)
+				{
+					// Process node hierarchy
+					if (std::strcmp((const char*)temp->name, "nodes") == 0)
+						processGEXFNode(temp->children, graphObject);
+
+					if (std::strcmp((const char*)temp->name, "position") == 0)
+						processGEXFVizAttr(temp->properties, &x, &y, &z);
+				}
+
+				temp = temp->next;
+			}
 
 			graphObject->addNode(id, x, y, z);
 		}

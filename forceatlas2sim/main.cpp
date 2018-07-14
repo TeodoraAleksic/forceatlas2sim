@@ -111,6 +111,8 @@ int main(int argc, char** argv)
 
 	glViewport(0, 0, 800, 600);
 
+	glEnable(GL_DEPTH_TEST);
+
 	// Sets callbacks for the GLFW window
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window, mouseCallback);

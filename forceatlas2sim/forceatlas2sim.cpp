@@ -27,13 +27,15 @@ void ForceAtlas2Sim::init(const ForceAtlas2Params& fa2Params, const GraphObject&
 	// Sets arguments for n-body
 	clNbody.setWorkSize(graphObject.getNumOfNodes());
 	clNbody.setArg(0, graphObject.getNumOfNodes());
-	clNbody.setArg(1, glGraphNode.getOffsetX(), CL_MEM_READ_ONLY);
-	clNbody.setArg(2, glGraphNode.getOffsetY(), CL_MEM_READ_ONLY);
-	clNbody.setArg(3, glGraphNode.getOffsetZ(), CL_MEM_READ_ONLY);
-	clNbody.setArg(4, glGraphNode.getScale(), CL_MEM_READ_ONLY);
-	clNbody.setArg(5, fx);
-	clNbody.setArg(6, fy);
-	clNbody.setArg(7, fz);
+	clNbody.setArg(1, fa2Params.getKr());
+	clNbody.setArg(2, fa2Params.getKrp());
+	clNbody.setArg(3, glGraphNode.getOffsetX(), CL_MEM_READ_ONLY);
+	clNbody.setArg(4, glGraphNode.getOffsetY(), CL_MEM_READ_ONLY);
+	clNbody.setArg(5, glGraphNode.getOffsetZ(), CL_MEM_READ_ONLY);
+	clNbody.setArg(6, glGraphNode.getScale(), CL_MEM_READ_ONLY);
+	clNbody.setArg(7, fx);
+	clNbody.setArg(8, fy);
+	clNbody.setArg(9, fz);
 
 	// Sets arguments for update node
 	clUpdateNode.setWorkSize(graphObject.getNumOfNodes());

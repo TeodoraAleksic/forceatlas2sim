@@ -7,28 +7,62 @@ namespace kernel
 {
 	const std::string nBody =
 		" \
-		__kernel void nBody(__const uint n, __global float* x, __global float* y, __global float* z, __global uint* degree, \
-			__global float* fx, __global float* fy, __global float* fz) \
+		float dist(float x1, float y1, float z1, float x2, float y2, float z2) \
 		{ \
-			int id = get_global_id(0); \
+			return sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2) + pow(z1 - z2, 2)); \
+		} \
 		\
+		float size(uint degree) \
+		{ \
+			return degree * 0.5 + 0.5; \
+		} \
+		\
+		__kernel void nBody( \
+			__const uint n, \
+			__const float kr, \
+			__const float krp, \
+			__global float* x, \
+			__global float* y, \
+			__global float* z, \
+			__global uint* degree, \
+			__global float* fx, \
+			__global float* fy, \
+			__global float* fz) \
+		{ \
+			uint id = get_global_id(0); \
+			\
 			if (id < n) \
 			{ \
-				uint i = n % (id + 1); \
-				uint count = 0; \
-		\
 				fx[id] = 0; \
 				fy[id] = 0; \
 				fz[id] = 0; \
-		\
-				while (count < (n - 1)) \
+				\
+				uint i = (id + 1) < n ? (id + 1) : 0; \
+				\
+				while (i != id) \
 				{ \
-					fx[id] += (x[i] - x[id]) + (degree[id] + 1) * (degree[i] + 1) / (x[id] - x[i]); \
-					fy[id] += (y[i] - y[id]) + (degree[id] + 1) * (degree[i] + 1) / (y[id] - y[i]); \
-					fz[id] += (z[i] - z[id]) + (degree[id] + 1) * (degree[i] + 1) / (z[id] - z[i]); \
-		\
-					i = n % (i + 1); \
-					++count; \
+					float d = dist(x[id], y[id], z[id], x[i], y[i], z[i]) - size(degree[id]) - size(degree[i]); \
+					\
+					float degrees = (degree[id] + 1) * (degree[i] + 1); \
+					\
+					if (d > 0) \
+					{ \
+						fx[id] += (x[i] - x[id]) / (degree[id] + 1); \
+						fy[id] += (y[i] - y[id]) / (degree[id] + 1); \
+						fz[id] += (z[i] - z[id]) / (degree[id] + 1); \
+						\
+						fx[id] += kr * degrees / (x[id] - x[i]); \
+						fy[id] += kr * degrees / (y[id] - y[i]); \
+						fz[id] += kr * degrees / (z[id] - z[i]); \
+					} \
+					else if (d < 0) \
+					{ \
+						fx[id] += krp * degrees * ((x[id] - x[i]) > 0 ? 1 : -1); \
+						fy[id] += krp * degrees * ((y[id] - y[i]) > 0 ? 1 : -1); \
+						fz[id] += krp * degrees * ((z[id] - z[i]) > 0 ? 1 : -1); \
+					} \
+					\
+					i = (i + 1) < n ? (i + 1) : 0; \
 				} \
 			} \
 		} \

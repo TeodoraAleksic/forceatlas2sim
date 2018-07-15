@@ -10,6 +10,7 @@
 #include "clupdateedge.h"
 #include "clupdatenode.h"
 #include "fileparser.h"
+#include "forceatlas2params.h"
 #include "glgraphedge.h"
 #include "glgraphnode.h"
 #include "graphobject.h"
@@ -21,6 +22,54 @@ double deltaTime = 0.0f;
 double lastFrame = 0.0f;
 
 Camera camera{ glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f) };
+
+bool isValueArg(std::string argName)
+{
+	return 
+		argName == std::string("-i")	||
+		argName == std::string("-kr")	||
+		argName == std::string("-krp")	||
+		argName == std::string("-kg");
+}
+
+bool isFlagArg(std::string argName)
+{
+	return 
+		argName == std::string("-fg")	|| 
+		argName == std::string("-fsg")	||
+		argName == std::string("-nw");
+}
+
+bool isNotArg(std::string argName)
+{
+	return !isValueArg(argName) && !isFlagArg(argName) && argName != std::string("-h");
+}
+
+void setValueArg(ForceAtlas2Params* fa2Params, std::string argName, std::string argValue)
+{
+	if (argName == std::string("-i"))
+		fa2Params->setInput(argValue);
+	else if (argName == std::string("-kr"))
+		fa2Params->setKr(argValue);
+	else if (argName == std::string("-krp"))
+		fa2Params->setKrp(argValue);
+	else if (argName == std::string("-kg"))
+		fa2Params->setKg(argValue);
+	else
+		throw "Invalid value argument " + argName;
+}
+
+void setFlagArg(ForceAtlas2Params* fa2Params, std::string argName)
+{
+	if (argName == std::string("-fg"))
+		fa2Params->setFg(true);
+	else if (argName == std::string("-fsg"))
+		fa2Params->setFsg(true);
+	else if (argName == std::string("-nw"))
+		fa2Params->setNw(true);
+	else
+		throw "Invalid flag argument " + argName;
+}
 
 void processInput(GLFWwindow* window)
 {
@@ -50,39 +99,81 @@ void scrollCallback(GLFWwindow* window, double offsetX, double offsetY)
 
 int main(int argc, char** argv)
 {
-	std::string help = "Usage: forceatlas2sim.exe (-i INPUT) [-h]\n\n"\
-		"GPU-based parallelization and graphical simulation of the ForceAtlas2 algorithm\n\n"\
+	std::string usage = \
+		"Usage: forceatlas2sim.exe (-i INPUT) [-kr FLOAT] [-krp FLOAT]\n"\
+		"                          [-fg] [-fsg] [-kg FLOAT] [-nw] [-h]\n\n"\
+		"GPU-based parallelization and graphical simulation of the ForceAtlas2 algorithm.\n\n"\
 		"Options:\n"\
-		"-i INPUT   Input GEFX or GML graph file. Required.\n"\
-		"-h         Prints usage.\n";
+		"-i INPUT     Input GEFX or GML graph file. Required.\n"\
+		"-kr FLOAT    Repulsion force coefficient. Default: 0.01.\n"\
+		"-krp FLOAT   Repulsion force overlap coefficient. Default: 100.\n"\
+		"-fg          Uses gravitational force to attract nodes to graph center.\n"\
+		"-fsg         Uses strong gravitational force to attract nodes to graph center.\n"\
+		"-kg FLOAT    Gravitational force coefficient. Default: 9.81.\n"\
+		"-nw          Discards edge weights.\n"\
+		"-h           Prints usage.\n";
 
-	std::string inputFile;
+	ForceAtlas2Params fa2Params;
 
 	switch (argc)
 	{
 	case 1:
-		std::cout << help;
+		std::cout << usage;
 		return 0;
 	case 2:
 		if (argv[1] == std::string("-h"))
 		{
-			std::cout << help;
+			std::cout << usage;
 			return 0;
 		}
-	case 3:
-		if (argv[1] == std::string("-i"))
+		else
 		{
-			inputFile = argv[2];
-			break;
+			std::cout << "Must provide input file.\n\n" << usage;
+			return 1;
 		}
 	default:
-		std::cout << "Invalid arguments. ";
-		std::cout << help;
-		return 1;
+		// Parses script arguments
+		for (int i = 1; i < argc; ++i)
+		{
+			if (isValueArg(argv[i]))
+			{
+				// Looks for value after value argument
+				if ((i + 1) < argc && isNotArg(argv[i + 1]))
+				{
+					setValueArg(&fa2Params, argv[i], argv[i + 1]);
+					++i;
+				}
+				else
+				{
+					std::cout << "Must provide value after '" << argv[i] << "' argument.\n\n" << usage;
+					return 1;
+				}
+			}
+			else if (isFlagArg(argv[i]))
+			{
+				setFlagArg(&fa2Params, argv[i]);
+			}
+			else if (argv[i] == std::string("-h"))
+			{
+				std::cout << "Can't specify '-h' with other arguments.\n\n" << usage;
+				return 1;
+			}
+			else 
+			{
+				std::cout << "Invalid argument: '" << argv[i] << "'.\n\n" << usage;
+				return 1;
+			}
+		}
+
+		if (fa2Params.getInput().empty())
+		{
+			std::cout << "Must provide input file.\n\n" << usage;
+			return 1;
+		}
 	}
 
 	FileParser fileParser;
-	GraphObject graphObject = fileParser.parse(inputFile);
+	GraphObject graphObject = fileParser.parse(fa2Params.getInput());
 
 	// Sets up OpenGL
 	glfwInit();

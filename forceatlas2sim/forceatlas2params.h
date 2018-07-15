@@ -25,16 +25,16 @@ public:
 
 	// Getters
 
-	std::string getInput();
+	std::string getInput() const;
 	
-	float getKr();
-	float getKrp();
+	float getKr() const;
+	float getKrp() const;
 
-	bool getFg();
-	bool getFsg();
-	float getKg();
+	bool getFg() const;
+	bool getFsg() const;
+	float getKg() const;
 
-	bool getNw();
+	bool getNw() const;
 
 	// Setters
 

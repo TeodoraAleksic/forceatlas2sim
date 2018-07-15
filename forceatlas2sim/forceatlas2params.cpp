@@ -36,37 +36,37 @@ float ForceAtlas2Params::stringToFloat(std::string str)
 	}
 }
 
-std::string ForceAtlas2Params::getInput()
+std::string ForceAtlas2Params::getInput() const
 {
 	return input;
 }
 
-float ForceAtlas2Params::getKr()
+float ForceAtlas2Params::getKr() const
 {
 	return kr;
 }
 
-float ForceAtlas2Params::getKrp()
+float ForceAtlas2Params::getKrp() const
 {
 	return krp;
 }
 
-bool ForceAtlas2Params::getFg()
+bool ForceAtlas2Params::getFg() const
 {
 	return fg;
 }
 
-bool ForceAtlas2Params::getFsg()
+bool ForceAtlas2Params::getFsg() const
 {
 	return fsg;
 }
 
-float ForceAtlas2Params::getKg()
+float ForceAtlas2Params::getKg() const
 {
 	return kg;
 }
 
-bool ForceAtlas2Params::getNw()
+bool ForceAtlas2Params::getNw() const
 {
 	return nw;
 }

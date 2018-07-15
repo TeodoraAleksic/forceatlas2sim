@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "forceatlas2params.h"
 
 ForceAtlas2Params::ForceAtlas2Params()
@@ -24,11 +26,13 @@ float ForceAtlas2Params::stringToFloat(std::string str)
 	}
 	catch (std::out_of_range)
 	{
-		throw str + " is out of range of a value representable by float";
+		std::cout << "'" << str << "' is out of range of a value representable by float." << std::endl;
+		throw;
 	}
 	catch (...)
 	{
-		throw str + " is not a valid float";
+		std::cout << "'" << str << "' is not a valid float." << std::endl;
+		throw;
 	}
 }
 
@@ -75,39 +79,45 @@ void ForceAtlas2Params::setInput(std::string input_)
 void ForceAtlas2Params::setKr(float kr_)
 {
 	if (kr_ < 0.0f)
-		throw "Repulsion force coefficient must be greater than 0.0";
+	{
+		std::string msg = "Repulsion force coefficient must be greater than 0.";
+		std::cout << msg << std::endl;
+		throw std::runtime_error(msg);
+	}
 
 	kr = kr_;
 }
 
 void ForceAtlas2Params::setKr(std::string kr_)
 {
-	kr = stringToFloat(kr_);
-
-	if (kr < 0.0f)
-		throw "Repulsion force coefficient must be greater than 0.0";
+	setKr(stringToFloat(kr_));
 }
 
 void ForceAtlas2Params::setKrp(float krp_)
 {
 	if (krp_ < 0.0f)
-		throw "Repulsion force overlap coefficient must be greater than 0.0";
+	{
+		std::string msg = "Repulsion force overlap coefficient must be greater than 0.";
+		std::cout << msg << std::endl;
+		throw std::runtime_error(msg);
+	}
 
 	krp = krp_;
 }
 
 void ForceAtlas2Params::setKrp(std::string krp_)
 {
-	krp = stringToFloat(krp_);
-
-	if (krp < 0.0f)
-		throw "Repulsion force overlap coefficient must be greater than 0.0";
+	setKrp(stringToFloat(krp_));
 }
 
 void ForceAtlas2Params::setFg(bool fg_)
 {
 	if (fsg && fg_)
-		throw "Can't set both normal and strong gravity";
+	{
+		std::string msg = "Can't set both normal and strong gravity.";
+		std::cout << msg << std::endl;
+		throw std::runtime_error(msg);
+	}
 
 	fg = fg_;
 }
@@ -115,7 +125,11 @@ void ForceAtlas2Params::setFg(bool fg_)
 void ForceAtlas2Params::setFsg(bool fsg_)
 {
 	if (fg && fsg_)
-		throw "Can't set both normal and strong gravity";
+	{
+		std::string msg = "Can't set both normal and strong gravity.";
+		std::cout << msg << std::endl;
+		throw std::runtime_error(msg);
+	}
 
 	fsg = fsg_;
 }
@@ -123,17 +137,18 @@ void ForceAtlas2Params::setFsg(bool fsg_)
 void ForceAtlas2Params::setKg(float kg_)
 {
 	if (kg_ < 0.0f)
-		throw "Gravitational force coefficient must be greater than 0.0";
+	{
+		std::string msg = "Gravitational force coefficient must be greater than 0.";
+		std::cout << msg << std::endl;
+		throw std::runtime_error(msg);
+	}
 
 	kg = kg_;
 }
 
 void ForceAtlas2Params::setKg(std::string kg_)
 {
-	kg = stringToFloat(kg_);
-
-	if (kg < 0.0f)
-		throw "Gravitational force coefficient must be greater than 0.0";
+	setKg(stringToFloat(kg_));
 }
 
 void ForceAtlas2Params::setNw(bool nw_)

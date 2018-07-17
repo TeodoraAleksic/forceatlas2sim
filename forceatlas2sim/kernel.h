@@ -77,40 +77,57 @@ namespace kernel
 		";
 
 	const std::string updateNode =
-		" \
-		__kernel void updateNode(__const uint n, __global float* x, __global float* y, __global float* z, __global uint* degree, \
-			__global float* fx, __global float* fy, __global float* fz) \
-		{ \
-			int id = get_global_id(0); \
-		\
-			if (id < n) \
-			{ \
-				x[id] += 0.01 * fx[id] / (degree[id] + 1); \
-				y[id] += 0.01 * fy[id] / (degree[id] + 1); \
-				z[id] += 0.01 * fz[id] / (degree[id] + 1); \
-			} \
-		} \
+		" \n\
+		__kernel void updateNode( \n\
+			__const uint n, \n\
+			__global float* x, \n\
+			__global float* y, \n\
+			__global float* z, \n\
+			__global uint* degree, \n\
+			__global float* fx, \n\
+			__global float* fy, \n\
+			__global float* fz) \n\
+		{ \n\
+			int id = get_global_id(0); \n\
+			\n\
+			if (id < n) \n\
+			{ \n\
+				x[id] += 0.01 * fx[id] / (degree[id] + 1); \n\
+				y[id] += 0.01 * fy[id] / (degree[id] + 1); \n\
+				z[id] += 0.01 * fz[id] / (degree[id] + 1); \n\
+			} \n\
+		} \n\
 		";
 
 	const std::string updateEdge =
-		" \
-		__kernel void updateEdge(__const uint n, __global float* x, __global float* y, __global float* z, \
-			__global uint* sid, __global float* sx, __global float* sy, __global float* sz, \
-			__global uint* tid, __global float* tx, __global float* ty, __global float* tz) \
-		{ \
-			int id = get_global_id(0); \
-		 \
-			if (id < n) \
-			{ \
-				sx[id] = x[sid[id]]; \
-				sy[id] = y[sid[id]]; \
-				sz[id] = z[sid[id]]; \
-		\
-				tx[id] = x[tid[id]]; \
-				ty[id] = y[tid[id]]; \
-				tz[id] = z[tid[id]]; \
-			} \
-		} \
+		" \n\
+		__kernel void updateEdge( \n\
+			__const uint n, \n\
+			__global float* x, \n\
+			__global float* y, \n\
+			__global float* z, \n\
+			__global uint* sid, \n\
+			__global float* sx, \n\
+			__global float* sy, \n\
+			__global float* sz, \n\
+			__global uint* tid, \n\
+			__global float* tx, \n\
+			__global float* ty, \n\
+			__global float* tz) \n\
+		{ \n\
+			int id = get_global_id(0); \n\
+			\n\
+			if (id < n) \n\
+			{ \n\
+				sx[id] = x[sid[id]]; \n\
+				sy[id] = y[sid[id]]; \n\
+				sz[id] = z[sid[id]]; \n\
+				\n\
+				tx[id] = x[tid[id]]; \n\
+				ty[id] = y[tid[id]]; \n\
+				tz[id] = z[tid[id]]; \n\
+			} \n\
+		} \n\
 		";
 }
 

@@ -6,6 +6,7 @@ GraphObject::GraphObject()
 	numOfEdges = 0;
 	initedGraphics = false;
 	meanDegree = 0.0;
+	totalDegree = 0.0;
 }
 
 GraphObject::~GraphObject()
@@ -55,11 +56,11 @@ void GraphObject::postprocessing()
 	// Initializes node positions if node were provided
 	if (!initedGraphics)
 	{
-		// Calculates mean node degree
+		// Calculates total and mean node degree
 		for (unsigned int i = 0; i < numOfNodes; ++i)
-			meanDegree += degree[i];
+			totalDegree += degree[i];
 
-		meanDegree /= numOfNodes;
+		meanDegree = totalDegree / numOfNodes;
 
 		float max = meanDegree * (float)pow(numOfNodes, 1.0 / 3.0); // Length of cube side
 		float x = 0.0f;

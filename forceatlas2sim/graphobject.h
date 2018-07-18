@@ -17,7 +17,7 @@ private:
 
 	std::vector<float> nodeX, nodeY, nodeZ;
 
-	float meanDegree;
+	float meanDegree, totalDegree;
 
 	std::vector<unsigned int> degree;
 

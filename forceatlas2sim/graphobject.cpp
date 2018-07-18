@@ -5,6 +5,7 @@ GraphObject::GraphObject()
 	numOfNodes = 0;
 	numOfEdges = 0;
 	initedGraphics = false;
+	meanDegree = 0.0;
 }
 
 GraphObject::~GraphObject()
@@ -54,8 +55,6 @@ void GraphObject::postprocessing()
 	// Initializes node positions if node were provided
 	if (!initedGraphics)
 	{
-		float meanDegree = 0.0;
-
 		// Calculates mean node degree
 		for (unsigned int i = 0; i < numOfNodes; ++i)
 			meanDegree += degree[i];
@@ -81,6 +80,15 @@ void GraphObject::postprocessing()
 			x = (y == 0.0 && z == 0.0) ? (x + meanDegree) : x;
 		}
 	}
+}
+
+float  GraphObject::getInitPosition() const
+{
+	// Calculates initial camera position
+	if (!initedGraphics)
+		return meanDegree * (float)pow(numOfNodes, 1.0 / 3.0) * (-2.0f) / sin(22.5f);
+	else
+		return 0.0f;
 }
 
 unsigned int GraphObject::getNumOfNodes() const

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <math.h>
 #include <memory>
 #include <string>
 
@@ -19,9 +20,9 @@ const int SCREEN_HIGHT = 600;
 double deltaTime = 0.0f;
 double lastFrame = 0.0f;
 
-std::unique_ptr<ForceAtlas2Sim> fa2Sim;
+std::unique_ptr<Camera> camera;
 
-Camera camera{ glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f) };
+std::unique_ptr<ForceAtlas2Sim> fa2Sim;
 
 bool isValueArg(std::string argName)
 {
@@ -76,25 +77,25 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE))
 		glfwSetWindowShouldClose(window, true);
 	else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		camera.move(MoveDirection::FWD, deltaTime);
+		camera->move(MoveDirection::FWD, deltaTime);
 	else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		camera.move(MoveDirection::BWD, deltaTime);
+		camera->move(MoveDirection::BWD, deltaTime);
 	else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		camera.move(MoveDirection::LEFT, deltaTime);
+		camera->move(MoveDirection::LEFT, deltaTime);
 	else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		camera.move(MoveDirection::RIGHT, deltaTime);
+		camera->move(MoveDirection::RIGHT, deltaTime);
 	else if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
 		fa2Sim->run();
 }
 
 void mouseCallback(GLFWwindow* window, double posX, double posY)
 {
-	camera.turn(posX, posY, deltaTime);
+	camera->turn(posX, posY, deltaTime);
 }
 
 void scrollCallback(GLFWwindow* window, double offsetX, double offsetY)
 {
-	camera.zoom(offsetX, offsetY);
+	camera->zoom(offsetX, offsetY);
 }
 
 int main(int argc, char** argv)
@@ -209,14 +210,21 @@ int main(int argc, char** argv)
 	glfwSetCursorPosCallback(window, mouseCallback);
 	glfwSetScrollCallback(window, scrollCallback);
 
+	// Initializes camera
+	camera = std::make_unique<Camera>(
+		glm::vec3(0.0f, 0.0f, graphObject.getInitPosition()), 
+		glm::vec3(0.0f, 0.0f, -1.0f), 
+		glm::vec3(0.0f, 1.0f, 0.0f));
+
 	// Initializes graph node
-	GLGraphNode graphNode(camera, graphObject);
+	GLGraphNode graphNode(*camera, graphObject);
 	graphNode.init();
 
 	// Initializes graph edge
-	GLGraphEdge graphEdge(camera, graphObject);
+	GLGraphEdge graphEdge(*camera, graphObject);
 	graphEdge.init();
 
+	// Initializes ForceAtlas2 simulation
 	fa2Sim = std::make_unique<ForceAtlas2Sim>();
 	fa2Sim->init(fa2Params, graphObject, graphNode, graphEdge);
 

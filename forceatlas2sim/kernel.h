@@ -117,7 +117,10 @@ namespace kernel
 			__global uint* degree, \n\
 			__global float* fx, \n\
 			__global float* fy, \n\
-			__global float* fz) \n\
+			__global float* fz, \n\
+		    __global float* cx, \n\
+			__global float* cy, \n\
+			__global float* cz) \n\
 		{ \n\
 			int id = get_global_id(0); \n\
 			\n\
@@ -126,6 +129,10 @@ namespace kernel
 				x[id] += 0.01 * fx[id] / (degree[id] + 1); \n\
 				y[id] += 0.01 * fy[id] / (degree[id] + 1); \n\
 				z[id] += 0.01 * fz[id] / (degree[id] + 1); \n\
+				\n\
+				cx[id] = x[id] * (degree[id] + 1); \n\
+				cy[id] = y[id] * (degree[id] + 1); \n\
+				cz[id] = z[id] * (degree[id] + 1); \n\
 			} \n\
 		} \n\
 		";

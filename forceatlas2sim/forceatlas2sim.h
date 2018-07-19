@@ -2,6 +2,7 @@
 #define _FORCEATLAS2SIM_H_
 
 #include "clcontext.h"
+#include "clgravity.h"
 #include "clnbody.h"
 #include "clupdateedge.h"
 #include "clupdatenode.h"
@@ -16,11 +17,15 @@ private:
 
 	CLContext clContext;
 
+	CLGravity clGravity;
 	CLNbody clNbody;
 	CLUpdateNode clUpdateNode;
 	CLUpdateEdge clUpdateEdge;
 
 	cl::Buffer fx, fy, fz;
+
+	int cxBuffer, cyBuffer, czBuffer;
+	cl::Buffer cx[2], cy[2], cz[2];
 
 public:
 

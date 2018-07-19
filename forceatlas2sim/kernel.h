@@ -5,6 +5,37 @@
 
 namespace kernel
 {
+
+	const std::string gravity =
+		" \n\
+		__kernel void sum( \n\
+			__const uint n, \n\
+			__global float *input, \n\
+			__global float *output, \n\
+			__local float *partial) \n\
+		{ \n\
+			uint globalId = get_global_id(0); \n\
+			uint localId = get_local_id(0); \n\
+			uint groupSize = get_local_size(0); \n\
+			uint groupId = get_group_id(0); \n\
+			\n\
+			partial[localId] = globalId < n ? input[globalId] : 0.0; \n\
+			\n\
+			barrier(CLK_LOCAL_MEM_FENCE); \n\
+			\n\
+			for (uint stride = groupSize / 2; stride > 0; stride /= 2) \n\
+			{ \n\
+				if (localId < stride) \n\
+					partial[localId] += partial[localId + stride]; \n\
+				\n\
+				barrier(CLK_LOCAL_MEM_FENCE); \n\
+			} \n\
+			\n\
+			if (localId == 0) \n\
+				output[groupId] = partial[0]; \n\
+		} \n\
+		";
+
 	const std::string nBody =
 		" \n\
 		float size(uint degree) \n\

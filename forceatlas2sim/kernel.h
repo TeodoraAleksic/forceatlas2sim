@@ -10,29 +10,45 @@ namespace kernel
 		" \n\
 		__kernel void sum( \n\
 			__const uint n, \n\
-			__global float *input, \n\
-			__global float *output, \n\
-			__local float *partial) \n\
+			__global float *ix, \n\
+			__global float *iy, \n\
+			__global float *iz, \n\
+			__global float *ox, \n\
+			__global float *oy, \n\
+			__global float *oz, \n\
+			__local float *px, \n\
+			__local float *py, \n\
+			__local float *pz) \n\
 		{ \n\
 			uint globalId = get_global_id(0); \n\
 			uint localId = get_local_id(0); \n\
 			uint groupSize = get_local_size(0); \n\
 			uint groupId = get_group_id(0); \n\
 			\n\
-			partial[localId] = globalId < n ? input[globalId] : 0.0; \n\
+			px[localId] = globalId < n ? ix[globalId] : 0.0; \n\
+			py[localId] = globalId < n ? iy[globalId] : 0.0; \n\
+			pz[localId] = globalId < n ? iz[globalId] : 0.0; \n\
 			\n\
 			barrier(CLK_LOCAL_MEM_FENCE); \n\
 			\n\
 			for (uint stride = groupSize / 2; stride > 0; stride /= 2) \n\
 			{ \n\
 				if (localId < stride) \n\
-					partial[localId] += partial[localId + stride]; \n\
+				{ \n\
+					px[localId] += px[localId + stride]; \n\
+					py[localId] += py[localId + stride]; \n\
+					pz[localId] += pz[localId + stride]; \n\
+				} \n\
 				\n\
 				barrier(CLK_LOCAL_MEM_FENCE); \n\
 			} \n\
 			\n\
 			if (localId == 0) \n\
-				output[groupId] = partial[0]; \n\
+			{ \n\
+				ox[groupId] = px[0]; \n\
+				oy[groupId] = py[0]; \n\
+				oz[groupId] = pz[0]; \n\
+			} \n\
 		} \n\
 		";
 

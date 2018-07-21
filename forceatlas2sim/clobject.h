@@ -47,6 +47,7 @@ public:
 	void setWorkSize(unsigned int ndRange);
 
 	template <class T> void setArg(unsigned int argId, T data);
+	template <class T> void setArg(unsigned int argId, unsigned int size, T* data);
 	template <class T> void setArg(unsigned int argId, unsigned int size, T* data, cl_mem_flags memFlags);
 
 	void setArg(unsigned int argId, GLuint glBufferId, cl_mem_flags memFlags);
@@ -57,6 +58,11 @@ public:
 template <class T> void CLObject::setArg(unsigned int argId, T data)
 {
 	kernel.setArg(argId, data);
+}
+
+template <class T> void CLObject::setArg(unsigned int argId, unsigned int size,  T* data)
+{
+	kernel.setArg(argId, size * sizeof(T), data);
 }
 
 template <class T> void CLObject::setArg(unsigned int argId, unsigned int size, T* data, cl_mem_flags memFlags)

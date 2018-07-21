@@ -24,6 +24,8 @@ ForceAtlas2Sim::~ForceAtlas2Sim()
 
 void ForceAtlas2Sim::setCLGravityArgs()
 {
+	float* temp = nullptr;
+
 	clGravity.setArg(0, graphObject.getNumOfNodes());
 	clGravity.setArg(1, cx[cFront]);
 	clGravity.setArg(2, cy[cFront]);
@@ -31,6 +33,9 @@ void ForceAtlas2Sim::setCLGravityArgs()
 	clGravity.setArg(4, cx[cFront == 1 ? 0 : 1]);
 	clGravity.setArg(5, cy[cFront == 1 ? 0 : 1]);
 	clGravity.setArg(6, cz[cFront == 1 ? 0 : 1]);
+	clGravity.setArg(7, graphObject.getNumOfNodes(), temp);
+	clGravity.setArg(8, graphObject.getNumOfNodes(), temp);
+	clGravity.setArg(9, graphObject.getNumOfNodes(), temp);
 }
 
 void ForceAtlas2Sim::setCLNbodyArgs()
@@ -90,13 +95,13 @@ void ForceAtlas2Sim::init()
 
 	// Allocates buffers for graph center of mass
 	cx[0] = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE, sizeof(cl_float) * graphObject.getNumOfNodes());
-	cx[1] = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE, sizeof(cl_float) * graphObject.getNumOfNodes() / 2);
+	cx[1] = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE, sizeof(cl_float) * graphObject.getNumOfNodes());
 
 	cy[0] = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE, sizeof(cl_float) * graphObject.getNumOfNodes());
-	cy[1] = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE, sizeof(cl_float) * graphObject.getNumOfNodes() / 2);
+	cy[1] = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE, sizeof(cl_float) * graphObject.getNumOfNodes());
 
 	cz[0] = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE, sizeof(cl_float) * graphObject.getNumOfNodes());
-	cz[1] = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE, sizeof(cl_float) * graphObject.getNumOfNodes() / 2);
+	cz[1] = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE, sizeof(cl_float) * graphObject.getNumOfNodes());
 
 	// Initializes CL kernels
 	clGravity.init();

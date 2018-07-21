@@ -29,8 +29,13 @@ private:
 
 	cl::Buffer fx, fy, fz;
 
-	int cxBuffer, cyBuffer, czBuffer;
+	int cFront;
 	cl::Buffer cx[2], cy[2], cz[2];
+
+	void setCLGravityArgs();
+	void setCLNbodyArgs();
+	void setCLUpdateNodeArgs();
+	void setCLUpdateEdgeArgs();
 
 public:
 

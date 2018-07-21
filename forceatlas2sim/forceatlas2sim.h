@@ -15,6 +15,11 @@ class ForceAtlas2Sim
 {
 private:
 
+	const ForceAtlas2Params& fa2Params;
+	const GraphObject& graphObject;
+	const GLGraphNode& glGraphNode;
+	const GLGraphEdge& glGraphEdge;
+
 	CLContext clContext;
 
 	CLGravity clGravity;
@@ -29,10 +34,14 @@ private:
 
 public:
 
-	ForceAtlas2Sim();
+	ForceAtlas2Sim(
+		const ForceAtlas2Params& fa2Params_, 
+		const GraphObject& graphObject_, 
+		const GLGraphNode& glGraphNode_, 
+		const GLGraphEdge& glGraphEdge_);
 	~ForceAtlas2Sim();
 
-	void init(const ForceAtlas2Params& fa2Params, const GraphObject& graphObject, const GLGraphNode& glGraphNode, const GLGraphEdge& glGraphEdge);
+	void init();
 	void run();
 
 };

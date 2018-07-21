@@ -225,8 +225,8 @@ int main(int argc, char** argv)
 	graphEdge.init();
 
 	// Initializes ForceAtlas2 simulation
-	fa2Sim = std::make_unique<ForceAtlas2Sim>();
-	fa2Sim->init(fa2Params, graphObject, graphNode, graphEdge);
+	fa2Sim = std::make_unique<ForceAtlas2Sim>(fa2Params, graphObject, graphNode, graphEdge);
+	fa2Sim->init();
 
 	// Runs rendering loop
 	while (!glfwWindowShouldClose(window))

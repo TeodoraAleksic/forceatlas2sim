@@ -1,6 +1,14 @@
 #include "forceatlas2sim.h"
 
-ForceAtlas2Sim::ForceAtlas2Sim():
+ForceAtlas2Sim::ForceAtlas2Sim(
+	const ForceAtlas2Params& fa2Params_, 
+	const GraphObject& graphObject_, 
+	const GLGraphNode& glGraphNode_, 
+	const GLGraphEdge& glGraphEdge_):
+	fa2Params(fa2Params_),
+	graphObject(graphObject_),
+	glGraphNode(glGraphNode_),
+	glGraphEdge(glGraphEdge_),
 	clGravity(clContext.getDevice(), clContext.getContext()),
 	clNbody(clContext.getDevice(), clContext.getContext()),
 	clUpdateNode(clContext.getDevice(), clContext.getContext()),
@@ -16,7 +24,7 @@ ForceAtlas2Sim::~ForceAtlas2Sim()
 {
 }
 
-void ForceAtlas2Sim::init(const ForceAtlas2Params& fa2Params, const GraphObject& graphObject, const GLGraphNode& glGraphNode, const GLGraphEdge& glGraphEdge)
+void ForceAtlas2Sim::init()
 {
 	// Allocates force buffers shared by CL objects
 	fx = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE, sizeof(cl_float) * graphObject.getNumOfNodes());

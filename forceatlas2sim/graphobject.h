@@ -17,6 +17,8 @@ private:
 
 	std::vector<float> nodeX, nodeY, nodeZ;
 
+	float meanDegree, totalDegree;
+
 	std::vector<unsigned int> degree;
 
 	std::vector<unsigned int> sourceId, targetId;
@@ -33,8 +35,12 @@ public:
 
 	void postprocessing();
 
+	float getInitPosition() const;
+
 	unsigned int getNumOfNodes() const;
 	unsigned int getNumOfEdges() const;
+
+	float getTotalDegree() const;
 
 	std::vector<float> getNodeX() const;
 	std::vector<float> getNodeY() const;

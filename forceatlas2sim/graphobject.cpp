@@ -5,6 +5,8 @@ GraphObject::GraphObject()
 	numOfNodes = 0;
 	numOfEdges = 0;
 	initedGraphics = false;
+	meanDegree = 0.0;
+	totalDegree = 0.0;
 }
 
 GraphObject::~GraphObject()
@@ -54,13 +56,11 @@ void GraphObject::postprocessing()
 	// Initializes node positions if node were provided
 	if (!initedGraphics)
 	{
-		float meanDegree = 0.0;
-
-		// Calculates mean node degree
+		// Calculates total and mean node degree
 		for (unsigned int i = 0; i < numOfNodes; ++i)
-			meanDegree += degree[i];
+			totalDegree += degree[i];
 
-		meanDegree /= numOfNodes;
+		meanDegree = totalDegree / numOfNodes;
 
 		float max = meanDegree * (float)pow(numOfNodes, 1.0 / 3.0); // Length of cube side
 		float x = 0.0f;
@@ -83,6 +83,15 @@ void GraphObject::postprocessing()
 	}
 }
 
+float  GraphObject::getInitPosition() const
+{
+	// Calculates initial camera position
+	if (!initedGraphics)
+		return meanDegree * (float)pow(numOfNodes, 1.0 / 3.0) * (-2.0f) / sin(22.5f);
+	else
+		return 0.0f;
+}
+
 unsigned int GraphObject::getNumOfNodes() const
 {
 	return numOfNodes;
@@ -91,6 +100,11 @@ unsigned int GraphObject::getNumOfNodes() const
 unsigned int GraphObject::getNumOfEdges() const
 {
 	return numOfEdges;
+}
+
+float GraphObject::getTotalDegree() const
+{
+	return totalDegree;
 }
 
 std::vector<float> GraphObject::getNodeX() const

@@ -7,7 +7,7 @@ class CLUpdateNode: public CLObject
 {
 public:
 
-	CLUpdateNode(const cl::Device& device_, const cl::Context& context_);
+	CLUpdateNode(const cl::Device& device_, const cl::Context& context_, bool fg, bool fsg);
 	~CLUpdateNode();
 
 };

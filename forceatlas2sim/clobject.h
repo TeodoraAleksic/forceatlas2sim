@@ -1,6 +1,7 @@
 #ifndef _CLOBJECT_H_
 #define _CLOBJECT_H_
 
+#include <iostream>
 #include <string>
 
 #define CL_USE_DEPRECATED_OPENCL_1_2_APIS
@@ -47,6 +48,7 @@ public:
 	void setWorkSize(unsigned int ndRange);
 
 	template <class T> void setArg(unsigned int argId, T data);
+	template <class T> void setArg(unsigned int argId, unsigned int size, T* data);
 	template <class T> void setArg(unsigned int argId, unsigned int size, T* data, cl_mem_flags memFlags);
 
 	void setArg(unsigned int argId, GLuint glBufferId, cl_mem_flags memFlags);
@@ -56,14 +58,40 @@ public:
 
 template <class T> void CLObject::setArg(unsigned int argId, T data)
 {
-	kernel.setArg(argId, data);
+	try
+	{
+		kernel.setArg(argId, data);
+	}
+	catch (cl::Error error)
+	{
+		std::cout << getErrorCode(error.err()) << " " << error.what() << std::endl;
+	}
+}
+
+template <class T> void CLObject::setArg(unsigned int argId, unsigned int size,  T* data)
+{
+	try
+	{
+		kernel.setArg(argId, size * sizeof(T), data);
+	}
+	catch (cl::Error error)
+	{
+		std::cout << getErrorCode(error.err()) << " " << error.what() << std::endl;
+	}
 }
 
 template <class T> void CLObject::setArg(unsigned int argId, unsigned int size, T* data, cl_mem_flags memFlags)
 {
-	cl::Buffer clBuffer = cl::Buffer(context, memFlags, size, data);
-	clBuffers.push_back(clBuffer);
-	kernel.setArg(argId, clBuffer);
+	try
+	{
+		cl::Buffer clBuffer = cl::Buffer(context, memFlags, size, data);
+		clBuffers.push_back(clBuffer);
+		kernel.setArg(argId, clBuffer);
+	}
+	catch (cl::Error error)
+	{
+		std::cout << getErrorCode(error.err()) << " " << error.what() << std::endl;
+	}
 }
 
 #endif

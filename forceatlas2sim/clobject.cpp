@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "clobject.h"
 
 CLObject::CLObject(const cl::Device& device_, const cl::Context& context_): 
@@ -139,13 +137,27 @@ void CLObject::setWorkSize(unsigned int ndRange)
 
 void CLObject::setArg(unsigned int argId, GLuint glBufferId, cl_mem_flags memFlags)
 {
-	cl::BufferGL glBuffer = cl::BufferGL(context, memFlags, glBufferId, nullptr);
-	glBuffers.push_back(glBuffer);
-	kernel.setArg(argId, glBuffer);
+	try
+	{
+		cl::BufferGL glBuffer = cl::BufferGL(context, memFlags, glBufferId, nullptr);
+		glBuffers.push_back(glBuffer);
+		kernel.setArg(argId, glBuffer);
+	}
+	catch (cl::Error error)
+	{ 
+		std::cout << getErrorCode(error.err()) << " " << error.what() << std::endl;
+	}
 }
 
 void CLObject::setArg(unsigned int argId, cl::Buffer clBuffer)
 {
-	clBuffers.push_back(clBuffer);
-	kernel.setArg(argId, clBuffer);
+	try
+	{
+		clBuffers.push_back(clBuffer);
+		kernel.setArg(argId, clBuffer);
+	}
+	catch (cl::Error error)
+	{
+		std::cout << getErrorCode(error.err()) << " " << error.what() << std::endl;
+	}
 }

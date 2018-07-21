@@ -133,10 +133,7 @@ namespace kernel
 			__global uint* degree, \n\
 			__global float* fx, \n\
 			__global float* fy, \n\
-			__global float* fz, \n\
-		    __global float* cx, \n\
-			__global float* cy, \n\
-			__global float* cz) \n\
+			__global float* fz) \n\
 		{ \n\
 			int id = get_global_id(0); \n\
 			\n\
@@ -145,6 +142,74 @@ namespace kernel
 				x[id] += 0.01 * fx[id] / (degree[id] + 1); \n\
 				y[id] += 0.01 * fy[id] / (degree[id] + 1); \n\
 				z[id] += 0.01 * fz[id] / (degree[id] + 1); \n\
+			} \n\
+		} \n\
+		";
+
+	const std::string updateNodeFg =
+		" \n\
+		__kernel void updateNodeFg( \n\
+			__const uint n, \n\
+			__global float* x, \n\
+			__global float* y, \n\
+			__global float* z, \n\
+			__global uint* degree, \n\
+			__global float* fx, \n\
+			__global float* fy, \n\
+			__global float* fz, \n\
+			__const float kg, \n\
+			__const float mass, \n\
+			__global float* cx, \n\
+			__global float* cy, \n\
+			__global float* cz) \n\
+		{ \n\
+			int id = get_global_id(0); \n\
+			\n\
+			if (id < n) \n\
+			{ \n\
+				fx[id] += kg * (cx[0] / mass - x[id] > 0 ? 1 : -1) * (degree[id] + 1); \n\
+				fy[id] += kg * (cy[0] / mass - y[id] > 0 ? 1 : -1) * (degree[id] + 1); \n\
+				fz[id] += kg * (cz[0] / mass - z[id] > 0 ? 1 : -1) * (degree[id] + 1); \n\
+				\n\
+				x[id] += fx[id] / (degree[id] + 1); \n\
+				y[id] += fy[id] / (degree[id] + 1); \n\
+				z[id] += fz[id] / (degree[id] + 1); \n\
+				\n\
+				cx[id] = x[id] * (degree[id] + 1); \n\
+				cy[id] = y[id] * (degree[id] + 1); \n\
+				cz[id] = z[id] * (degree[id] + 1); \n\
+			} \n\
+		} \n\
+		";
+
+	const std::string updateNodeFsg =
+		" \n\
+		__kernel void updateNodeFsg( \n\
+			__const uint n, \n\
+			__global float* x, \n\
+			__global float* y, \n\
+			__global float* z, \n\
+			__global uint* degree, \n\
+			__global float* fx, \n\
+			__global float* fy, \n\
+			__global float* fz, \n\
+			__const float kg, \n\
+			__const float mass, \n\
+			__global float* cx, \n\
+			__global float* cy, \n\
+			__global float* cz) \n\
+		{ \n\
+			int id = get_global_id(0); \n\
+			\n\
+			if (id < n) \n\
+			{ \n\
+				fx[id] += kg * (degree[id] + 1) * (cx[0] / mass - x[id]); \n\
+				fy[id] += kg * (degree[id] + 1) * (cy[0] / mass - y[id]); \n\
+				fz[id] += kg * (degree[id] + 1) * (cz[0] / mass - z[id]); \n\
+				\n\
+				x[id] += fx[id] / (degree[id] + 1); \n\
+				y[id] += fy[id] / (degree[id] + 1); \n\
+				z[id] += fz[id] / (degree[id] + 1); \n\
 				\n\
 				cx[id] = x[id] * (degree[id] + 1); \n\
 				cy[id] = y[id] * (degree[id] + 1); \n\

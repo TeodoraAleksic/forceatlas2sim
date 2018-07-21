@@ -12,6 +12,11 @@ CLGravity::~CLGravity()
 {
 }
 
+unsigned int CLGravity::getMaxWorkGroupSize()
+{
+	return maxWorkGroupSize;
+}
+
 void CLGravity::setWorkSize(unsigned int ndRange)
 {
 	globalWorkSize = (ndRange % maxWorkGroupSize) > 0 ? 

@@ -40,6 +40,8 @@ public:
 	unsigned int getNumOfNodes() const;
 	unsigned int getNumOfEdges() const;
 
+	float getTotalDegree() const;
+
 	std::vector<float> getNodeX() const;
 	std::vector<float> getNodeY() const;
 	std::vector<float> getNodeZ() const;

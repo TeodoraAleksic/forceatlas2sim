@@ -32,9 +32,10 @@ private:
 	int cFront;
 	cl::Buffer cx[2], cy[2], cz[2];
 
-	void setCLGravityArgs();
+	void setCLGravityArgs(unsigned int n, unsigned int workGroupSize);
 	void setCLNbodyArgs();
 	void setCLUpdateNodeArgs();
+	void setCLUpdateNodeArgsFg();
 	void setCLUpdateEdgeArgs();
 
 public:

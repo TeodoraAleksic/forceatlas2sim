@@ -14,6 +14,8 @@ public:
 	CLGravity(const cl::Device& device_, const cl::Context& context_);
 	~CLGravity();
 
+	unsigned int getMaxWorkGroupSize();
+
 	void setWorkSize(unsigned int ndRange);
 
 };

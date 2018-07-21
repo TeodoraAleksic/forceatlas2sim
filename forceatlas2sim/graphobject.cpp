@@ -102,6 +102,11 @@ unsigned int GraphObject::getNumOfEdges() const
 	return numOfEdges;
 }
 
+float GraphObject::getTotalDegree() const
+{
+	return totalDegree;
+}
+
 std::vector<float> GraphObject::getNodeX() const
 {
 	return nodeX;

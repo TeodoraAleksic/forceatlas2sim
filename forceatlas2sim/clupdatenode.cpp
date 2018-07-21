@@ -1,10 +1,24 @@
 #include "clupdatenode.h"
 #include "kernel.h"
 
-CLUpdateNode::CLUpdateNode(const cl::Device& device_, const cl::Context& context_): CLObject(device_, context_)
+CLUpdateNode::CLUpdateNode(const cl::Device& device_, const cl::Context& context_, bool fg, bool fsg): 
+	CLObject(device_, context_)
 {
-	kernelName = "updateNode";
-	kernelBody = kernel::updateNode;
+	if (fg)
+	{
+		kernelName = "updateNodeFg";
+		kernelBody = kernel::updateNodeFg;
+	}
+	else if (fsg)
+	{
+		kernelName = "updateNodeFsg";
+		kernelBody = kernel::updateNodeFsg;
+	}
+	else
+	{
+		kernelName = "updateNode";
+		kernelBody = kernel::updateNode;
+	}
 }
 
 CLUpdateNode::~CLUpdateNode()

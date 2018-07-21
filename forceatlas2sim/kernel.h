@@ -5,10 +5,30 @@
 
 namespace kernel
 {
-
-	const std::string gravity =
+	const std::string initCenter =
 		" \n\
-		__kernel void sum( \n\
+		__kernel void initCenter( \n\
+			__const uint n, \n\
+			__global float* x, \n\
+			__global float* y, \n\
+			__global float* z, \n\
+			__global uint* degree, \n\
+			__global float* cx, \n\
+			__global float* cy, \n\
+			__global float* cz) \n\
+		{ \n\
+			int id = get_global_id(0); \n\
+			\n\
+			if (id < n) \n\
+			{ \n\
+			} \n\
+		} \n\
+		";
+
+
+	const std::string calcCenter =
+		" \n\
+		__kernel void calcCenter( \n\
 			__const uint n, \n\
 			__global float *ix, \n\
 			__global float *iy, \n\
@@ -174,10 +194,6 @@ namespace kernel
 				x[id] += fx[id] / (degree[id] + 1); \n\
 				y[id] += fy[id] / (degree[id] + 1); \n\
 				z[id] += fz[id] / (degree[id] + 1); \n\
-				\n\
-				cx[id] = x[id] * (degree[id] + 1); \n\
-				cy[id] = y[id] * (degree[id] + 1); \n\
-				cz[id] = z[id] * (degree[id] + 1); \n\
 			} \n\
 		} \n\
 		";
@@ -210,10 +226,6 @@ namespace kernel
 				x[id] += fx[id] / (degree[id] + 1); \n\
 				y[id] += fy[id] / (degree[id] + 1); \n\
 				z[id] += fz[id] / (degree[id] + 1); \n\
-				\n\
-				cx[id] = x[id] * (degree[id] + 1); \n\
-				cy[id] = y[id] * (degree[id] + 1); \n\
-				cz[id] = z[id] * (degree[id] + 1); \n\
 			} \n\
 		} \n\
 		";

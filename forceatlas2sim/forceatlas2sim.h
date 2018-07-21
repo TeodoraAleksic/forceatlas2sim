@@ -1,8 +1,9 @@
 #ifndef _FORCEATLAS2SIM_H_
 #define _FORCEATLAS2SIM_H_
 
+#include "clcalccenter.h"
 #include "clcontext.h"
-#include "clgravity.h"
+#include "clinitcenter.h"
 #include "clnbody.h"
 #include "clupdateedge.h"
 #include "clupdatenode.h"
@@ -22,7 +23,8 @@ private:
 
 	CLContext clContext;
 
-	CLGravity clGravity;
+	CLInitCenter clInitCenter;
+	CLCalcCenter clCalcCenter;
 	CLNbody clNbody;
 	CLUpdateNode clUpdateNode;
 	CLUpdateEdge clUpdateEdge;
@@ -32,7 +34,8 @@ private:
 	int cFront;
 	cl::Buffer cx[2], cy[2], cz[2];
 
-	void setCLGravityArgs(unsigned int n, unsigned int workGroupSize);
+	void setCLInitCenterArgs();
+	void setCLCalcCenterArgs(unsigned int n, unsigned int workGroupSize);
 	void setCLNbodyArgs();
 	void setCLUpdateNodeArgs();
 	void setCLUpdateNodeArgsFg();

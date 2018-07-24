@@ -210,6 +210,15 @@ int main(int argc, char** argv)
 	glfwSetCursorPosCallback(window, mouseCallback);
 	glfwSetScrollCallback(window, scrollCallback);
 
+	// Gets info about selected OpenGL device
+	std::string glVendor = (const char*)glGetString(GL_VENDOR);
+	std::string glRenderer = (const char*)glGetString(GL_RENDERER);
+
+	std::cout << "OpenGL Device" << std::endl;
+	std::cout << "VENDOR: " << glVendor << std::endl;
+	std::cout << "RENDERER: " << glRenderer << std::endl;
+	std::cout << std::endl;
+
 	// Initializes camera
 	camera = std::make_unique<Camera>(
 		glm::vec3(0.0f, 0.0f, graphObject.getInitPosition()), 

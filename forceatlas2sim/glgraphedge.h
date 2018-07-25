@@ -2,10 +2,10 @@
 #define _GLGRAPHEDGE_H_
 
 #include "camera.h"
-#include "globject.h"
+#include "glbase.h"
 #include "graphobject.h"
 
-class GLGraphEdge : public GLObject
+class GLGraphEdge : public GLBase
 {
 private:
 

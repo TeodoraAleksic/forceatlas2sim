@@ -2,10 +2,10 @@
 #define _GLGRAPHNODE_H_
 
 #include "camera.h"
-#include "globject.h"
+#include "glbase.h"
 #include "graphobject.h"
 
-class GLGraphNode: public GLObject
+class GLGraphNode: public GLBase
 {
 private:
 

@@ -14,24 +14,6 @@ CLContext::~CLContext()
 {
 }
 
-void CLContext::print(cl::Platform platform)
-{
-	std::cout << "OpenCL Platform" << std::endl;
-	std::cout << "NAME:	" << platform.getInfo<CL_PLATFORM_NAME>() << std::endl;
-	std::cout << "VENDOR: " << platform.getInfo<CL_PLATFORM_VENDOR>() << std::endl;
-	std::cout << "VERSION: " << platform.getInfo<CL_PLATFORM_VERSION>() << std::endl;
-	std::cout << std::endl;
-}
-
-void CLContext::print(cl::Device device)
-{
-	std::cout << "OpenCL Device" << std::endl;
-	std::cout << "NAME: " << device.getInfo<CL_DEVICE_NAME>() << std::endl;
-	std::cout << "VENDOR: " << device.getInfo<CL_DEVICE_VENDOR>() << std::endl;
-	std::cout << "VERSION: " << device.getInfo<CL_DEVICE_VERSION>() << std::endl;
-	std::cout << std::endl;
-}
-
 void CLContext::init()
 {
 	unsigned int numOfPlatforms;

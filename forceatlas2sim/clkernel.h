@@ -1,19 +1,12 @@
 #ifndef _CLKERNEL_H_
 #define _CLKERNEL_H_
 
-#include <iostream>
-#include <string>
-
-#define CL_USE_DEPRECATED_OPENCL_1_2_APIS
-#define __CL_ENABLE_EXCEPTIONS
-
-#include <CL/cl.h>
-#include <CL/cl.hpp>
-
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-class CLKernel
+#include "clbase.h"
+
+class CLKernel: public CLBase
 {
 protected:
 
@@ -32,8 +25,6 @@ protected:
 
 	std::vector<cl::Memory> clBuffers;
 	std::vector<cl::Memory> glBuffers;
-
-	std::string getErrorCode(cl_int error);
 
 	void build();
 

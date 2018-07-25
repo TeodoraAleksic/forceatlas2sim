@@ -1,9 +1,9 @@
 #ifndef _CLNBODY_H_
 #define _CLNBODY_H_
 
-#include "clobject.h"
+#include "clkernel.h"
 
-class CLNbody: public CLObject
+class CLNbody: public CLKernel
 {
 public:
 

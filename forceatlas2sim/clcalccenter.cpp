@@ -1,7 +1,7 @@
 #include "clcalccenter.h"
 #include "kernel.h"
 
-CLCalcCenter::CLCalcCenter(const cl::Device& device_, const cl::Context& context_) : CLObject(device_, context_)
+CLCalcCenter::CLCalcCenter(const cl::Device& device_, const cl::Context& context_) : CLKernel(device_, context_)
 {
 	kernelName = "calcCenter";
 	kernelBody = kernel::calcCenter;

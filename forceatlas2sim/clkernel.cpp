@@ -1,6 +1,6 @@
-#include "clobject.h"
+#include "clkernel.h"
 
-CLObject::CLObject(const cl::Device& device_, const cl::Context& context_): 
+CLKernel::CLKernel(const cl::Device& device_, const cl::Context& context_): 
 	device(device_), context(context_)
 {
 	isInited = false;
@@ -8,11 +8,11 @@ CLObject::CLObject(const cl::Device& device_, const cl::Context& context_):
 	globalWorkSize = 0;
 }
 
-CLObject::~CLObject()
+CLKernel::~CLKernel()
 {
 }
 
-std::string CLObject::getErrorCode(cl_int error)
+std::string CLKernel::getErrorCode(cl_int error)
 {
 	switch (error) {
 	case 0: return "CL_SUCCESS";
@@ -80,7 +80,7 @@ std::string CLObject::getErrorCode(cl_int error)
 	}
 }
 
-void CLObject::build()
+void CLKernel::build()
 {
 	try
 	{
@@ -99,7 +99,7 @@ void CLObject::build()
 	}
 }
 
-void CLObject::init()
+void CLKernel::init()
 {
 	if (isInited)
 		return;
@@ -109,7 +109,7 @@ void CLObject::init()
 	isInited = true;
 }
 
-void CLObject::run()
+void CLKernel::run()
 {
 	if (!isInited)
 		return;
@@ -129,13 +129,13 @@ void CLObject::run()
 	queue.finish();
 }
 
-void CLObject::setWorkSize(unsigned int ndRange)
+void CLKernel::setWorkSize(unsigned int ndRange)
 {
 	globalWorkSize = (ndRange % 64) > 0 ? 64 * ((int)std::ceil(ndRange / 64) + 1) : ndRange;
 	localWorkSize = 64;
 }
 
-void CLObject::setArg(unsigned int argId, GLuint glBufferId, cl_mem_flags memFlags)
+void CLKernel::setArg(unsigned int argId, GLuint glBufferId, cl_mem_flags memFlags)
 {
 	try
 	{
@@ -149,7 +149,7 @@ void CLObject::setArg(unsigned int argId, GLuint glBufferId, cl_mem_flags memFla
 	}
 }
 
-void CLObject::setArg(unsigned int argId, cl::Buffer clBuffer)
+void CLKernel::setArg(unsigned int argId, cl::Buffer clBuffer)
 {
 	try
 	{

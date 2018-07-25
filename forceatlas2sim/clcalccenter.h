@@ -1,9 +1,9 @@
 #ifndef _CLCALCCENTER_H_
 #define _CLCALCCENTER_H_
 
-#include "clobject.h"
+#include "clkernel.h"
 
-class CLCalcCenter : public CLObject
+class CLCalcCenter : public CLKernel
 {
 private:
 

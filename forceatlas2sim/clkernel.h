@@ -1,5 +1,5 @@
-#ifndef _CLOBJECT_H_
-#define _CLOBJECT_H_
+#ifndef _CLKERNEL_H_
+#define _CLKERNEL_H_
 
 #include <iostream>
 #include <string>
@@ -13,7 +13,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-class CLObject
+class CLKernel
 {
 protected:
 
@@ -39,8 +39,8 @@ protected:
 
 public:
 
-	CLObject(const cl::Device& device_, const cl::Context& context_);
-	~CLObject();
+	CLKernel(const cl::Device& device_, const cl::Context& context_);
+	~CLKernel();
 
 	void init();
 	void run();
@@ -56,7 +56,7 @@ public:
 
 };
 
-template <class T> void CLObject::setArg(unsigned int argId, T data)
+template <class T> void CLKernel::setArg(unsigned int argId, T data)
 {
 	try
 	{
@@ -68,7 +68,7 @@ template <class T> void CLObject::setArg(unsigned int argId, T data)
 	}
 }
 
-template <class T> void CLObject::setArg(unsigned int argId, unsigned int size,  T* data)
+template <class T> void CLKernel::setArg(unsigned int argId, unsigned int size,  T* data)
 {
 	try
 	{
@@ -80,7 +80,7 @@ template <class T> void CLObject::setArg(unsigned int argId, unsigned int size, 
 	}
 }
 
-template <class T> void CLObject::setArg(unsigned int argId, unsigned int size, T* data, cl_mem_flags memFlags)
+template <class T> void CLKernel::setArg(unsigned int argId, unsigned int size, T* data, cl_mem_flags memFlags)
 {
 	try
 	{

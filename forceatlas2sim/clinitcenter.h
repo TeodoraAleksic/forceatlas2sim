@@ -1,9 +1,9 @@
 #ifndef _CLINITCENTER_H_
 #define _CLINITCENTER_H_
 
-#include "clobject.h"
+#include "clkernel.h"
 
-class CLInitCenter : public CLObject
+class CLInitCenter : public CLKernel
 {
 public:
 

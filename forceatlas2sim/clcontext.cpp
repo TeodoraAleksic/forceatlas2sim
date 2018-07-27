@@ -14,59 +14,56 @@ CLContext::~CLContext()
 {
 }
 
-void CLContext::print(cl::Platform platform)
-{
-	std::cout << "Name:	" << platform.getInfo<CL_PLATFORM_NAME>() << "\n";
-	std::cout << "Vendor: " << platform.getInfo<CL_PLATFORM_VENDOR>() << "\n";
-	std::cout << "Version: " << platform.getInfo<CL_PLATFORM_VERSION>() << "\n";
-}
-
-void CLContext::print(cl::Device device)
-{
-	std::cout << "Name: " << device.getInfo<CL_DEVICE_NAME>() << "\n";
-	std::cout << "Vendor: " << device.getInfo<CL_DEVICE_VENDOR>() << "\n";
-	std::cout << "Version: " << device.getInfo<CL_DEVICE_VERSION>() << "\n";
-}
-
 void CLContext::init()
 {
-	std::vector<cl::Platform> platforms;
-	cl::Platform::get(&platforms);
+	// Gets number of available OpenCL platforms
+	unsigned int numOfPlatforms;
+	clGetPlatformIDs(0, nullptr, &numOfPlatforms);
 
-	std::vector<cl::Device> devices;
-	platforms[0].getDevices(CL_DEVICE_TYPE_GPU, &devices);
-
-	// Gets info about selected OpenGL device
-	std::string glVendor = (const char*)glGetString(GL_VENDOR);
-	std::string glRenderer = (const char*)glGetString(GL_RENDERER);
-
-	auto deviceIter = devices.begin();
-
-	// Searches for CL/GL compatible device
-	for (; deviceIter != devices.end(); ++deviceIter) {
-		std::string clDeviceName = deviceIter->getInfo<CL_DEVICE_NAME>();
-		std::string clDeviceVendor = deviceIter->getInfo<CL_DEVICE_VENDOR>();
-
-		if (glVendor.find(clDeviceVendor.substr(0, clDeviceVendor.length() - 1)) != std::string::npos &&
-			glRenderer.find(clDeviceName.substr(0, clDeviceName.length() - 1)) != std::string::npos)
-			break;
+	if (numOfPlatforms == 0)
+	{
+		std::cout << "Could not find OpenCL platform" << std::endl;
+		throw "Could not find OpenCL platform";
 	}
 
-	if (deviceIter == devices.end())
-		throw "CL/GL compatible device not found";
+	// Gets all available OpenCL platforms
+	std::vector<cl_platform_id> platformIds;
+	platformIds.resize(numOfPlatforms);
+	clGetPlatformIDs(numOfPlatforms, &platformIds[0], nullptr);
 
-	device = *deviceIter;
-	print(device);
+	for (auto platformId = platformIds.begin(); platformId != platformIds.end(); ++platformId)
+	{
+		cl_context_properties properties[] = {
+			CL_GL_CONTEXT_KHR, (cl_context_properties)wglGetCurrentContext(),	// Windows OpenGL context
+			CL_WGL_HDC_KHR, (cl_context_properties)wglGetCurrentDC(),			// Windows OpenGL HDC
+			CL_CONTEXT_PLATFORM, (cl_context_properties)(*platformId),			// OpenCL platform
+			0
+		};
 
-	cl_context_properties properties[] = {
-		CL_GL_CONTEXT_KHR, (cl_context_properties)wglGetCurrentContext(),
-		CL_WGL_HDC_KHR, (cl_context_properties)wglGetCurrentDC(),
-		CL_CONTEXT_PLATFORM, reinterpret_cast<cl_context_properties>(platforms[0]()),
-		0
-	};
+		// Gets pointer to function clGetGLContextInfoKHR
+		clGetGLContextInfoKHR_fn clGetGLContextInfoKHR =
+			(clGetGLContextInfoKHR_fn)clGetExtensionFunctionAddressForPlatform(*platformId, "clGetGLContextInfoKHR");
 
-	// Creates CL context
-	context = cl::Context(device, properties);
+		cl_device_id deviceId;
+
+		// Gets Id of the device associated with the current OpenGL context
+		cl_int errorCode = clGetGLContextInfoKHR(
+			properties, CL_CURRENT_DEVICE_FOR_GL_CONTEXT_KHR, sizeof(cl_device_id), &deviceId, nullptr);
+
+		if (errorCode == CL_SUCCESS)
+		{
+			print(cl::Platform(*platformId));
+			print(cl::Device(deviceId));
+
+			device = cl::Device(deviceId);
+			context = cl::Context(device , properties);
+
+			return;
+		}
+	}
+
+	std::cout << "Could not find CL/GL interoperable device" << std::endl;
+	throw "Could not find CL/GL interoperable device";
 }
 
 const cl::Device& CLContext::getDevice() const

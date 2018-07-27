@@ -1,5 +1,5 @@
-#ifndef _GLOBJECT_H_
-#define _GLOBJECT_H_
+#ifndef _GLBASE_H_
+#define _GLBASE_H_
 
 #include <string>
 #include <vector>
@@ -7,7 +7,7 @@
 #include <glad\glad.h>
 #include <GLFW\glfw3.h>
 
-class GLObject
+class GLBase
 {
 protected:
 
@@ -18,8 +18,8 @@ protected:
 
 public:
 
-	GLObject();
-	~GLObject();
+	GLBase();
+	~GLBase();
 
 	virtual void init() = 0;
 	virtual void draw() = 0;

@@ -1,18 +1,14 @@
-#include "clobject.h"
+#include "clbase.h"
 
-CLObject::CLObject(const cl::Device& device_, const cl::Context& context_): 
-	device(device_), context(context_)
-{
-	isInited = false;
-	localWorkSize = 0;
-	globalWorkSize = 0;
-}
-
-CLObject::~CLObject()
+CLBase::CLBase()
 {
 }
 
-std::string CLObject::getErrorCode(cl_int error)
+CLBase::~CLBase()
+{
+}
+
+std::string CLBase::getErrorCode(cl_int error)
 {
 	switch (error) {
 	case 0: return "CL_SUCCESS";
@@ -80,84 +76,20 @@ std::string CLObject::getErrorCode(cl_int error)
 	}
 }
 
-void CLObject::build()
+void CLBase::print(cl::Platform platform)
 {
-	try
-	{
-		// Builds CL kernel from source and initializes command queue
-		cl::Program::Sources sources(1, std::make_pair(kernelBody.c_str(), kernelBody.length()));
-		program = cl::Program(context, sources);
-		program.build({ device });	
-		kernel = cl::Kernel(program, kernelName.c_str());
-		queue = cl::CommandQueue(context, device);
-	}
-	catch (cl::Error error) {
-		// Handles build error
-		std::cout << kernelName << " " << getErrorCode(error.err()) << " " << error.what() << "\n";
-  		std::string strDirect = program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device);
-		std::cout << strDirect << "\n";
-	}
+	std::cout << "OpenCL Platform" << std::endl;
+	std::cout << "NAME:	" << platform.getInfo<CL_PLATFORM_NAME>() << std::endl;
+	std::cout << "VENDOR: " << platform.getInfo<CL_PLATFORM_VENDOR>() << std::endl;
+	std::cout << "VERSION: " << platform.getInfo<CL_PLATFORM_VERSION>() << std::endl;
+	std::cout << std::endl;
 }
 
-void CLObject::init()
+void CLBase::print(cl::Device device)
 {
-	if (isInited)
-		return;
-
-	build();
-
-	isInited = true;
-}
-
-void CLObject::run()
-{
-	if (!isInited)
-		return;
-
-	queue.enqueueAcquireGLObjects(&glBuffers);
-
-	try
-	{
-		// Runs kernel
-		queue.enqueueNDRangeKernel(kernel, cl::NDRange(), cl::NDRange(globalWorkSize), cl::NDRange(localWorkSize));
-	}
-	catch (cl::Error error) {
-		std::cout << getErrorCode(error.err()) << " " << error.what() << "\n";
-	}
-
-	queue.enqueueReleaseGLObjects(&glBuffers);
-	queue.finish();
-}
-
-void CLObject::setWorkSize(unsigned int ndRange)
-{
-	globalWorkSize = (ndRange % 64) > 0 ? 64 * ((int)std::ceil(ndRange / 64) + 1) : ndRange;
-	localWorkSize = 64;
-}
-
-void CLObject::setArg(unsigned int argId, GLuint glBufferId, cl_mem_flags memFlags)
-{
-	try
-	{
-		cl::BufferGL glBuffer = cl::BufferGL(context, memFlags, glBufferId, nullptr);
-		glBuffers.push_back(glBuffer);
-		kernel.setArg(argId, glBuffer);
-	}
-	catch (cl::Error error)
-	{ 
-		std::cout << getErrorCode(error.err()) << " " << error.what() << std::endl;
-	}
-}
-
-void CLObject::setArg(unsigned int argId, cl::Buffer clBuffer)
-{
-	try
-	{
-		clBuffers.push_back(clBuffer);
-		kernel.setArg(argId, clBuffer);
-	}
-	catch (cl::Error error)
-	{
-		std::cout << getErrorCode(error.err()) << " " << error.what() << std::endl;
-	}
+	std::cout << "OpenCL Device" << std::endl;
+	std::cout << "NAME: " << device.getInfo<CL_DEVICE_NAME>() << std::endl;
+	std::cout << "VENDOR: " << device.getInfo<CL_DEVICE_VENDOR>() << std::endl;
+	std::cout << "VERSION: " << device.getInfo<CL_DEVICE_VERSION>() << std::endl;
+	std::cout << std::endl;
 }

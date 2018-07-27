@@ -1,16 +1,16 @@
 #include <iostream>
 
-#include "globject.h"
+#include "glbase.h"
 
-GLObject::GLObject()
+GLBase::GLBase()
 {
 }
 
-GLObject::~GLObject()
+GLBase::~GLBase()
 {
 }
 
-std::string GLObject::getShaderName(GLenum shaderType)
+std::string GLBase::getShaderName(GLenum shaderType)
 {
 	switch (shaderType)
 	{
@@ -31,7 +31,7 @@ std::string GLObject::getShaderName(GLenum shaderType)
 	}
 }
 
-unsigned int GLObject::buildShader(GLenum shaderType, std::string shaderBody)
+unsigned int GLBase::buildShader(GLenum shaderType, std::string shaderBody)
 {
 	unsigned int shader;
 	shader = glCreateShader(shaderType);
@@ -55,7 +55,7 @@ unsigned int GLObject::buildShader(GLenum shaderType, std::string shaderBody)
 	return shader;
 }
 
-unsigned int GLObject::buildProgram(std::vector<unsigned int> shaders)
+unsigned int GLBase::buildProgram(std::vector<unsigned int> shaders)
 {
 	unsigned int program;
 	program = glCreateProgram();

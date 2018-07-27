@@ -1,9 +1,9 @@
 #ifndef _CLUPDATEEDGE_H_
 #define _CLUPDATEEDGE_H_
 
-#include "clobject.h"
+#include "clkernel.h"
 
-class CLUpdateEdge : public CLObject
+class CLUpdateEdge : public CLKernel
 {
 public:
 

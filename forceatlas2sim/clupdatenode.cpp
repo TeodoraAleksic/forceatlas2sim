@@ -2,7 +2,7 @@
 #include "kernel.h"
 
 CLUpdateNode::CLUpdateNode(const cl::Device& device_, const cl::Context& context_, bool fg, bool fsg): 
-	CLObject(device_, context_)
+	CLKernel(device_, context_)
 {
 	if (fg)
 	{

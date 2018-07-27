@@ -1,9 +1,9 @@
 #ifndef _CLUPDATENODE_H_
 #define _CLUPDATENODE_H_
 
-#include "clobject.h"
+#include "clkernel.h"
 
-class CLUpdateNode: public CLObject
+class CLUpdateNode: public CLKernel
 {
 public:
 

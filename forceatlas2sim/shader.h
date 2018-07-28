@@ -14,13 +14,21 @@ namespace shader
 	layout(location = 2) in float offsetY; \
 	layout(location = 3) in float offsetZ; \
 	layout(location = 4) in uint scale; \
-	 \
+	\
 	uniform mat4 projection; \
 	uniform mat4 view; \
 	uniform mat4 model; \
-	 \
+	\
+	uniform mat3 normalMatrix;\
+	\
+	out vec3 vertPos;\
+	out vec3 vertNormal;\
+	\
 	void main() \
 	{ \
+		vertPos = vec3(model * vec4(position, 1.0f));\
+		vertNormal = normalMatrix * normalize(position);\
+		\
 		vec3 offset = vec3(offsetX, offsetY, offsetZ); \
 		vec3 newPos = position * (float(scale) * 0.5 + 0.5) + offset; \
 		gl_Position = projection * view * model * vec4(newPos, 1); \
@@ -31,10 +39,25 @@ namespace shader
 	" \
 	#version 330 core \n\
 	\
+	in vec3 vertPos;\
+	in vec3 vertNormal;\
+	\
 	out vec4 outColor; \
 	\
 	void main() { \
-		outColor = vec4(1.0, 0.0, 1.0, 1.0); \
+		vec3 lightPos = vec3(50.0, 50.0, 50.0);\
+		vec3 nodeColor = vec3(1.0, 0.0, 1.0);\
+		vec3 lightColor = vec3(1.0, 1.0, 1.0);\
+		\
+		float ambientStrength = 0.2; \
+		vec3 ambient = ambientStrength * lightColor; \
+		\
+		vec3 normal = normalize(vertNormal); \
+		vec3 lightDir = normalize(lightPos - vertPos); \
+		vec3 diffuse = max(dot(normal, lightDir), 0.0) * lightColor; \
+		\
+		vec3 color = (ambient + diffuse) * nodeColor; \
+		outColor = vec4(color, 1.0); \
 	} \
 	";
 

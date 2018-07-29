@@ -47,18 +47,25 @@ namespace shader
 	out vec4 outColor; \n\
 	\n\
 	void main() { \n\
-		vec3 nodeColor = vec3(1.0, 0.0, 1.0); \n\
+		vec3 nodeColor = vec3(0.95, 0.7, 0.25); \n\
 		vec3 lightPos = cameraPos + vec3(1.0, 1.0, 1.0); \n\
 		vec3 lightColor = vec3(1.0, 1.0, 1.0); \n\
 		\n\
-		float ambientStrength = 0.2; \n\
+		float ambientStrength = 0.1; \n\
 		vec3 ambient = ambientStrength * lightColor; \n\
 		\n\
 		vec3 normal = normalize(vertNormal); \n\
 		vec3 lightDir = normalize(lightPos - vertPos); \n\
 		vec3 diffuse = max(dot(normal, lightDir), 0.0) * lightColor; \n\
 		\n\
-		vec3 color = (ambient + diffuse) * nodeColor; \n\
+		vec3 viewDir = normalize(cameraPos - vertPos); \n\
+		vec3 reflectDir = reflect(-lightDir, vertNormal); \n\
+		\n\
+		float specularStrength = 0.1; \n\
+		float spec = pow(max(dot(viewDir, reflectDir), 0.0), 256); \n\
+		vec3 specular = specularStrength * spec * lightColor; \n\
+		\n\
+		vec3 color = (ambient + diffuse + specular) * nodeColor; \n\
 		outColor = vec4(color, 1.0); \n\
 	} \n\
 	";

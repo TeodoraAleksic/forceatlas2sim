@@ -42,11 +42,13 @@ namespace shader
 	in vec3 vertPos; \n\
 	in vec3 vertNormal; \n\
 	\n\
+	uniform vec3 cameraPos; \n\
+	\n\
 	out vec4 outColor; \n\
 	\n\
 	void main() { \n\
-		vec3 lightPos = vec3(50.0, 50.0, 50.0); \n\
 		vec3 nodeColor = vec3(1.0, 0.0, 1.0); \n\
+		vec3 lightPos = cameraPos + vec3(1.0, 1.0, 1.0); \n\
 		vec3 lightColor = vec3(1.0, 1.0, 1.0); \n\
 		\n\
 		float ambientStrength = 0.2; \n\

@@ -88,6 +88,7 @@ void GLGraphNode::init()
 	uniformView = glGetUniformLocation(program, "view");
 	uniformModel = glGetUniformLocation(program, "model");
 	uniformNormalMatrix = glGetUniformLocation(program, "normalMatrix");
+	uniformCameraPos = glGetUniformLocation(program, "cameraPos");
 
 	std::vector<float> vertices;
 	std::vector<unsigned int> indices;
@@ -168,12 +169,14 @@ void GLGraphNode::draw()
 	glm::mat4 view = camera.getPosition();
 	glm::mat4 model(1.0f);
 	glm::mat3 normalMatrix = glm::transpose(glm::inverse(model));
+	glm::vec3 cameraPos = camera.getCameraPos();
 
 	// Sets uniforms for camera position
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	glUniformMatrix3fv(uniformNormalMatrix, 1, GL_FALSE, glm::value_ptr(normalMatrix));
+	glUniform3f(uniformCameraPos, cameraPos.x, cameraPos.y, cameraPos.z);
 
 	// Binds buffers
 	glBindVertexArray(vao);

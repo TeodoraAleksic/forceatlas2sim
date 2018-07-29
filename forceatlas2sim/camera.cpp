@@ -20,6 +20,11 @@ void Camera::update()
 	cameraFront = glm::normalize(front);
 }
 
+glm::vec3 Camera::getCameraPos() const
+{
+	return cameraPos;
+}
+
 glm::mat4 Camera::getPosition() const
 {
 	return glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);

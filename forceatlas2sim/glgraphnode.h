@@ -20,7 +20,7 @@ private:
 	unsigned int vboVertex, vboIndex, vboOffsetX, vboOffsetY, vboOffsetZ, vboScale;
 	
 	unsigned int program;
-	unsigned int uniformProjection, uniformView, uniformModel;
+	unsigned int uniformProjection, uniformView, uniformModel, uniformNormalMatrix, uniformCameraPos;
 
 	void initNode(std::vector<float>* vertices, std::vector<unsigned int>* indices);
 

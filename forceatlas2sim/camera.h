@@ -30,6 +30,8 @@ public:
 	Camera(glm::vec3 cameraPos_, glm::vec3 cameraFront_, glm::vec3 cameraUp_);
 	~Camera();
 
+	glm::vec3 getCameraPos() const;
+
 	glm::mat4 getPosition() const;
 	double getFOV() const;
 

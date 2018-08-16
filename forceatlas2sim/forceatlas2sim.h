@@ -1,10 +1,10 @@
 #ifndef _FORCEATLAS2SIM_H_
 #define _FORCEATLAS2SIM_H_
 
-#include "clcalccenter.h"
 #include "clcontext.h"
-#include "clinitcenter.h"
+#include "clgraphcenter.h"
 #include "clnbody.h"
+#include "clsum.h"
 #include "clupdateedge.h"
 #include "clupdatenode.h"
 #include "forceatlas2params.h"
@@ -23,23 +23,25 @@ private:
 
 	CLContext clContext;
 
-	CLInitCenter clInitCenter;
-	CLCalcCenter clCalcCenter;
+	CLGraphCenter clGraphCenter;
+	CLSum clSum;
 	CLNbody clNbody;
 	CLUpdateNode clUpdateNode;
 	CLUpdateEdge clUpdateEdge;
 
 	cl::Buffer fx, fy, fz;
 
-	int cFront;
-	cl::Buffer cx[2], cy[2], cz[2];
+	int front;
+	cl::Buffer bufferX[2], bufferY[2], bufferZ[2];
 
-	void setCLInitCenterArgs();
-	void setCLCalcCenterArgs(unsigned int n, unsigned int workGroupSize);
+	void setCLGraphCenterArgs();
+	void setCLSumArgs(unsigned int n, unsigned int workGroupSize);
 	void setCLNbodyArgs();
 	void setCLUpdateNodeArgs();
 	void setCLUpdateNodeArgsFg();
 	void setCLUpdateEdgeArgs();
+
+	void sum(unsigned int n);
 
 public:
 

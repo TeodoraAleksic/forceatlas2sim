@@ -5,9 +5,9 @@
 
 namespace kernel
 {
-	const std::string initCenter =
+	const std::string graphCenter =
 		" \n\
-		__kernel void initCenter( \n\
+		__kernel void graphCenter( \n\
 			__const uint n, \n\
 			__global float* x, \n\
 			__global float* y, \n\
@@ -26,9 +26,9 @@ namespace kernel
 		";
 
 
-	const std::string calcCenter =
+	const std::string sum =
 		" \n\
-		__kernel void calcCenter( \n\
+		__kernel void sum( \n\
 			__const uint n, \n\
 			__global float *ix, \n\
 			__global float *iy, \n\

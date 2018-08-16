@@ -28,6 +28,58 @@ namespace kernel
 		} \n\
 		";
 
+	const std::string globalSwing =
+		" \n\
+		__kernel void globalSwing( \n\
+			__const uint n, \n\
+			__global float* swgx, \n\
+			__global float* swgy, \n\
+			__global float* swgz, \n\
+			__global float* fcurrx, \n\
+			__global float* fcurry, \n\
+			__global float* fcurrz, \n\
+			__global float* fprevx, \n\
+			__global float* fprevy, \n\
+			__global float* fprevz, \n\
+			__global uint* degree) \n\
+		{ \n\
+			int id = get_global_id(0); \n\
+			\n\
+			if (id < n) \n\
+			{ \n\
+				swgx[id] = (degree[id] + 1) * fabs(fcurrx - fprevx); \n\
+				swgy[id] = (degree[id] + 1) * fabs(fcurry - fprevy); \n\
+				swgz[id] = (degree[id] + 1) * fabs(fcurrz - fprevz); \n\
+			} \n\
+		} \n\
+		";
+
+	const std::string globalTraction =
+		" \n\
+		__kernel void globalTraction( \n\
+			__const uint n, \n\
+			__global float* trax, \n\
+			__global float* tray, \n\
+			__global float* traz, \n\
+			__global float* fcurrx, \n\
+			__global float* fcurry, \n\
+			__global float* fcurrz, \n\
+			__global float* fprevx, \n\
+			__global float* fprevy, \n\
+			__global float* fprevz, \n\
+			__global uint* degree) \n\
+		{ \n\
+			int id = get_global_id(0); \n\
+			\n\
+			if (id < n) \n\
+			{ \n\
+				trax[id] = (degree[id] + 1) * fabs(fcurrx + fprevx) / 2; \n\
+				tray[id] = (degree[id] + 1) * fabs(fcurry + fprevy) / 2; \n\
+				traz[id] = (degree[id] + 1) * fabs(fcurrz + fprevz) / 2; \n\
+			} \n\
+		} \n\
+		";
+
 	const std::string sum =
 		" \n\
 		__kernel void sum( \n\

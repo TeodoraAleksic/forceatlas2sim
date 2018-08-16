@@ -11,6 +11,8 @@ ForceAtlas2Sim::ForceAtlas2Sim(
 	graphObject(graphObject_),
 	glGraphNode(glGraphNode_),
 	glGraphEdge(glGraphEdge_),
+	clGlobalSwing(clContext.getDevice(), clContext.getContext()),
+	clGlobalTraction(clContext.getDevice(), clContext.getContext()),
 	clGraphCenter(clContext.getDevice(), clContext.getContext()),
 	clSum(clContext.getDevice(), clContext.getContext()),
 	clNbody(clContext.getDevice(), clContext.getContext()),
@@ -22,6 +24,14 @@ ForceAtlas2Sim::ForceAtlas2Sim(
 }
 
 ForceAtlas2Sim::~ForceAtlas2Sim()
+{
+}
+
+void ForceAtlas2Sim::setCLGlobalSwing()
+{
+}
+
+void ForceAtlas2Sim::setCLGlobalTraction()
 {
 }
 

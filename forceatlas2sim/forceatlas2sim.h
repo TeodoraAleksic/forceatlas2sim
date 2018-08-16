@@ -2,6 +2,8 @@
 #define _FORCEATLAS2SIM_H_
 
 #include "clcontext.h"
+#include "clglobalswing.h"
+#include "clglobaltraction.h"
 #include "clgraphcenter.h"
 #include "clnbody.h"
 #include "clsum.h"
@@ -23,6 +25,8 @@ private:
 
 	CLContext clContext;
 
+	CLGlobalSwing clGlobalSwing;
+	CLGlobalTraction clGlobalTraction;
 	CLGraphCenter clGraphCenter;
 	CLSum clSum;
 	CLNbody clNbody;
@@ -34,6 +38,8 @@ private:
 	int front;
 	cl::Buffer bufferX[2], bufferY[2], bufferZ[2];
 
+	void setCLGlobalSwing();
+	void setCLGlobalTraction();
 	void setCLGraphCenterArgs();
 	void setCLSumArgs(unsigned int n, unsigned int workGroupSize);
 	void setCLNbodyArgs();

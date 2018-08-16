@@ -21,10 +21,12 @@ namespace kernel
 			\n\
 			if (id < n) \n\
 			{ \n\
+				cx[id] = (degree[id] + 1) * x[id]; \n\
+				cy[id] = (degree[id] + 1) * y[id]; \n\
+				cz[id] = (degree[id] + 1) * z[id]; \n\
 			} \n\
 		} \n\
 		";
-
 
 	const std::string sum =
 		" \n\

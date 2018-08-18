@@ -47,9 +47,9 @@ namespace kernel
 			\n\
 			if (id < n) \n\
 			{ \n\
-				swgx[id] = (degree[id] + 1) * fabs(fcurrx - fprevx); \n\
-				swgy[id] = (degree[id] + 1) * fabs(fcurry - fprevy); \n\
-				swgz[id] = (degree[id] + 1) * fabs(fcurrz - fprevz); \n\
+				swgx[id] = (degree[id] + 1) * fabs(fcurrx[id] - fprevx[id]); \n\
+				swgy[id] = (degree[id] + 1) * fabs(fcurry[id] - fprevy[id]); \n\
+				swgz[id] = (degree[id] + 1) * fabs(fcurrz[id] - fprevz[id]); \n\
 			} \n\
 		} \n\
 		";
@@ -73,9 +73,9 @@ namespace kernel
 			\n\
 			if (id < n) \n\
 			{ \n\
-				trax[id] = (degree[id] + 1) * fabs(fcurrx + fprevx) / 2; \n\
-				tray[id] = (degree[id] + 1) * fabs(fcurry + fprevy) / 2; \n\
-				traz[id] = (degree[id] + 1) * fabs(fcurrz + fprevz) / 2; \n\
+				trax[id] = (degree[id] + 1) * fabs(fcurrx[id] + fprevx[id]) / 2; \n\
+				tray[id] = (degree[id] + 1) * fabs(fcurry[id] + fprevy[id]) / 2; \n\
+				traz[id] = (degree[id] + 1) * fabs(fcurrz[id] + fprevz[id]) / 2; \n\
 			} \n\
 		} \n\
 		";
@@ -84,6 +84,7 @@ namespace kernel
 		" \n\
 		__kernel void sum( \n\
 			__const uint n, \n\
+			__global float *graphGlobal, \n\
 			__global float *ix, \n\
 			__global float *iy, \n\
 			__global float *iz, \n\
@@ -119,9 +120,18 @@ namespace kernel
 			\n\
 			if (localId == 0) \n\
 			{ \n\
-				ox[groupId] = px[0]; \n\
-				oy[groupId] = py[0]; \n\
-				oz[groupId] = pz[0]; \n\
+				if (n <= groupSize) \n\
+				{ \n\
+					graphGlobal[0] = px[0]; \n\
+					graphGlobal[1] = py[0]; \n\
+					graphGlobal[2] = pz[0]; \n\
+				} \n\
+				else \n\
+				{ \n\
+					ox[groupId] = px[0]; \n\
+					oy[groupId] = py[0]; \n\
+					oz[groupId] = pz[0]; \n\
+				} \n\
 			} \n\
 		} \n\
 		";
@@ -233,17 +243,15 @@ namespace kernel
 			__global float* fz, \n\
 			__const float kg, \n\
 			__const float mass, \n\
-			__global float* cx, \n\
-			__global float* cy, \n\
-			__global float* cz) \n\
+			__global float* center) \n\
 		{ \n\
 			int id = get_global_id(0); \n\
 			\n\
 			if (id < n) \n\
 			{ \n\
-				fx[id] += kg * (cx[0] / mass - x[id] > 0 ? 1 : -1) * (degree[id] + 1); \n\
-				fy[id] += kg * (cy[0] / mass - y[id] > 0 ? 1 : -1) * (degree[id] + 1); \n\
-				fz[id] += kg * (cz[0] / mass - z[id] > 0 ? 1 : -1) * (degree[id] + 1); \n\
+				fx[id] += kg * (center[0] / mass - x[id] > 0 ? 1 : -1) * (degree[id] + 1); \n\
+				fy[id] += kg * (center[1] / mass - y[id] > 0 ? 1 : -1) * (degree[id] + 1); \n\
+				fz[id] += kg * (center[2] / mass - z[id] > 0 ? 1 : -1) * (degree[id] + 1); \n\
 				\n\
 				x[id] += fx[id] / (degree[id] + 1); \n\
 				y[id] += fy[id] / (degree[id] + 1); \n\
@@ -265,17 +273,15 @@ namespace kernel
 			__global float* fz, \n\
 			__const float kg, \n\
 			__const float mass, \n\
-			__global float* cx, \n\
-			__global float* cy, \n\
-			__global float* cz) \n\
+			__global float* center) \n\
 		{ \n\
 			int id = get_global_id(0); \n\
 			\n\
 			if (id < n) \n\
 			{ \n\
-				fx[id] += kg * (degree[id] + 1) * (cx[0] / mass - x[id]); \n\
-				fy[id] += kg * (degree[id] + 1) * (cy[0] / mass - y[id]); \n\
-				fz[id] += kg * (degree[id] + 1) * (cz[0] / mass - z[id]); \n\
+				fx[id] += kg * (degree[id] + 1) * (center[0] / mass - x[id]); \n\
+				fy[id] += kg * (degree[id] + 1) * (center[1] / mass - y[id]); \n\
+				fz[id] += kg * (degree[id] + 1) * (center[2] / mass - z[id]); \n\
 				\n\
 				x[id] += fx[id] / (degree[id] + 1); \n\
 				y[id] += fy[id] / (degree[id] + 1); \n\

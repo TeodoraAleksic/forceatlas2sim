@@ -33,21 +33,24 @@ private:
 	CLUpdateNode clUpdateNode;
 	CLUpdateEdge clUpdateEdge;
 
-	cl::Buffer fx, fy, fz;
+	cl::Buffer centerOfMass, globalSwing, globalTraction;
 
-	int front;
-	cl::Buffer bufferX[2], bufferY[2], bufferZ[2];
+	int forceFront;
+	cl::Buffer fx[2], fy[2], fz[2];
 
-	void setCLGlobalSwing();
-	void setCLGlobalTraction();
+	int tmpFront;
+	cl::Buffer tmpX[2], tmpY[2], tmpZ[2];
+
+	void setCLGlobalSwingArgs();
+	void setCLGlobalTractionArgs();
 	void setCLGraphCenterArgs();
-	void setCLSumArgs(unsigned int n, unsigned int workGroupSize);
+	void setCLSumArgs(unsigned int n, unsigned int workGroupSize, cl::Buffer global);
 	void setCLNbodyArgs();
 	void setCLUpdateNodeArgs();
 	void setCLUpdateNodeArgsFg();
 	void setCLUpdateEdgeArgs();
 
-	void sum(unsigned int n);
+	void sum(unsigned int n, cl::Buffer global);
 
 public:
 

@@ -209,83 +209,69 @@ namespace kernel
 
 	const std::string updateNode =
 		" \n\
+		float forceOfGravity(float kg, float mass, float cp, float p, uint degree) \n\
+		{ \n\
+			return kg * (cp / mass - p > 0 ? 1 : -1) * (degree + 1); \n\
+		} \n\
+		\n\
+		float strongForceOfGravity(float kg, float mass, float cp, float p, uint degree) \n\
+		{ \n\
+			return kg * (degree + 1) * (cp / mass - p); \n\
+		} \n\
+		\n\
+		float swing(float fcurr, float fprev, uint degree) \n\
+		{ \n\
+			return (degree + 1) * fabs(fcurr - fprev); \n\
+		} \n\
+		\n\
+		float localSpeed(float globalSpeed, float fcurr, float fprev, uint degree) \n\
+		{ \n\
+			return globalSpeed / ((1 + globalSpeed) * sqrt(swing(fcurr, fprev, degree))); \n\
+		} \n\
+		\n\
 		__kernel void updateNode( \n\
 			__const uint n, \n\
-			__global float* x, \n\
-			__global float* y, \n\
-			__global float* z, \n\
-			__global uint* degree, \n\
-			__global float* fx, \n\
-			__global float* fy, \n\
-			__global float* fz) \n\
-		{ \n\
-			int id = get_global_id(0); \n\
-			\n\
-			if (id < n) \n\
-			{ \n\
-				x[id] += 0.01 * fx[id] / (degree[id] + 1); \n\
-				y[id] += 0.01 * fy[id] / (degree[id] + 1); \n\
-				z[id] += 0.01 * fz[id] / (degree[id] + 1); \n\
-			} \n\
-		} \n\
-		";
-
-	const std::string updateNodeFg =
-		" \n\
-		__kernel void updateNodeFg( \n\
-			__const uint n, \n\
-			__global float* x, \n\
-			__global float* y, \n\
-			__global float* z, \n\
-			__global uint* degree, \n\
-			__global float* fx, \n\
-			__global float* fy, \n\
-			__global float* fz, \n\
 			__const float kg, \n\
-			__const float mass, \n\
-			__global float* center) \n\
-		{ \n\
-			int id = get_global_id(0); \n\
-			\n\
-			if (id < n) \n\
-			{ \n\
-				fx[id] += kg * (center[0] / mass - x[id] > 0 ? 1 : -1) * (degree[id] + 1); \n\
-				fy[id] += kg * (center[1] / mass - y[id] > 0 ? 1 : -1) * (degree[id] + 1); \n\
-				fz[id] += kg * (center[2] / mass - z[id] > 0 ? 1 : -1) * (degree[id] + 1); \n\
-				\n\
-				x[id] += fx[id] / (degree[id] + 1); \n\
-				y[id] += fy[id] / (degree[id] + 1); \n\
-				z[id] += fz[id] / (degree[id] + 1); \n\
-			} \n\
-		} \n\
-		";
-
-	const std::string updateNodeFsg =
-		" \n\
-		__kernel void updateNodeFsg( \n\
-			__const uint n, \n\
+			__const float graphMass, \n\
+			__const uint fg, \n\
+			__const uint fsg, \n\
+			__global float* centerOfMass, \n\
+			__global float* globalSwing, \n\
+			__global float* globalTraction, \n\
 			__global float* x, \n\
 			__global float* y, \n\
 			__global float* z, \n\
 			__global uint* degree, \n\
-			__global float* fx, \n\
-			__global float* fy, \n\
-			__global float* fz, \n\
-			__const float kg, \n\
-			__const float mass, \n\
-			__global float* center) \n\
+			__global float* fcurrx, \n\
+			__global float* fcurry, \n\
+			__global float* fcurrz, \n\
+			__global float* fprevx, \n\
+			__global float* fprevy, \n\
+			__global float* fprevz) \n\
 		{ \n\
 			int id = get_global_id(0); \n\
 			\n\
+			float globalSpeedX = globalTraction[0] / globalSwing[0]; \n\
+			float globalSpeedY = globalTraction[1] / globalSwing[1]; \n\
+			float globalSpeedZ = globalTraction[2] / globalSwing[2]; \n\
+			\n\
 			if (id < n) \n\
 			{ \n\
-				fx[id] += kg * (degree[id] + 1) * (center[0] / mass - x[id]); \n\
-				fy[id] += kg * (degree[id] + 1) * (center[1] / mass - y[id]); \n\
-				fz[id] += kg * (degree[id] + 1) * (center[2] / mass - z[id]); \n\
+				fcurrx[id] += fg ? forceOfGravity(kg, graphMass, centerOfMass[0], x[id], degree[id]) : 0.0; \n\
+				fcurry[id] += fg ? forceOfGravity(kg, graphMass, centerOfMass[1], y[id], degree[id]) : 0.0; \n\
+				fcurrz[id] += fg ? forceOfGravity(kg, graphMass, centerOfMass[2], z[id], degree[id]) : 0.0; \n\
 				\n\
-				x[id] += fx[id] / (degree[id] + 1); \n\
-				y[id] += fy[id] / (degree[id] + 1); \n\
-				z[id] += fz[id] / (degree[id] + 1); \n\
+				fcurrx[id] += fsg ? strongForceOfGravity(kg, graphMass, centerOfMass[0], x[id], degree[id]) : 0.0; \n\
+				fcurry[id] += fsg ? strongForceOfGravity(kg, graphMass, centerOfMass[1], y[id], degree[id]) : 0.0; \n\
+				fcurrz[id] += fsg ? strongForceOfGravity(kg, graphMass, centerOfMass[2], z[id], degree[id]) : 0.0; \n\
+				\n\
+				float localSpeddX = localSpeed(globalSpeedX, fcurrx[id], fprevx[id], degree[id]); \n\
+				float localSpeddY = localSpeed(globalSpeedY, fcurry[id], fprevy[id], degree[id]); \n\
+				float localSpeddZ = localSpeed(globalSpeedZ, fcurrz[id], fprevz[id], degree[id]); \n\
+				\n\
+				x[id] += localSpeddX * fcurrx[id]; \n\
+				y[id] += localSpeddY * fcurry[id]; \n\
+				z[id] += localSpeddZ * fcurrz[id]; \n\
 			} \n\
 		} \n\
 		";

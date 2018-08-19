@@ -44,11 +44,11 @@ private:
 	void setCLGlobalSwingArgs();
 	void setCLGlobalTractionArgs();
 	void setCLGraphCenterArgs();
-	void setCLSumArgs(unsigned int n, unsigned int workGroupSize, cl::Buffer global);
 	void setCLNbodyArgs();
 	void setCLUpdateNodeArgs();
-	void setCLUpdateNodeArgsFg();
 	void setCLUpdateEdgeArgs();
+
+	void setCLSumArgs(unsigned int n, unsigned int workGroupSize, cl::Buffer global);
 
 	void sum(unsigned int n, cl::Buffer global);
 

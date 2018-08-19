@@ -16,7 +16,7 @@ ForceAtlas2Sim::ForceAtlas2Sim(
 	clGraphCenter(clContext.getDevice(), clContext.getContext()),
 	clSum(clContext.getDevice(), clContext.getContext()),
 	clNbody(clContext.getDevice(), clContext.getContext()),
-	clUpdateNode(clContext.getDevice(), clContext.getContext(), fa2Params_.getFg(), fa2Params_.getFsg()),
+	clUpdateNode(clContext.getDevice(), clContext.getContext()),
 	clUpdateEdge(clContext.getDevice(), clContext.getContext()),
 	clContext()
 {
@@ -73,24 +73,6 @@ void ForceAtlas2Sim::setCLGraphCenterArgs()
 	clGraphCenter.setArg(7, tmpZ[tmpFront]);
 }
 
-void ForceAtlas2Sim::setCLSumArgs(unsigned int n, unsigned int workGroupSize, cl::Buffer graphGlobal)
-{
-	float* partial = nullptr;
-
-	clSum.setWorkSize(n);
-	clSum.setArg(0, n);
-	clSum.setArg(1, graphGlobal);
-	clSum.setArg(2, tmpX[tmpFront]);
-	clSum.setArg(3, tmpY[tmpFront]);
-	clSum.setArg(4, tmpZ[tmpFront]);
-	clSum.setArg(5, tmpX[tmpFront == 1 ? 0 : 1]);
-	clSum.setArg(6, tmpY[tmpFront == 1 ? 0 : 1]);
-	clSum.setArg(7, tmpZ[tmpFront == 1 ? 0 : 1]);
-	clSum.setArg(8, workGroupSize, partial);
-	clSum.setArg(9, workGroupSize, partial);
-	clSum.setArg(10, workGroupSize, partial);
-}
-
 void ForceAtlas2Sim::setCLNbodyArgs()
 {
 	clNbody.setWorkSize(graphObject.getNumOfNodes());
@@ -110,20 +92,23 @@ void ForceAtlas2Sim::setCLUpdateNodeArgs()
 {
 	clUpdateNode.setWorkSize(graphObject.getNumOfNodes());
 	clUpdateNode.setArg(0, graphObject.getNumOfNodes());
-	clUpdateNode.setArg(1, glGraphNode.getOffsetX(), CL_MEM_READ_WRITE);
-	clUpdateNode.setArg(2, glGraphNode.getOffsetY(), CL_MEM_READ_WRITE);
-	clUpdateNode.setArg(3, glGraphNode.getOffsetZ(), CL_MEM_READ_WRITE);
-	clUpdateNode.setArg(4, glGraphNode.getScale(), CL_MEM_READ_ONLY);
-	clUpdateNode.setArg(5, fx[forceFront]);
-	clUpdateNode.setArg(6, fy[forceFront]);
-	clUpdateNode.setArg(7, fz[forceFront]);
-}
-
-void ForceAtlas2Sim::setCLUpdateNodeArgsFg()
-{
-	clUpdateNode.setArg(8, fa2Params.getKg());
-	clUpdateNode.setArg(9, graphObject.getTotalDegree());
-	clUpdateNode.setArg(10, centerOfMass);
+	clUpdateNode.setArg(1, fa2Params.getKg());
+	clUpdateNode.setArg(2, graphObject.getTotalDegree());
+	clUpdateNode.setArg(3, fa2Params.getFg() ? 1 : 0);
+	clUpdateNode.setArg(4, fa2Params.getFsg() ? 1 : 0);
+	clUpdateNode.setArg(5, centerOfMass);
+	clUpdateNode.setArg(6, globalSwing);
+	clUpdateNode.setArg(7, globalTraction);
+	clUpdateNode.setArg(8, glGraphNode.getOffsetX(), CL_MEM_READ_WRITE);
+	clUpdateNode.setArg(9, glGraphNode.getOffsetY(), CL_MEM_READ_WRITE);
+	clUpdateNode.setArg(10, glGraphNode.getOffsetZ(), CL_MEM_READ_WRITE);
+	clUpdateNode.setArg(11, glGraphNode.getScale(), CL_MEM_READ_ONLY);
+	clUpdateNode.setArg(12, fx[forceFront]);
+	clUpdateNode.setArg(13, fy[forceFront]);
+	clUpdateNode.setArg(14, fz[forceFront]);
+	clUpdateNode.setArg(15, fx[forceFront == 1 ? 0 : 1]);
+	clUpdateNode.setArg(16, fy[forceFront == 1 ? 0 : 1]);
+	clUpdateNode.setArg(17, fz[forceFront == 1 ? 0 : 1]);
 }
 
 void ForceAtlas2Sim::setCLUpdateEdgeArgs()
@@ -143,6 +128,24 @@ void ForceAtlas2Sim::setCLUpdateEdgeArgs()
 	clUpdateEdge.setArg(9, glGraphEdge.getTargetX(), CL_MEM_READ_WRITE);
 	clUpdateEdge.setArg(10, glGraphEdge.getTargetY(), CL_MEM_READ_WRITE);
 	clUpdateEdge.setArg(11, glGraphEdge.getTargetZ(), CL_MEM_READ_WRITE);
+}
+
+void ForceAtlas2Sim::setCLSumArgs(unsigned int n, unsigned int workGroupSize, cl::Buffer graphGlobal)
+{
+	float* partial = nullptr;
+
+	clSum.setWorkSize(n);
+	clSum.setArg(0, n);
+	clSum.setArg(1, graphGlobal);
+	clSum.setArg(2, tmpX[tmpFront]);
+	clSum.setArg(3, tmpY[tmpFront]);
+	clSum.setArg(4, tmpZ[tmpFront]);
+	clSum.setArg(5, tmpX[tmpFront == 1 ? 0 : 1]);
+	clSum.setArg(6, tmpY[tmpFront == 1 ? 0 : 1]);
+	clSum.setArg(7, tmpZ[tmpFront == 1 ? 0 : 1]);
+	clSum.setArg(8, workGroupSize, partial);
+	clSum.setArg(9, workGroupSize, partial);
+	clSum.setArg(10, workGroupSize, partial);
 }
 
 void ForceAtlas2Sim::sum(unsigned int n, cl::Buffer graphGlobal)
@@ -221,21 +224,22 @@ void ForceAtlas2Sim::run()
 	{
 		setCLGraphCenterArgs();
 		clGraphCenter.run();
-
 		sum(graphObject.getNumOfNodes(), centerOfMass);
-
-		setCLUpdateNodeArgsFg();
 	}
 
 	// Runs n-body
 	setCLNbodyArgs();
 	clNbody.run();
 
+	// Calculates global swing
 	setCLGlobalSwingArgs();
 	clGlobalSwing.run();
+	sum(graphObject.getNumOfNodes(), globalSwing);
 
+	// Calculates global traction
 	setCLGlobalTractionArgs();
 	clGlobalTraction.run();
+	sum(graphObject.getNumOfNodes(), globalTraction);
 
 	// Updates graph
 	setCLUpdateNodeArgs();

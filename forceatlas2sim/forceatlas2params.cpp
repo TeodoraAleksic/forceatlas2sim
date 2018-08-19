@@ -9,7 +9,11 @@ ForceAtlas2Params::ForceAtlas2Params()
 
 	fg = false;
 	fsg = false;
-	kg = 9.81f;
+	kg = 1.0f;
+
+	tau = 0.5f;
+	ks = 0.1f;
+	ksmax = 10.0f;
 
 	nw = false;
 }
@@ -64,6 +68,21 @@ bool ForceAtlas2Params::getFsg() const
 float ForceAtlas2Params::getKg() const
 {
 	return kg;
+}
+
+float ForceAtlas2Params::getTau() const
+{
+	return tau;
+}
+
+float ForceAtlas2Params::getKs() const
+{
+	return ks;
+}
+
+float ForceAtlas2Params::getKsmax() const
+{
+	return ksmax;
 }
 
 bool ForceAtlas2Params::getNw() const
@@ -149,6 +168,57 @@ void ForceAtlas2Params::setKg(float kg_)
 void ForceAtlas2Params::setKg(std::string kg_)
 {
 	setKg(stringToFloat(kg_));
+}
+
+void ForceAtlas2Params::setTau(float tau_)
+{
+	if (tau_ < 0.0f)
+	{
+		std::string msg = "Tolerance to swinging coefficient must be greater than 0.";
+		std::cout << msg << std::endl;
+		throw std::runtime_error(msg);
+	}
+
+	tau = tau_;
+}
+
+void ForceAtlas2Params::setTau(std::string tau_)
+{
+	setTau(stringToFloat(tau_));
+}
+
+void ForceAtlas2Params::setKs(float ks_)
+{
+	if (ks_ < 0.0f)
+	{
+		std::string msg = "Global speed coefficient must be greater than 0.";
+		std::cout << msg << std::endl;
+		throw std::runtime_error(msg);
+	}
+
+	ks = ks_;
+}
+
+void ForceAtlas2Params::setKs(std::string ks_)
+{
+	setKs(stringToFloat(ks_));
+}
+
+void ForceAtlas2Params::setKsmax(float ksmax_)
+{
+	if (ksmax_ < 0.0f)
+	{
+		std::string msg = "Max global speed coefficient must be greater than 0.";
+		std::cout << msg << std::endl;
+		throw std::runtime_error(msg);
+	}
+
+	ksmax = ksmax_;
+}
+
+void ForceAtlas2Params::setKsmax(std::string ksmax_)
+{
+	setKsmax(stringToFloat(ksmax_));
 }
 
 void ForceAtlas2Params::setNw(bool nw_)

@@ -224,9 +224,14 @@ namespace kernel
 			return (degree + 1) * fabs(fcurr - fprev); \n\
 		} \n\
 		\n\
-		float localSpeed(float globalSpeed, float fcurr, float fprev, uint degree) \n\
+		float localSpeed(float ks, float globalSpeed, float fcurr, float fprev, uint degree) \n\
 		{ \n\
-			return globalSpeed / ((1 + globalSpeed) * sqrt(swing(fcurr, fprev, degree))); \n\
+			return ks * globalSpeed / ((1 + globalSpeed) * sqrt(swing(fcurr, fprev, degree))); \n\
+		} \n\
+		\n\
+		float localSpeedConstraint(float ksmax, float localSpeed, float fcurr) \n\
+		{ \n\
+			return (localSpeed < ksmax / fabs(fcurr)) ? localSpeed : (ksmax / fabs(fcurr)); \n\
 		} \n\
 		\n\
 		__kernel void updateNode( \n\
@@ -235,6 +240,9 @@ namespace kernel
 			__const float graphMass, \n\
 			__const uint fg, \n\
 			__const uint fsg, \n\
+			__const float tau, \n\
+			__const float ks, \n\
+			__const float ksmax, \n\
 			__global float* centerOfMass, \n\
 			__global float* globalSwing, \n\
 			__global float* globalTraction, \n\
@@ -251,9 +259,9 @@ namespace kernel
 		{ \n\
 			int id = get_global_id(0); \n\
 			\n\
-			float globalSpeedX = globalTraction[0] / globalSwing[0]; \n\
-			float globalSpeedY = globalTraction[1] / globalSwing[1]; \n\
-			float globalSpeedZ = globalTraction[2] / globalSwing[2]; \n\
+			float globalSpeedX = tau * globalTraction[0] / globalSwing[0]; \n\
+			float globalSpeedY = tau * globalTraction[1] / globalSwing[1]; \n\
+			float globalSpeedZ = tau * globalTraction[2] / globalSwing[2]; \n\
 			\n\
 			if (id < n) \n\
 			{ \n\
@@ -265,13 +273,17 @@ namespace kernel
 				fcurry[id] += fsg ? strongForceOfGravity(kg, graphMass, centerOfMass[1], y[id], degree[id]) : 0.0; \n\
 				fcurrz[id] += fsg ? strongForceOfGravity(kg, graphMass, centerOfMass[2], z[id], degree[id]) : 0.0; \n\
 				\n\
-				float localSpeddX = localSpeed(globalSpeedX, fcurrx[id], fprevx[id], degree[id]); \n\
-				float localSpeddY = localSpeed(globalSpeedY, fcurry[id], fprevy[id], degree[id]); \n\
-				float localSpeddZ = localSpeed(globalSpeedZ, fcurrz[id], fprevz[id], degree[id]); \n\
+				float localSpeedX = localSpeed(ks, globalSpeedX, fcurrx[id], fprevx[id], degree[id]); \n\
+				float localSpeedY = localSpeed(ks, globalSpeedY, fcurry[id], fprevy[id], degree[id]); \n\
+				float localSpeedZ = localSpeed(ks, globalSpeedZ, fcurrz[id], fprevz[id], degree[id]); \n\
 				\n\
-				x[id] += localSpeddX * fcurrx[id]; \n\
-				y[id] += localSpeddY * fcurry[id]; \n\
-				z[id] += localSpeddZ * fcurrz[id]; \n\
+				localSpeedX = localSpeedConstraint(ksmax, localSpeedX, fcurrx[id]); \n\
+				localSpeedY = localSpeedConstraint(ksmax, localSpeedY, fcurry[id]); \n\
+				localSpeedZ = localSpeedConstraint(ksmax, localSpeedZ, fcurrz[id]); \n\
+				\n\
+				x[id] += localSpeedX * fcurrx[id]; \n\
+				y[id] += localSpeedY * fcurry[id]; \n\
+				z[id] += localSpeedZ * fcurrz[id]; \n\
 			} \n\
 		} \n\
 		";

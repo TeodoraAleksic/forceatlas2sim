@@ -3,7 +3,7 @@
 
 #include "clkernel.h"
 
-class CLCalcCenter : public CLKernel
+class CLSum : public CLKernel
 {
 private:
 
@@ -11,8 +11,8 @@ private:
 
 public:
 
-	CLCalcCenter(const cl::Device& device_, const cl::Context& context_);
-	~CLCalcCenter();
+	CLSum(const cl::Device& device_, const cl::Context& context_);
+	~CLSum();
 
 	unsigned int getMaxWorkGroupSize();
 

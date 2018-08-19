@@ -30,7 +30,10 @@ bool isValueArg(std::string argName)
 		argName == std::string("-i")	||
 		argName == std::string("-kr")	||
 		argName == std::string("-krp")	||
-		argName == std::string("-kg");
+		argName == std::string("-kg")	||
+		argName == std::string("-tau")	||
+		argName == std::string("-ks")	||
+		argName == std::string("-ksmax");
 }
 
 bool isFlagArg(std::string argName)
@@ -56,6 +59,12 @@ void setValueArg(ForceAtlas2Params* fa2Params, std::string argName, std::string 
 		fa2Params->setKrp(argValue);
 	else if (argName == std::string("-kg"))
 		fa2Params->setKg(argValue);
+	else if (argName == std::string("-tau"))
+		fa2Params->setTau(argValue);
+	else if (argName == std::string("-ks"))
+		fa2Params->setKs(argValue);
+	else if (argName == std::string("-ksmax"))
+		fa2Params->setKsmax(argValue);
 	else
 		throw "Invalid value argument " + argName;
 }
@@ -105,14 +114,17 @@ int main(int argc, char** argv)
 		"                          [-fg] [-fsg] [-kg FLOAT] [-nw] [-h]\n\n"\
 		"GPU-based parallelization and graphical simulation of the ForceAtlas2 algorithm.\n\n"\
 		"Options:\n"\
-		"-i INPUT     Input GEFX or GML graph file. Required.\n"\
-		"-kr FLOAT    Repulsion force coefficient. Default: 0.01.\n"\
-		"-krp FLOAT   Repulsion force overlap coefficient. Default: 100.\n"\
-		"-fg          Uses gravitational force to attract nodes to graph center.\n"\
-		"-fsg         Uses strong gravitational force to attract nodes to graph center.\n"\
-		"-kg FLOAT    Gravitational force coefficient. Default: 9.81.\n"\
-		"-nw          Discards edge weights.\n"\
-		"-h           Prints usage.\n";
+		"-i INPUT      Input GEFX or GML graph file. Required.\n"\
+		"-kr FLOAT     Repulsion force coefficient. Default: 0.01.\n"\
+		"-krp FLOAT    Repulsion force overlap coefficient. Default: 100.\n"\
+		"-fg           Uses gravitational force to attract nodes to graph center.\n"\
+		"-fsg          Uses strong gravitational force to attract nodes to graph center.\n"\
+		"-kg FLOAT     Gravitational force coefficient. Default: 1.0.\n"\
+		"-tau FLOAT    Tolerance to swinging coefficient. Default: 0.5.\n"\
+		"-ks FLOAT     Global speed coefficient. Default: 0.1.\n"\
+		"-ksmax FLOAT  Max global speed coefficient. Default: 10.\n"\
+		"-nw           Discards edge weights.\n"\
+		"-h            Prints usage.\n";
 
 	ForceAtlas2Params fa2Params;
 

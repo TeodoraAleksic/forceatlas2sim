@@ -7,7 +7,7 @@ class CLUpdateNode: public CLKernel
 {
 public:
 
-	CLUpdateNode(const cl::Device& device_, const cl::Context& context_, bool fg, bool fsg);
+	CLUpdateNode(const cl::Device& device_, const cl::Context& context_);
 	~CLUpdateNode();
 
 };

@@ -1,10 +1,12 @@
 #ifndef _FORCEATLAS2SIM_H_
 #define _FORCEATLAS2SIM_H_
 
-#include "clcalccenter.h"
 #include "clcontext.h"
-#include "clinitcenter.h"
+#include "clglobalswing.h"
+#include "clglobaltraction.h"
+#include "clgraphcenter.h"
 #include "clnbody.h"
+#include "clsum.h"
 #include "clupdateedge.h"
 #include "clupdatenode.h"
 #include "forceatlas2params.h"
@@ -23,23 +25,32 @@ private:
 
 	CLContext clContext;
 
-	CLInitCenter clInitCenter;
-	CLCalcCenter clCalcCenter;
+	CLGlobalSwing clGlobalSwing;
+	CLGlobalTraction clGlobalTraction;
+	CLGraphCenter clGraphCenter;
+	CLSum clSum;
 	CLNbody clNbody;
 	CLUpdateNode clUpdateNode;
 	CLUpdateEdge clUpdateEdge;
 
-	cl::Buffer fx, fy, fz;
+	cl::Buffer centerOfMass, globalSwing, globalTraction;
 
-	int cFront;
-	cl::Buffer cx[2], cy[2], cz[2];
+	int forceFront;
+	cl::Buffer fx[2], fy[2], fz[2];
 
-	void setCLInitCenterArgs();
-	void setCLCalcCenterArgs(unsigned int n, unsigned int workGroupSize);
+	int tmpFront;
+	cl::Buffer tmpX[2], tmpY[2], tmpZ[2];
+
+	void setCLGlobalSwingArgs();
+	void setCLGlobalTractionArgs();
+	void setCLGraphCenterArgs();
 	void setCLNbodyArgs();
 	void setCLUpdateNodeArgs();
-	void setCLUpdateNodeArgsFg();
 	void setCLUpdateEdgeArgs();
+
+	void setCLSumArgs(unsigned int n, unsigned int workGroupSize, cl::Buffer global);
+
+	void sum(unsigned int n, cl::Buffer global);
 
 public:
 

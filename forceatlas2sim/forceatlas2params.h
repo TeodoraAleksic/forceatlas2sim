@@ -14,6 +14,8 @@ private:
 	bool fg, fsg;
 	float kg;
 
+	float tau, ks, ksmax;
+
 	bool nw;
 
 	float stringToFloat(std::string str);
@@ -34,6 +36,10 @@ public:
 	bool getFsg() const;
 	float getKg() const;
 
+	float getTau() const;
+	float getKs() const;
+	float getKsmax() const;
+
 	bool getNw() const;
 
 	// Setters
@@ -51,6 +57,15 @@ public:
 	
 	void setKg(float kg_);
 	void setKg(std::string kg_);
+
+	void setTau(float tau_);
+	void setTau(std::string tau_);
+
+	void setKs(float ks_);
+	void setKs(std::string ks_);
+
+	void setKsmax(float ksmax_);
+	void setKsmax(std::string ksmax_);
 
 	void setNw(bool nw_);
 

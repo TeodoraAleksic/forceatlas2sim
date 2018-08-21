@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "graphobject.h"
 
 GraphObject::GraphObject()
@@ -11,6 +13,70 @@ GraphObject::GraphObject()
 
 GraphObject::~GraphObject()
 {
+}
+
+int GraphObject::findSource(unsigned int source)
+{
+	// Finds first element greater than or equal to source
+	for (unsigned int i = 0; i < sourceId.size(); ++i)
+		if (source <= sourceId[i])
+			return (int)i;
+
+	return -1;
+}
+
+int GraphObject::findTarget(int index, unsigned int source, unsigned int target)
+{
+	// Finds first element greater than or equal to target with corresponding source
+	for (unsigned int i = index; i < targetId.size(); ++i)
+		if (target <= targetId[i] || sourceId[i] != source)
+			return (int)i;
+
+	return -1;
+}
+
+int GraphObject::insertEdgeSorted(unsigned int source, unsigned int target)
+{
+	if (sourceId.empty())
+	{
+		sourceId.push_back(source);
+		targetId.push_back(target);
+		return 0;
+	}
+	else
+	{
+		int i = findSource(source);
+
+		if (i == -1)
+		{
+			sourceId.push_back(source);
+			targetId.push_back(target);
+			return sourceId.size() - 1;
+		}
+		else if (sourceId[i] != source)
+		{
+			sourceId.insert(sourceId.begin() + i, source);
+			targetId.insert(targetId.begin() + i, target);
+			return i;
+		}
+		else
+		{
+			i = findTarget(i, source, target);
+
+			if (i == -1)
+			{
+				sourceId.push_back(source);
+				targetId.push_back(target);
+				return sourceId.size() - 1;
+			}
+			else
+			{
+				sourceId.insert(sourceId.begin() + i, source);
+				targetId.insert(targetId.begin() + i, target);
+				return i;
+			}
+		}
+	}
 }
 
 void GraphObject::addNode(std::string node, float x, float y, float z)
@@ -32,26 +98,28 @@ void GraphObject::addNode(std::string node, float x, float y, float z)
 
 void GraphObject::addEdge(std::string source, std::string target, float weight)
 {
-	// Gets and saves source node info
+	// Gets node Ids
 	unsigned int sourceIndex = nodeIds[source];
 	++degree[sourceIndex];
-	sourceId.push_back(sourceIndex);
-	sourceX.push_back(nodeX[sourceIndex]);
-	sourceY.push_back(nodeY[sourceIndex]);
-	sourceZ.push_back(nodeZ[sourceIndex]);
 
-	// Gets and saves target node info
 	unsigned int targetIndex = nodeIds[target];
 	++degree[targetIndex];
-	targetId.push_back(targetIndex);
-	targetX.push_back(nodeX[targetIndex]);
-	targetY.push_back(nodeY[targetIndex]);
-	targetZ.push_back(nodeZ[targetIndex]);
+
+	// Inserts ans sorts edge
+	int i = insertEdgeSorted(sourceIndex, targetIndex);
+
+	sourceX.insert(sourceX.begin() + i, nodeX[sourceIndex]);
+	sourceY.insert(sourceY.begin() + i, nodeY[sourceIndex]);
+	sourceZ.insert(sourceZ.begin() + i, nodeZ[sourceIndex]);
+
+	targetX.insert(targetX.begin() + i, nodeX[targetIndex]);
+	targetY.insert(targetY.begin() + i, nodeY[targetIndex]);
+	targetZ.insert(targetZ.begin() + i, nodeZ[targetIndex]);
 
 	++numOfEdges;
-}
+}	
 
-void GraphObject::postprocessing()
+void GraphObject::postprocessGraphics()
 {
 	// Initializes node positions if node were provided
 	if (!initedGraphics)
@@ -81,6 +149,33 @@ void GraphObject::postprocessing()
 			x = (y == 0.0 && z == 0.0) ? (x + meanDegree) : x;
 		}
 	}
+}
+
+void GraphObject::postprocessEdges()
+{
+	unsigned int curr = 0;
+
+	// Calculates offsets of edges belonging to a node
+	for (unsigned int i = 0; i < numOfNodes; ++i)
+	{
+		for (; curr < numOfEdges; ++curr)
+			if (i == sourceId[curr])
+			{
+				edgeOffsets.push_back((int)curr);
+				break;
+			}
+			else if (i < sourceId[curr] || curr == numOfEdges - 1)
+			{
+				edgeOffsets.push_back(-1);
+				break;
+			}
+	}
+}
+
+void GraphObject::postprocessing()
+{
+	postprocessGraphics();
+	postprocessEdges();
 }
 
 float  GraphObject::getInitPosition() const

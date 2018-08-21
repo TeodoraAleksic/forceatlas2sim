@@ -25,6 +25,16 @@ private:
 	std::vector<float> sourceX, sourceY, sourceZ;
 	std::vector<float> targetX, targetY, targetZ;
 
+	std::vector<int> edgeOffsets;
+
+	int findSource(unsigned int source);
+	int findTarget(int index, unsigned int source, unsigned int target);
+
+	int insertEdgeSorted(unsigned int source, unsigned int target);
+
+	void postprocessGraphics();
+	void postprocessEdges();
+
 public:
 
 	GraphObject();

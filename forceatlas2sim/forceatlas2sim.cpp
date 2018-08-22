@@ -15,7 +15,8 @@ ForceAtlas2Sim::ForceAtlas2Sim(
 	clGlobalTraction(clContext.getDevice(), clContext.getContext()),
 	clGraphCenter(clContext.getDevice(), clContext.getContext()),
 	clSum(clContext.getDevice(), clContext.getContext()),
-	clNbody(clContext.getDevice(), clContext.getContext()),
+	clForceAttr(clContext.getDevice(), clContext.getContext()),
+	clForceRepl(clContext.getDevice(), clContext.getContext()),
 	clUpdateNode(clContext.getDevice(), clContext.getContext()),
 	clUpdateEdge(clContext.getDevice(), clContext.getContext()),
 	clContext()
@@ -73,19 +74,32 @@ void ForceAtlas2Sim::setCLGraphCenterArgs()
 	clGraphCenter.setArg(7, tmpZ[tmpFront]);
 }
 
-void ForceAtlas2Sim::setCLNbodyArgs()
+void ForceAtlas2Sim::setCLForceAttr()
 {
-	clNbody.setWorkSize(graphObject.getNumOfNodes());
-	clNbody.setArg(0, graphObject.getNumOfNodes());
-	clNbody.setArg(1, fa2Params.getKr());
-	clNbody.setArg(2, fa2Params.getKrp());
-	clNbody.setArg(3, glGraphNode.getOffsetX(), CL_MEM_READ_ONLY);
-	clNbody.setArg(4, glGraphNode.getOffsetY(), CL_MEM_READ_ONLY);
-	clNbody.setArg(5, glGraphNode.getOffsetZ(), CL_MEM_READ_ONLY);
-	clNbody.setArg(6, glGraphNode.getScale(), CL_MEM_READ_ONLY);
-	clNbody.setArg(7, fx[forceFront]);
-	clNbody.setArg(8, fy[forceFront]);
-	clNbody.setArg(9, fz[forceFront]);
+	clForceAttr.setWorkSize(graphObject.getNumOfNodes());
+	clForceAttr.setArg(0, graphObject.getNumOfNodes());
+	clForceAttr.setArg(1, glGraphNode.getOffsetX(), CL_MEM_READ_ONLY);
+	clForceAttr.setArg(2, glGraphNode.getOffsetY(), CL_MEM_READ_ONLY);
+	clForceAttr.setArg(3, glGraphNode.getOffsetZ(), CL_MEM_READ_ONLY);
+	clForceAttr.setArg(4, glGraphNode.getScale(), CL_MEM_READ_ONLY);
+	clForceAttr.setArg(5, fx[forceFront]);
+	clForceAttr.setArg(6, fy[forceFront]);
+	clForceAttr.setArg(7, fz[forceFront]);
+}
+
+void ForceAtlas2Sim::setCLForceRepl()
+{
+	clForceRepl.setWorkSize(graphObject.getNumOfNodes());
+	clForceRepl.setArg(0, graphObject.getNumOfNodes());
+	clForceRepl.setArg(1, fa2Params.getKr());
+	clForceRepl.setArg(2, fa2Params.getKrp());
+	clForceRepl.setArg(3, glGraphNode.getOffsetX(), CL_MEM_READ_ONLY);
+	clForceRepl.setArg(4, glGraphNode.getOffsetY(), CL_MEM_READ_ONLY);
+	clForceRepl.setArg(5, glGraphNode.getOffsetZ(), CL_MEM_READ_ONLY);
+	clForceRepl.setArg(6, glGraphNode.getScale(), CL_MEM_READ_ONLY);
+	clForceRepl.setArg(7, fx[forceFront]);
+	clForceRepl.setArg(8, fy[forceFront]);
+	clForceRepl.setArg(9, fz[forceFront]);
 }
 
 void ForceAtlas2Sim::setCLUpdateNodeArgs()
@@ -215,7 +229,8 @@ void ForceAtlas2Sim::init()
 	clGlobalTraction.init();
 	clGraphCenter.init();
 	clSum.init();
-	clNbody.init();
+	clForceAttr.init();
+	clForceRepl.init();
 	clUpdateNode.init();
 	clUpdateEdge.init();
 }
@@ -231,8 +246,11 @@ void ForceAtlas2Sim::run()
 	}
 
 	// Runs n-body
-	setCLNbodyArgs();
-	clNbody.run();
+	setCLForceAttr();
+	clForceAttr.run();
+
+	setCLForceRepl();
+	clForceRepl.run();
 
 	// Calculates global swing
 	setCLGlobalSwingArgs();

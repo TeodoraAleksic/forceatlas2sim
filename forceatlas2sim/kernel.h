@@ -136,7 +136,7 @@ namespace kernel
 		} \n\
 		";
 
-	const std::string nBody =
+	const std::string forceAttr =
 		" \n\
 		float size(uint degree) \n\
 		{ \n\
@@ -156,22 +156,8 @@ namespace kernel
 				return 0; \n\
 		} \n\
 		\n\
-		float fr(__const float kr, __const float kpr, float p1, float p2, uint degree1, uint degree2) \n\
-		{ \n\
-			float d = dist(p1, p2, degree1, degree2); \n\
-		\n\
-			if (d > 0) \n\
-				return kr * (degree1 + 1) * (degree2 + 1) / (p1 - p2); \n\
-			else if (d < 0) \n\
-				return kpr * (degree1 + 1) * (degree2 + 1) * ((p1 - p2) >= 0 ? 1 : -1); \n\
-			else \n\
-				return 0; \n\
-		} \n\
-		\n\
-		__kernel void nBody( \n\
+		__kernel void forceAttr( \n\
 			__const uint n, \n\
-			__const float kr, \n\
-			__const float krp, \n\
 			__global float* x, \n\
 			__global float* y, \n\
 			__global float* z, \n\
@@ -193,12 +179,61 @@ namespace kernel
 				while (i != id) \n\
 				{ \n\
 					fx[id] += fa(x[id], x[i], degree[id], degree[i]); \n\
-					fx[id] += fr(kr, krp, x[id], x[i], degree[id], degree[i]); \n\
-					\n\
 					fy[id] += fa(y[id], y[i], degree[id], degree[i]); \n\
-					fy[id] += fr(kr, krp, y[id], y[i], degree[id], degree[i]); \n\
-					\n\
 					fz[id] += fa(z[id], z[i], degree[id], degree[i]); \n\
+					\n\
+					i = (i + 1) < n ? (i + 1) : 0; \n\
+				} \n\
+			} \n\
+		} \n\
+		";
+
+	const std::string forceRepl =
+		" \n\
+		float size(uint degree) \n\
+		{ \n\
+			return degree * 0.5 + 0.5; \n\
+		} \n\
+		\n\
+		float dist(float p1, float p2, uint degree1, uint degree2) \n\
+		{ \n\
+			return fabs(p1 - p2) - size(degree1) - size(degree2); \n\
+		} \n\
+		\n\
+		float fr(__const float kr, __const float kpr, float p1, float p2, uint degree1, uint degree2) \n\
+		{ \n\
+			float d = dist(p1, p2, degree1, degree2); \n\
+		\n\
+			if (d > 0) \n\
+				return kr * (degree1 + 1) * (degree2 + 1) / (p1 - p2); \n\
+			else if (d < 0) \n\
+				return kpr * (degree1 + 1) * (degree2 + 1) * ((p1 - p2) >= 0 ? 1 : -1); \n\
+			else \n\
+				return 0; \n\
+		} \n\
+		\n\
+		__kernel void forceRepl( \n\
+			__const uint n, \n\
+			__const float kr, \n\
+			__const float krp, \n\
+			__global float* x, \n\
+			__global float* y, \n\
+			__global float* z, \n\
+			__global uint* degree, \n\
+			__global float* fx, \n\
+			__global float* fy, \n\
+			__global float* fz) \n\
+		{ \n\
+			uint id = get_global_id(0); \n\
+			\n\
+			if (id < n) \n\
+			{ \n\
+				uint i = (id + 1) < n ? (id + 1) : 0; \n\
+				\n\
+				while (i != id) \n\
+				{ \n\
+					fx[id] += fr(kr, krp, x[id], x[i], degree[id], degree[i]); \n\
+					fy[id] += fr(kr, krp, y[id], y[i], degree[id], degree[i]); \n\
 					fz[id] += fr(kr, krp, z[id], z[i], degree[id], degree[i]); \n\
 					\n\
 					i = (i + 1) < n ? (i + 1) : 0; \n\

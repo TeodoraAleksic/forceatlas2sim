@@ -26,6 +26,7 @@ private:
 	std::vector<float> targetX, targetY, targetZ;
 
 	std::vector<int> edgeOffsets;
+	std::vector<float> edgeWeight;
 
 	int findSource(unsigned int source);
 	int findTarget(int index, unsigned int source, unsigned int target);
@@ -41,7 +42,7 @@ public:
 	~GraphObject();
 
 	void addNode(std::string node, float x = 0.0, float y = 0.0, float z = 0.0);
-	void addEdge(std::string source, std::string target, float weight = 0.0);
+	void addEdge(std::string source, std::string target, float weight);
 
 	void postprocessing();
 

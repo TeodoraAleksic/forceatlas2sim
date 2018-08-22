@@ -20,7 +20,7 @@ private:
 
 	void processGEXFVizAttr(xmlAttr* attr, float* x, float* y, float* z);
 	void processGEXFNodeAttr(xmlAttr* attr, std::string* id);
-	void processGEXFEdgeAttr(xmlAttr* attr, std::string* source, std::string* target);
+	void processGEXFEdgeAttr(xmlAttr* attr, std::string* source, std::string* target, float* weight);
 	void processGEXFNode(xmlNode* node, GraphObject* graphObject);
 	void processGEXFEdge(xmlNode* edge, GraphObject* graphObject);
 	void processGEXFList(xmlNode* list, GraphObject* graphObject);

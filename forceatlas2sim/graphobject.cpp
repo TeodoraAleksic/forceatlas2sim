@@ -116,6 +116,8 @@ void GraphObject::addEdge(std::string source, std::string target, float weight)
 	targetY.insert(targetY.begin() + i, nodeY[targetIndex]);
 	targetZ.insert(targetZ.begin() + i, nodeZ[targetIndex]);
 
+	edgeWeight.insert(edgeWeight.begin() + i, weight);
+
 	++numOfEdges;
 }	
 

@@ -158,13 +158,18 @@ namespace kernel
 		\n\
 		__kernel void forceAttr( \n\
 			__const uint n, \n\
+			__const uint e, \n\
 			__global float* x, \n\
 			__global float* y, \n\
 			__global float* z, \n\
 			__global uint* degree, \n\
 			__global float* fx, \n\
 			__global float* fy, \n\
-			__global float* fz) \n\
+			__global float* fz, \n\
+			__global uint* sid, \n\
+			__global uint* tid, \n\
+			__global int* offset, \n\
+			__global float* weight) \n\
 		{ \n\
 			uint id = get_global_id(0); \n\
 			\n\

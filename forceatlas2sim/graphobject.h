@@ -25,7 +25,7 @@ private:
 	std::vector<float> sourceX, sourceY, sourceZ;
 	std::vector<float> targetX, targetY, targetZ;
 
-	std::vector<int> edgeOffsets;
+	std::vector<int> edgeOffset;
 	std::vector<float> edgeWeight;
 
 	int findSource(unsigned int source);
@@ -69,6 +69,9 @@ public:
 	std::vector<float> getTargetX() const;
 	std::vector<float> getTargetY() const;
 	std::vector<float> getTargetZ() const;
+
+	std::vector<int> getEdgeOffset() const;
+	std::vector<float> getEdgeWeight() const;
 
 };
 

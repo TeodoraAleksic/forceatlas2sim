@@ -163,12 +163,12 @@ void GraphObject::postprocessEdges()
 		for (; curr < numOfEdges; ++curr)
 			if (i == sourceId[curr])
 			{
-				edgeOffsets.push_back((int)curr);
+				edgeOffset.push_back((int)curr);
 				break;
 			}
 			else if (i < sourceId[curr] || curr == numOfEdges - 1)
 			{
-				edgeOffsets.push_back(-1);
+				edgeOffset.push_back(-1);
 				break;
 			}
 	}
@@ -262,4 +262,14 @@ std::vector<float> GraphObject::getTargetY() const
 std::vector<float> GraphObject::getTargetZ() const
 {
 	return targetZ;
+}
+
+std::vector<int> GraphObject::getEdgeOffset() const
+{
+	return edgeOffset;
+}
+
+std::vector<float> GraphObject::getEdgeWeight() const
+{
+	return edgeWeight;
 }

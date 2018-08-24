@@ -78,13 +78,18 @@ void ForceAtlas2Sim::setCLForceAttr()
 {
 	clForceAttr.setWorkSize(graphObject.getNumOfNodes());
 	clForceAttr.setArg(0, graphObject.getNumOfNodes());
-	clForceAttr.setArg(1, glGraphNode.getOffsetX(), CL_MEM_READ_ONLY);
-	clForceAttr.setArg(2, glGraphNode.getOffsetY(), CL_MEM_READ_ONLY);
-	clForceAttr.setArg(3, glGraphNode.getOffsetZ(), CL_MEM_READ_ONLY);
-	clForceAttr.setArg(4, glGraphNode.getScale(), CL_MEM_READ_ONLY);
-	clForceAttr.setArg(5, fx[forceFront]);
-	clForceAttr.setArg(6, fy[forceFront]);
-	clForceAttr.setArg(7, fz[forceFront]);
+	clForceAttr.setArg(1, graphObject.getNumOfEdges());
+	clForceAttr.setArg(2, glGraphNode.getOffsetX(), CL_MEM_READ_ONLY);
+	clForceAttr.setArg(3, glGraphNode.getOffsetY(), CL_MEM_READ_ONLY);
+	clForceAttr.setArg(4, glGraphNode.getOffsetZ(), CL_MEM_READ_ONLY);
+	clForceAttr.setArg(5, glGraphNode.getScale(), CL_MEM_READ_ONLY);
+	clForceAttr.setArg(6, fx[forceFront]);
+	clForceAttr.setArg(7, fy[forceFront]);
+	clForceAttr.setArg(8, fz[forceFront]);
+	clForceAttr.setArg(9, sourceId);
+	clForceAttr.setArg(10, targetId);
+	clForceAttr.setArg(11, edgeOffset);
+	clForceAttr.setArg(12, edgeWeight);
 }
 
 void ForceAtlas2Sim::setCLForceRepl()
@@ -135,13 +140,11 @@ void ForceAtlas2Sim::setCLUpdateEdgeArgs()
 	clUpdateEdge.setArg(1, glGraphNode.getOffsetX(), CL_MEM_READ_ONLY);
 	clUpdateEdge.setArg(2, glGraphNode.getOffsetY(), CL_MEM_READ_ONLY);
 	clUpdateEdge.setArg(3, glGraphNode.getOffsetZ(), CL_MEM_READ_ONLY);
-	clUpdateEdge.setArg(4, sizeof(cl_uint) * graphObject.getNumOfEdges(), 
-		&(graphObject.getSourceId())[0], CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR);
+	clUpdateEdge.setArg(4, sourceId);
 	clUpdateEdge.setArg(5, glGraphEdge.getSourceX(), CL_MEM_READ_WRITE);
 	clUpdateEdge.setArg(6, glGraphEdge.getSourceY(), CL_MEM_READ_WRITE);
 	clUpdateEdge.setArg(7, glGraphEdge.getSourceZ(), CL_MEM_READ_WRITE);
-	clUpdateEdge.setArg(8, sizeof(cl_uint) * graphObject.getNumOfEdges(), 
-		&(graphObject.getTargetId())[0], CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR);
+	clUpdateEdge.setArg(8, targetId);
 	clUpdateEdge.setArg(9, glGraphEdge.getTargetX(), CL_MEM_READ_WRITE);
 	clUpdateEdge.setArg(10, glGraphEdge.getTargetY(), CL_MEM_READ_WRITE);
 	clUpdateEdge.setArg(11, glGraphEdge.getTargetZ(), CL_MEM_READ_WRITE);
@@ -196,6 +199,16 @@ void ForceAtlas2Sim::init()
 		globalTraction = cl::Buffer(clContext.getContext(), 
 			CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(cl_float) * 3, &zeros[0]);
 	}
+
+	// Allocates buffers for values used for calculation
+	sourceId = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, 
+		sizeof(cl_uint) * graphObject.getNumOfEdges(), &(graphObject.getSourceId())[0]);
+	targetId = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+		sizeof(cl_uint) * graphObject.getNumOfEdges(), &(graphObject.getTargetId())[0]);
+	edgeOffset = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+		sizeof(cl_int) * graphObject.getNumOfNodes(), &(graphObject.getEdgeOffset())[0]);
+	edgeWeight = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+		sizeof(cl_float) * graphObject.getNumOfEdges(), &(graphObject.getEdgeWeight())[0]);
 	
 	{
 		std::vector<int> zeros(graphObject.getNumOfNodes(), 0);

@@ -79,17 +79,18 @@ void ForceAtlas2Sim::setCLForceAttr()
 	clForceAttr.setWorkSize(graphObject.getNumOfNodes());
 	clForceAttr.setArg(0, graphObject.getNumOfNodes());
 	clForceAttr.setArg(1, graphObject.getNumOfEdges());
-	clForceAttr.setArg(2, glGraphNode.getOffsetX(), CL_MEM_READ_ONLY);
-	clForceAttr.setArg(3, glGraphNode.getOffsetY(), CL_MEM_READ_ONLY);
-	clForceAttr.setArg(4, glGraphNode.getOffsetZ(), CL_MEM_READ_ONLY);
-	clForceAttr.setArg(5, glGraphNode.getScale(), CL_MEM_READ_ONLY);
-	clForceAttr.setArg(6, fx[forceFront]);
-	clForceAttr.setArg(7, fy[forceFront]);
-	clForceAttr.setArg(8, fz[forceFront]);
-	clForceAttr.setArg(9, sourceId);
-	clForceAttr.setArg(10, targetId);
-	clForceAttr.setArg(11, edgeOffset);
-	clForceAttr.setArg(12, edgeWeight);
+	clForceAttr.setArg(2, fa2Params.getDelta());
+	clForceAttr.setArg(3, glGraphNode.getOffsetX(), CL_MEM_READ_ONLY);
+	clForceAttr.setArg(4, glGraphNode.getOffsetY(), CL_MEM_READ_ONLY);
+	clForceAttr.setArg(5, glGraphNode.getOffsetZ(), CL_MEM_READ_ONLY);
+	clForceAttr.setArg(6, glGraphNode.getScale(), CL_MEM_READ_ONLY);
+	clForceAttr.setArg(7, fx[forceFront]);
+	clForceAttr.setArg(8, fy[forceFront]);
+	clForceAttr.setArg(9, fz[forceFront]);
+	clForceAttr.setArg(10, sourceId);
+	clForceAttr.setArg(11, targetId);
+	clForceAttr.setArg(12, edgeOffset);
+	clForceAttr.setArg(13, edgeWeight);
 }
 
 void ForceAtlas2Sim::setCLForceRepl()

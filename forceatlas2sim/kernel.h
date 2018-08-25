@@ -188,10 +188,10 @@ namespace kernel
 			return fabs(p1 - p2) - size(degree1) - size(degree2); \n\
 		} \n\
 		\n\
-		float fa(float p1, float p2, uint degree1, uint degree2, float weight) \n\
+		float fa(__const int delta, float p1, float p2, uint degree1, uint degree2, float weight) \n\
 		{ \n\
 			if (dist(p1, p2, degree1, degree2) > 0) \n\
-				return weight * (p2 - p1) / (degree1 + 1); \n\
+				return pow(weight, delta) * (p2 - p1) / (degree1 + 1); \n\
 			else \n\
 				return 0; \n\
 		} \n\
@@ -199,6 +199,7 @@ namespace kernel
 		__kernel void forceAttr( \n\
 			__const uint n, \n\
 			__const uint e, \n\
+			__const int delta, \n\
 			__global float* x, \n\
 			__global float* y, \n\
 			__global float* z, \n\
@@ -225,9 +226,9 @@ namespace kernel
 				{ \n\
 					float ew = findWeight(e, id, i, sid, tid, offset, weight); \n\
 					\n\
-					fx[id] += fa(x[id], x[i], degree[id], degree[i], ew); \n\
-					fy[id] += fa(y[id], y[i], degree[id], degree[i], ew); \n\
-					fz[id] += fa(z[id], z[i], degree[id], degree[i], ew); \n\
+					fx[id] += fa(delta, x[id], x[i], degree[id], degree[i], ew); \n\
+					fy[id] += fa(delta, y[id], y[i], degree[id], degree[i], ew); \n\
+					fz[id] += fa(delta, z[id], z[i], degree[id], degree[i], ew); \n\
 					\n\
 					i = (i + 1) < n ? (i + 1) : 0; \n\
 				} \n\

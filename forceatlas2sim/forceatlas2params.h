@@ -16,8 +16,9 @@ private:
 
 	float tau, ks, ksmax;
 
-	bool nw;
+	int delta;
 
+	int stringToInt(std::string str);
 	float stringToFloat(std::string str);
 
 public:
@@ -40,7 +41,7 @@ public:
 	float getKs() const;
 	float getKsmax() const;
 
-	bool getNw() const;
+	int getDelta() const;
 
 	// Setters
 
@@ -67,7 +68,8 @@ public:
 	void setKsmax(float ksmax_);
 	void setKsmax(std::string ksmax_);
 
-	void setNw(bool nw_);
+	void setDelta(int delta_);
+	void setDelta(std::string delta_);
 
 };
 

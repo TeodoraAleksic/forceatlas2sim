@@ -15,11 +15,29 @@ ForceAtlas2Params::ForceAtlas2Params()
 	ks = 0.1f;
 	ksmax = 10.0f;
 
-	nw = false;
+	delta = 1;
 }
 
 ForceAtlas2Params::~ForceAtlas2Params()
 {
+}
+
+int ForceAtlas2Params::stringToInt(std::string str)
+{
+	try
+	{
+		return std::stoi(str);
+	}
+	catch (std::out_of_range)
+	{
+		std::cout << "'" << str << "' is out of range of a value representable by integer." << std::endl;
+		throw;
+	}
+	catch (...)
+	{
+		std::cout << "'" << str << "' is not a valid integer." << std::endl;
+		throw;
+	}
 }
 
 float ForceAtlas2Params::stringToFloat(std::string str)
@@ -85,9 +103,9 @@ float ForceAtlas2Params::getKsmax() const
 	return ksmax;
 }
 
-bool ForceAtlas2Params::getNw() const
+int ForceAtlas2Params::getDelta() const
 {
-	return nw;
+	return delta;
 }
 
 void ForceAtlas2Params::setInput(std::string input_)
@@ -221,7 +239,19 @@ void ForceAtlas2Params::setKsmax(std::string ksmax_)
 	setKsmax(stringToFloat(ksmax_));
 }
 
-void ForceAtlas2Params::setNw(bool nw_)
+void ForceAtlas2Params::setDelta(int delta_)
 {
-	nw = nw_;
+	if (delta_ < 0)
+	{
+		std::string msg = "Edge weight influence must be equal to or greater than 0.";
+		std::cout << msg << std::endl;
+		throw std::runtime_error(msg);
+	}
+
+	delta = delta_;
+}
+
+void ForceAtlas2Params::setDelta(std::string delta_)
+{
+	setDelta(stringToInt(delta_));
 }

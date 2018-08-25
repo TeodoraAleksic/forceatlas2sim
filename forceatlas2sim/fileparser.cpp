@@ -58,7 +58,7 @@ void FileParser::processGEXFNodeAttr(xmlAttr* attr, std::string* id)
 	}
 }
 
-void FileParser::processGEXFEdgeAttr(xmlAttr* attr, std::string* source, std::string* target)
+void FileParser::processGEXFEdgeAttr(xmlAttr* attr, std::string* source, std::string* target, float* weight)
 {
 	// Processes edge attribute section of GEXF file
 	while (attr != nullptr)
@@ -70,6 +70,9 @@ void FileParser::processGEXFEdgeAttr(xmlAttr* attr, std::string* source, std::st
 
 			if (std::strcmp((const char*)attr->name, "target") == 0)
 				*target = (const char*)attr->children->content;
+
+			if (std::strcmp((const char*)attr->name, "weight") == 0)
+				*weight = std::stof((const char*)attr->children->content);
 		}
 
 		attr = attr->next;
@@ -123,10 +126,11 @@ void FileParser::processGEXFEdge(xmlNode* edge, GraphObject* graphObject)
 		{
 			std::string source;
 			std::string target;
+			float weight = 1.0;
 
-			processGEXFEdgeAttr(edge->properties, &source, &target);
+			processGEXFEdgeAttr(edge->properties, &source, &target, &weight);
 
-			graphObject->addEdge(source, target);
+			graphObject->addEdge(source, target, weight);
 		}
 
 		edge = edge->next;
@@ -253,6 +257,7 @@ void FileParser::processGMLEdge(GML_pair* edge, GraphObject* graphObject)
 {
 	std::string source;
 	std::string target;
+	float weight = 1;
 
 	// Processes edge section of GML file
 	while (edge != nullptr)
@@ -263,10 +268,14 @@ void FileParser::processGMLEdge(GML_pair* edge, GraphObject* graphObject)
 		if (std::strcmp(edge->key, "target") == 0)
 			target = std::to_string(edge->value.integer);
 
+		if (std::strcmp(edge->key, "value") == 0)
+			weight = edge->value.floating >= 0.0f ? 
+			(float)edge->value.floating : (float)edge->value.integer;
+
 		edge = edge->next;
 	}
 
-	graphObject->addEdge(source, target);
+	graphObject->addEdge(source, target, weight);
 }
 
 void FileParser::processGMLList(GML_pair* list, GraphObject* graphObject)

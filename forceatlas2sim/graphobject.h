@@ -25,13 +25,24 @@ private:
 	std::vector<float> sourceX, sourceY, sourceZ;
 	std::vector<float> targetX, targetY, targetZ;
 
+	std::vector<int> edgeOffset;
+	std::vector<float> edgeWeight;
+
+	int findSource(unsigned int source);
+	int findTarget(int index, unsigned int source, unsigned int target);
+
+	int insertEdgeSorted(unsigned int source, unsigned int target);
+
+	void postprocessGraphics();
+	void postprocessEdges();
+
 public:
 
 	GraphObject();
 	~GraphObject();
 
 	void addNode(std::string node, float x = 0.0, float y = 0.0, float z = 0.0);
-	void addEdge(std::string source, std::string target, float weight = 0.0);
+	void addEdge(std::string source, std::string target, float weight);
 
 	void postprocessing();
 
@@ -58,6 +69,9 @@ public:
 	std::vector<float> getTargetX() const;
 	std::vector<float> getTargetY() const;
 	std::vector<float> getTargetZ() const;
+
+	std::vector<int> getEdgeOffset() const;
+	std::vector<float> getEdgeWeight() const;
 
 };
 

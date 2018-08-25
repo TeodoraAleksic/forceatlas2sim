@@ -4,8 +4,9 @@
 #include "clcontext.h"
 #include "clglobalswing.h"
 #include "clglobaltraction.h"
+#include "clforceattr.h"
+#include "clforcerepl.h"
 #include "clgraphcenter.h"
-#include "clnbody.h"
 #include "clsum.h"
 #include "clupdateedge.h"
 #include "clupdatenode.h"
@@ -29,11 +30,14 @@ private:
 	CLGlobalTraction clGlobalTraction;
 	CLGraphCenter clGraphCenter;
 	CLSum clSum;
-	CLNbody clNbody;
+	CLForceAttr clForceAttr;
+	CLForceRepl clForceRepl;
 	CLUpdateNode clUpdateNode;
 	CLUpdateEdge clUpdateEdge;
 
 	cl::Buffer centerOfMass, globalSwing, globalTraction;
+
+	cl::Buffer sourceId, targetId, edgeOffset, edgeWeight;
 
 	int forceFront;
 	cl::Buffer fx[2], fy[2], fz[2];
@@ -44,7 +48,8 @@ private:
 	void setCLGlobalSwingArgs();
 	void setCLGlobalTractionArgs();
 	void setCLGraphCenterArgs();
-	void setCLNbodyArgs();
+	void setCLForceAttr();
+	void setCLForceRepl();
 	void setCLUpdateNodeArgs();
 	void setCLUpdateEdgeArgs();
 

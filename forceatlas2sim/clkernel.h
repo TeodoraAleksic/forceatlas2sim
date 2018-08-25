@@ -23,7 +23,6 @@ protected:
 
 	int localWorkSize, globalWorkSize;
 
-	std::vector<cl::Memory> clBuffers;
 	std::vector<cl::Memory> glBuffers;
 
 	void build();
@@ -40,7 +39,6 @@ public:
 
 	template <class T> void setArg(unsigned int argId, T data);
 	template <class T> void setArg(unsigned int argId, unsigned int size, T* data);
-	template <class T> void setArg(unsigned int argId, unsigned int size, T* data, cl_mem_flags memFlags);
 
 	void setArg(unsigned int argId, GLuint glBufferId, cl_mem_flags memFlags);
 	void setArg(unsigned int argId, cl::Buffer clBuffer);
@@ -64,20 +62,6 @@ template <class T> void CLKernel::setArg(unsigned int argId, unsigned int size, 
 	try
 	{
 		kernel.setArg(argId, size * sizeof(T), data);
-	}
-	catch (cl::Error error)
-	{
-		std::cout << getErrorCode(error.err()) << " " << error.what() << std::endl;
-	}
-}
-
-template <class T> void CLKernel::setArg(unsigned int argId, unsigned int size, T* data, cl_mem_flags memFlags)
-{
-	try
-	{
-		cl::Buffer clBuffer = cl::Buffer(context, memFlags, size, data);
-		clBuffers.push_back(clBuffer);
-		kernel.setArg(argId, clBuffer);
 	}
 	catch (cl::Error error)
 	{

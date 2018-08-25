@@ -27,21 +27,19 @@ std::unique_ptr<ForceAtlas2Sim> fa2Sim;
 bool isValueArg(std::string argName)
 {
 	return 
-		argName == std::string("-i")	||
-		argName == std::string("-kr")	||
-		argName == std::string("-krp")	||
-		argName == std::string("-kg")	||
-		argName == std::string("-tau")	||
-		argName == std::string("-ks")	||
-		argName == std::string("-ksmax");
+		argName == std::string("-i")		||
+		argName == std::string("-kr")		||
+		argName == std::string("-krp")		||
+		argName == std::string("-kg")		||
+		argName == std::string("-tau")		||
+		argName == std::string("-ks")		||
+		argName == std::string("-ksmax")	||
+		argName == std::string("-delta");
 }
 
 bool isFlagArg(std::string argName)
 {
-	return 
-		argName == std::string("-fg")	|| 
-		argName == std::string("-fsg")	||
-		argName == std::string("-nw");
+	return argName == std::string("-fg") || argName == std::string("-fsg");
 }
 
 bool isNotArg(std::string argName)
@@ -65,6 +63,8 @@ void setValueArg(ForceAtlas2Params* fa2Params, std::string argName, std::string 
 		fa2Params->setKs(argValue);
 	else if (argName == std::string("-ksmax"))
 		fa2Params->setKsmax(argValue);
+	else if (argName == std::string("-delta"))
+		fa2Params->setDelta(argValue);
 	else
 		throw "Invalid value argument " + argName;
 }
@@ -75,8 +75,6 @@ void setFlagArg(ForceAtlas2Params* fa2Params, std::string argName)
 		fa2Params->setFg(true);
 	else if (argName == std::string("-fsg"))
 		fa2Params->setFsg(true);
-	else if (argName == std::string("-nw"))
-		fa2Params->setNw(true);
 	else
 		throw "Invalid flag argument " + argName;
 }
@@ -123,7 +121,7 @@ int main(int argc, char** argv)
 		"-tau FLOAT    Tolerance to swinging coefficient. Default: 0.5.\n"\
 		"-ks FLOAT     Global speed coefficient. Default: 0.1.\n"\
 		"-ksmax FLOAT  Max global speed coefficient. Default: 10.\n"\
-		"-nw           Discards edge weights.\n"\
+		"-delta INT    Edge weight influence coefficient. Default: 1.\n"\
 		"-h            Prints usage.\n";
 
 	ForceAtlas2Params fa2Params;

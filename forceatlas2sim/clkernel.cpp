@@ -85,7 +85,6 @@ void CLKernel::setArg(unsigned int argId, cl::Buffer clBuffer)
 {
 	try
 	{
-		clBuffers.push_back(clBuffer);
 		kernel.setArg(argId, clBuffer);
 	}
 	catch (cl::Error error)

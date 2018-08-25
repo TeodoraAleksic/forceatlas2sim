@@ -138,6 +138,46 @@ namespace kernel
 
 	const std::string forceAttr =
 		" \n\
+		int findEdge( \n\
+			uint e, \n\
+			uint n1Id, \n\
+			uint n2Id, \n\
+			__global uint* sid, \n\
+			__global uint* tid, \n\
+			__global int* offset) \n\
+		{ \n\
+			if (offset[n1Id] != -1) \n\
+			{ \n\
+				int i = offset[n1Id]; \n\
+				\n\
+				while (i < e && sid[i] == n1Id) \n\
+				{ \n\
+					if (tid[i] == n2Id) break; \n\
+					++i; \n\
+				} \n\
+				\n\
+				if (i < e && sid[i] == n1Id && tid[i] == n2Id) \n\
+					return i; \n\
+				else \n\
+					return -1; \n\
+			} \n\
+			else \n\
+				return -1; \n\
+		} \n\
+		float findWeight( \n\
+			uint e, \n\
+			uint n1Id, \n\
+			uint n2Id, \n\
+			__global uint* sid, \n\
+			__global uint* tid, \n\
+			__global int* offset, \n\
+			__global float* weight) \n\
+		{ \n\
+			int i = findEdge(e, n1Id, n2Id, sid, tid, offset); \n\
+			i = (i == -1) ? findEdge(e, n2Id, n1Id, sid, tid, offset) : i; \n\
+			return weight[i]; \n\
+		} \n\
+		\n\
 		float size(uint degree) \n\
 		{ \n\
 			return degree * 0.5 + 0.5; \n\
@@ -148,10 +188,10 @@ namespace kernel
 			return fabs(p1 - p2) - size(degree1) - size(degree2); \n\
 		} \n\
 		\n\
-		float fa(float p1, float p2, uint degree1, uint degree2) \n\
+		float fa(float p1, float p2, uint degree1, uint degree2, float weight) \n\
 		{ \n\
 			if (dist(p1, p2, degree1, degree2) > 0) \n\
-				return (p2 - p1) / (degree1 + 1); \n\
+				return weight * (p2 - p1) / (degree1 + 1); \n\
 			else \n\
 				return 0; \n\
 		} \n\
@@ -183,9 +223,11 @@ namespace kernel
 				\n\
 				while (i != id) \n\
 				{ \n\
-					fx[id] += fa(x[id], x[i], degree[id], degree[i]); \n\
-					fy[id] += fa(y[id], y[i], degree[id], degree[i]); \n\
-					fz[id] += fa(z[id], z[i], degree[id], degree[i]); \n\
+					float ew = findWeight(e, id, i, sid, tid, offset, weight); \n\
+					\n\
+					fx[id] += fa(x[id], x[i], degree[id], degree[i], ew); \n\
+					fy[id] += fa(y[id], y[i], degree[id], degree[i], ew); \n\
+					fz[id] += fa(z[id], z[i], degree[id], degree[i], ew); \n\
 					\n\
 					i = (i + 1) < n ? (i + 1) : 0; \n\
 				} \n\

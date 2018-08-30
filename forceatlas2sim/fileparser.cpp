@@ -340,6 +340,10 @@ GraphObject FileParser::parse(std::string fileName)
 	else 
 		throw "Unsupported file extension";
 
+	std::cout << fileName << std::endl;
+	std::cout << "Number of nodes: " << graphObject.getNumOfNodes() << std::endl;
+	std::cout << "Number of edges: " << graphObject.getNumOfEdges() << std::endl << std::endl;
+
 	graphObject.postprocessing();
 
 	return graphObject;

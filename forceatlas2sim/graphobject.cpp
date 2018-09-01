@@ -1,3 +1,5 @@
+#include <cstdlib>
+#include <ctime>
 #include <iostream>
 
 #include "graphobject.h"
@@ -6,7 +8,11 @@ GraphObject::GraphObject()
 {
 	numOfNodes = 0;
 	numOfEdges = 0;
-	initedGraphics = false;
+
+	initedX = false;
+	initedY = false;
+	initedZ = false;
+
 	meanDegree = 0.0;
 	totalDegree = 0.0;
 }
@@ -107,8 +113,9 @@ void GraphObject::addNode(std::string node, float x, float y, float z)
 	unsigned int nodeId = getNodeId(node);
 
 	// Sets flag if input file contains graphics info
-	if (!initedGraphics && (x != 0.0 || y != 0.0 || z != 0.0))
-		initedGraphics = true;
+	if (x != 0.0) initedX = true;
+	if (y != 0.0) initedY = true;
+	if (z != 0.0) initedZ = true;
 
 	nodeX[nodeId] = x;
 	nodeY[nodeId] = y;
@@ -142,8 +149,7 @@ void GraphObject::addEdge(std::string source, std::string target, float weight)
 
 void GraphObject::postprocessGraphics()
 {
-	// Initializes node positions if node were provided
-	if (!initedGraphics)
+	if (!initedX && !initedY && !initedZ) // Initializes node positions if none were provided
 	{
 		// Calculates total and mean node degree
 		for (unsigned int i = 0; i < numOfNodes; ++i)
@@ -168,6 +174,26 @@ void GraphObject::postprocessGraphics()
 			z = (z + meanDegree <= max) ? (z + meanDegree) : 0.0f;
 			y = (z == 0.0) ? ((y + meanDegree <= max) ? (y + meanDegree) : 0.0f) : y;
 			x = (y == 0.0 && z == 0.0) ? (x + meanDegree) : x;
+		}
+	}
+	else
+	{
+		srand((unsigned int)time(NULL));
+
+		int min = -1;
+		int max = 1;
+
+		// Sets small random values for uninitialized axis to avoid zero force sums
+		for (unsigned int i = 0; i < numOfNodes; ++i)
+		{
+			if (!initedX)
+				nodeX[i] = (min + (rand() % (int)(max - min + 1))) / 10.0f;
+
+			if (!initedY)
+				nodeY[i] = (min + (rand() % (int)(max - min + 1))) / 10.0f;
+
+			if (!initedZ)
+				nodeZ[i] = (min + (rand() % (int)(max - min + 1))) / 10.0f;
 		}
 	}
 }
@@ -202,7 +228,7 @@ void GraphObject::postprocessing()
 float  GraphObject::getInitPosition() const
 {
 	// Calculates initial camera position
-	if (!initedGraphics)
+	if (!initedX && !initedY && !initedZ)
 		return meanDegree * (float)pow(numOfNodes, 1.0 / 3.0) * (-2.0f) / sin(22.5f);
 	else
 		return 0.0f;

@@ -11,7 +11,7 @@ private:
 
 	unsigned int numOfNodes, numOfEdges;
 
-	bool initedGraphics;
+	bool initedX, initedY, initedZ;
 
 	std::unordered_map<std::string, unsigned int> nodeIds;
 

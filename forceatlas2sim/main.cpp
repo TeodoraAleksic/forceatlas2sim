@@ -14,8 +14,8 @@
 #include "glgraphnode.h"
 #include "graphobject.h"
 
-const int SCREEN_WIDTH = 800;
-const int SCREEN_HIGHT = 600;
+const int SCREEN_WIDTH = 1920;
+const int SCREEN_HEIGHT = 1080;
 
 double deltaTime = 0.0f;
 double lastFrame = 0.0f;
@@ -193,7 +193,7 @@ int main(int argc, char** argv)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HIGHT, "ForceAtlas2Sim", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "ForceAtlas2Sim", NULL, NULL);
 
 	if (window == NULL)
 	{
@@ -211,7 +211,7 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	glViewport(0, 0, 800, 600);
+	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -231,6 +231,7 @@ int main(int argc, char** argv)
 
 	// Initializes camera
 	camera = std::make_unique<Camera>(
+		SCREEN_WIDTH, SCREEN_HEIGHT,
 		glm::vec3(0.0f, 0.0f, graphObject.getInitPosition()), 
 		glm::vec3(0.0f, 0.0f, -1.0f), 
 		glm::vec3(0.0f, 1.0f, 0.0f));

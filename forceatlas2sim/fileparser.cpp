@@ -71,7 +71,7 @@ void FileParser::processGEXFEdgeAttr(xmlAttr* attr, std::string* source, std::st
 			if (std::strcmp((const char*)attr->name, "target") == 0)
 				*target = (const char*)attr->children->content;
 
-			if (std::strcmp((const char*)attr->name, "weight") == 0)
+			if (std::strcmp((const char*)attr->name, "cardinal") == 0)
 				*weight = std::stof((const char*)attr->children->content);
 		}
 

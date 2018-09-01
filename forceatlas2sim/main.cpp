@@ -26,7 +26,7 @@ std::unique_ptr<ForceAtlas2Sim> fa2Sim;
 
 bool isValueArg(std::string argName)
 {
-	return 
+	return
 		argName == std::string("-i")		||
 		argName == std::string("-kr")		||
 		argName == std::string("-krp")		||
@@ -93,6 +93,11 @@ void processInput(GLFWwindow* window)
 		camera->move(MoveDirection::RIGHT, deltaTime);
 	else if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
 		fa2Sim->run();
+}
+
+void framebufferSizeCallback(GLFWwindow* window, int width, int height)
+{
+	glViewport(0, 0, width, height);
 }
 
 void mouseCallback(GLFWwindow* window, double posX, double posY)
@@ -169,7 +174,7 @@ int main(int argc, char** argv)
 				std::cout << "Can't specify '-h' with other arguments.\n\n" << usage;
 				return 1;
 			}
-			else 
+			else
 			{
 				std::cout << "Invalid argument: '" << argv[i] << "'.\n\n" << usage;
 				return 1;
@@ -216,6 +221,7 @@ int main(int argc, char** argv)
 	glEnable(GL_DEPTH_TEST);
 
 	// Sets callbacks for the GLFW window
+	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window, mouseCallback);
 	glfwSetScrollCallback(window, scrollCallback);
@@ -232,8 +238,8 @@ int main(int argc, char** argv)
 	// Initializes camera
 	camera = std::make_unique<Camera>(
 		SCREEN_WIDTH, SCREEN_HEIGHT,
-		glm::vec3(0.0f, 0.0f, graphObject.getInitPosition()), 
-		glm::vec3(0.0f, 0.0f, -1.0f), 
+		glm::vec3(0.0f, 0.0f, graphObject.getInitPosition()),
+		glm::vec3(0.0f, 0.0f, -1.0f),
 		glm::vec3(0.0f, 1.0f, 0.0f));
 
 	// Initializes graph node

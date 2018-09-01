@@ -28,6 +28,9 @@ private:
 	std::vector<int> edgeOffset;
 	std::vector<float> edgeWeight;
 
+	void initNode(std::string node);
+	unsigned int getNodeId(std::string node);
+
 	int findSource(unsigned int source);
 	int findTarget(int index, unsigned int source, unsigned int target);
 

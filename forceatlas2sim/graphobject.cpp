@@ -15,6 +15,29 @@ GraphObject::~GraphObject()
 {
 }
 
+void GraphObject::initNode(std::string node)
+{
+	// Generates new node Id
+	nodeIds[node] = numOfNodes++;
+
+	// Initializes node position and degree
+	nodeX.push_back(0);
+	nodeY.push_back(0);
+	nodeZ.push_back(0);
+	degree.push_back(0);
+}
+
+unsigned int GraphObject::getNodeId(std::string node)
+{
+	if (nodeIds.find(node) != nodeIds.end())
+		return nodeIds[node];
+	else
+	{
+		initNode(node);
+		return (numOfNodes - 1);
+	}
+}
+
 int GraphObject::findSource(unsigned int source)
 {
 	// Finds first element greater than or equal to source
@@ -81,28 +104,24 @@ int GraphObject::insertEdgeSorted(unsigned int source, unsigned int target)
 
 void GraphObject::addNode(std::string node, float x, float y, float z)
 {
-	// Sets and increments node Id
-	nodeIds[node] = numOfNodes++;
+	unsigned int nodeId = getNodeId(node);
 
 	// Sets flag if input file contains graphics info
 	if (!initedGraphics && (x != 0.0 || y != 0.0 || z != 0.0))
 		initedGraphics = true;
-	
-	// Sets node info
-	nodeX.push_back(x);
-	nodeY.push_back(y);
-	nodeZ.push_back(z);
 
-	degree.push_back(0);
+	nodeX[nodeId] = x;
+	nodeY[nodeId] = y;
+	nodeZ[nodeId] = z;
 }
 
 void GraphObject::addEdge(std::string source, std::string target, float weight)
 {
 	// Gets node Ids
-	unsigned int sourceIndex = nodeIds[source];
+	unsigned int sourceIndex = getNodeId(source);
 	++degree[sourceIndex];
 
-	unsigned int targetIndex = nodeIds[target];
+	unsigned int targetIndex = getNodeId(target);
 	++degree[targetIndex];
 
 	// Inserts ans sorts edge

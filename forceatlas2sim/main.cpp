@@ -23,6 +23,9 @@ double lastFrame = 0.0f;
 bool runSim = false;
 int oldPKeyState = GLFW_RELEASE;
 
+bool drawEdges = true;
+int oldEKeyState = GLFW_RELEASE;
+
 std::unique_ptr<Camera> camera;
 
 std::unique_ptr<ForceAtlas2Sim> fa2Sim;
@@ -85,6 +88,7 @@ void setFlagArg(ForceAtlas2Params* fa2Params, std::string argName)
 void processInput(GLFWwindow* window)
 {
 	int newPKeyState = glfwGetKey(window, GLFW_KEY_P);
+	int newEKeyState = glfwGetKey(window, GLFW_KEY_E);
 
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE))
 		glfwSetWindowShouldClose(window, true);
@@ -98,8 +102,11 @@ void processInput(GLFWwindow* window)
 		camera->move(MoveDirection::RIGHT, deltaTime);
 	else if (newPKeyState == GLFW_PRESS && oldPKeyState == GLFW_RELEASE)
 		runSim = runSim ? false : true;
+	else if (newEKeyState == GLFW_PRESS && oldEKeyState == GLFW_RELEASE)
+		drawEdges = drawEdges ? false : true;
 
 	oldPKeyState = newPKeyState;
+	oldEKeyState = newEKeyState;
 }
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
@@ -279,7 +286,7 @@ int main(int argc, char** argv)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Draws graph
-		graphEdge.draw();
+		if (drawEdges) graphEdge.draw();
 		graphNode.draw();
 
 		glfwSwapBuffers(window);

@@ -45,13 +45,13 @@ private:
 	int tmpFront;
 	cl::Buffer tmpX[2], tmpY[2], tmpZ[2];
 
-	void setCLGlobalSwingArgs();
-	void setCLGlobalTractionArgs();
-	void setCLGraphCenterArgs();
-	void setCLForceAttr();
-	void setCLForceRepl();
-	void setCLUpdateNodeArgs();
-	void setCLUpdateEdgeArgs();
+	void setCLGlobalSwingArgs(bool init);
+	void setCLGlobalTractionArgs(bool init);
+	void setCLGraphCenterArgs(bool init);
+	void setCLForceAttrArgs(bool init);
+	void setCLForceReplArgs(bool init);
+	void setCLUpdateNodeArgs(bool init);
+	void setCLUpdateEdgeArgs(bool init);
 
 	void setCLSumArgs(unsigned int n, unsigned int workGroupSize, cl::Buffer global);
 

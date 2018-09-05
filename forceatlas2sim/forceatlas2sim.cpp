@@ -29,10 +29,15 @@ ForceAtlas2Sim::~ForceAtlas2Sim()
 {
 }
 
-void ForceAtlas2Sim::setCLGlobalSwingArgs()
+void ForceAtlas2Sim::setCLGlobalSwingArgs(bool init)
 {
-	clGlobalSwing.setWorkSize(graphObject.getNumOfNodes());
-	clGlobalSwing.setArg(0, graphObject.getNumOfNodes());
+	if (init)
+	{
+		clGlobalSwing.setWorkSize(graphObject.getNumOfNodes());
+		clGlobalSwing.setArg(0, graphObject.getNumOfNodes());
+		clGlobalSwing.setArg(10, glGraphNode.getScale(), CL_MEM_READ_ONLY);
+	}
+
 	clGlobalSwing.setArg(1, tmpX[tmpFront]);
 	clGlobalSwing.setArg(2, tmpY[tmpFront]);
 	clGlobalSwing.setArg(3, tmpZ[tmpFront]);
@@ -42,13 +47,17 @@ void ForceAtlas2Sim::setCLGlobalSwingArgs()
 	clGlobalSwing.setArg(7, fx[forceFront == 1 ? 0 : 1]);
 	clGlobalSwing.setArg(8, fy[forceFront == 1 ? 0 : 1]);
 	clGlobalSwing.setArg(9, fz[forceFront == 1 ? 0 : 1]);
-	clGlobalSwing.setArg(10, glGraphNode.getScale(), CL_MEM_READ_ONLY);
 }
 
-void ForceAtlas2Sim::setCLGlobalTractionArgs()
+void ForceAtlas2Sim::setCLGlobalTractionArgs(bool init)
 {
-	clGlobalTraction.setWorkSize(graphObject.getNumOfNodes());
-	clGlobalTraction.setArg(0, graphObject.getNumOfNodes());
+	if (init)
+	{
+		clGlobalTraction.setWorkSize(graphObject.getNumOfNodes());
+		clGlobalTraction.setArg(0, graphObject.getNumOfNodes());
+		clGlobalTraction.setArg(10, glGraphNode.getScale(), CL_MEM_READ_ONLY);
+	}
+
 	clGlobalTraction.setArg(1, tmpX[tmpFront]);
 	clGlobalTraction.setArg(2, tmpY[tmpFront]);
 	clGlobalTraction.setArg(3, tmpZ[tmpFront]);
@@ -58,74 +67,89 @@ void ForceAtlas2Sim::setCLGlobalTractionArgs()
 	clGlobalTraction.setArg(7, fx[forceFront == 1 ? 0 : 1]);
 	clGlobalTraction.setArg(8, fy[forceFront == 1 ? 0 : 1]);
 	clGlobalTraction.setArg(9, fz[forceFront == 1 ? 0 : 1]);
-	clGlobalTraction.setArg(10, glGraphNode.getScale(), CL_MEM_READ_ONLY);
 }
 
-void ForceAtlas2Sim::setCLGraphCenterArgs()
+void ForceAtlas2Sim::setCLGraphCenterArgs(bool init)
 {
-	clGraphCenter.setWorkSize(graphObject.getNumOfNodes());
-	clGraphCenter.setArg(0, graphObject.getNumOfNodes());
-	clGraphCenter.setArg(1, glGraphNode.getOffsetX(), CL_MEM_READ_WRITE);
-	clGraphCenter.setArg(2, glGraphNode.getOffsetY(), CL_MEM_READ_WRITE);
-	clGraphCenter.setArg(3, glGraphNode.getOffsetZ(), CL_MEM_READ_WRITE);
-	clGraphCenter.setArg(4, glGraphNode.getScale(), CL_MEM_READ_ONLY);
+	if (init)
+	{
+		clGraphCenter.setWorkSize(graphObject.getNumOfNodes());
+		clGraphCenter.setArg(0, graphObject.getNumOfNodes());
+		clGraphCenter.setArg(1, glGraphNode.getOffsetX(), CL_MEM_READ_WRITE);
+		clGraphCenter.setArg(2, glGraphNode.getOffsetY(), CL_MEM_READ_WRITE);
+		clGraphCenter.setArg(3, glGraphNode.getOffsetZ(), CL_MEM_READ_WRITE);
+		clGraphCenter.setArg(4, glGraphNode.getScale(), CL_MEM_READ_ONLY);
+	}
+
 	clGraphCenter.setArg(5, tmpX[tmpFront]);
 	clGraphCenter.setArg(6, tmpY[tmpFront]);
 	clGraphCenter.setArg(7, tmpZ[tmpFront]);
 }
 
-void ForceAtlas2Sim::setCLForceAttr()
+void ForceAtlas2Sim::setCLForceAttrArgs(bool init)
 {
-	clForceAttr.setWorkSize(graphObject.getNumOfNodes());
-	clForceAttr.setArg(0, graphObject.getNumOfNodes());
-	clForceAttr.setArg(1, graphObject.getNumOfEdges());
-	clForceAttr.setArg(2, fa2Params.getDelta());
-	clForceAttr.setArg(3, glGraphNode.getOffsetX(), CL_MEM_READ_ONLY);
-	clForceAttr.setArg(4, glGraphNode.getOffsetY(), CL_MEM_READ_ONLY);
-	clForceAttr.setArg(5, glGraphNode.getOffsetZ(), CL_MEM_READ_ONLY);
-	clForceAttr.setArg(6, glGraphNode.getScale(), CL_MEM_READ_ONLY);
+	if (init)
+	{
+		clForceAttr.setWorkSize(graphObject.getNumOfNodes());
+		clForceAttr.setArg(0, graphObject.getNumOfNodes());
+		clForceAttr.setArg(1, graphObject.getNumOfEdges());
+		clForceAttr.setArg(2, fa2Params.getDelta());
+		clForceAttr.setArg(3, glGraphNode.getOffsetX(), CL_MEM_READ_ONLY);
+		clForceAttr.setArg(4, glGraphNode.getOffsetY(), CL_MEM_READ_ONLY);
+		clForceAttr.setArg(5, glGraphNode.getOffsetZ(), CL_MEM_READ_ONLY);
+		clForceAttr.setArg(6, glGraphNode.getScale(), CL_MEM_READ_ONLY);
+		clForceAttr.setArg(10, sourceId);
+		clForceAttr.setArg(11, targetId);
+		clForceAttr.setArg(12, edgeOffset);
+		clForceAttr.setArg(13, edgeWeight);
+	}
+
 	clForceAttr.setArg(7, fx[forceFront]);
 	clForceAttr.setArg(8, fy[forceFront]);
 	clForceAttr.setArg(9, fz[forceFront]);
-	clForceAttr.setArg(10, sourceId);
-	clForceAttr.setArg(11, targetId);
-	clForceAttr.setArg(12, edgeOffset);
-	clForceAttr.setArg(13, edgeWeight);
 }
 
-void ForceAtlas2Sim::setCLForceRepl()
+void ForceAtlas2Sim::setCLForceReplArgs(bool init)
 {
-	clForceRepl.setWorkSize(graphObject.getNumOfNodes());
-	clForceRepl.setArg(0, graphObject.getNumOfNodes());
-	clForceRepl.setArg(1, fa2Params.getKr());
-	clForceRepl.setArg(2, fa2Params.getKrp());
-	clForceRepl.setArg(3, glGraphNode.getOffsetX(), CL_MEM_READ_ONLY);
-	clForceRepl.setArg(4, glGraphNode.getOffsetY(), CL_MEM_READ_ONLY);
-	clForceRepl.setArg(5, glGraphNode.getOffsetZ(), CL_MEM_READ_ONLY);
-	clForceRepl.setArg(6, glGraphNode.getScale(), CL_MEM_READ_ONLY);
+	if (init)
+	{
+		clForceRepl.setWorkSize(graphObject.getNumOfNodes());
+		clForceRepl.setArg(0, graphObject.getNumOfNodes());
+		clForceRepl.setArg(1, fa2Params.getKr());
+		clForceRepl.setArg(2, fa2Params.getKrp());
+		clForceRepl.setArg(3, glGraphNode.getOffsetX(), CL_MEM_READ_ONLY);
+		clForceRepl.setArg(4, glGraphNode.getOffsetY(), CL_MEM_READ_ONLY);
+		clForceRepl.setArg(5, glGraphNode.getOffsetZ(), CL_MEM_READ_ONLY);
+		clForceRepl.setArg(6, glGraphNode.getScale(), CL_MEM_READ_ONLY);
+	}
+
 	clForceRepl.setArg(7, fx[forceFront]);
 	clForceRepl.setArg(8, fy[forceFront]);
 	clForceRepl.setArg(9, fz[forceFront]);
 }
 
-void ForceAtlas2Sim::setCLUpdateNodeArgs()
+void ForceAtlas2Sim::setCLUpdateNodeArgs(bool init)
 {
-	clUpdateNode.setWorkSize(graphObject.getNumOfNodes());
-	clUpdateNode.setArg(0, graphObject.getNumOfNodes());
-	clUpdateNode.setArg(1, fa2Params.getKg());
-	clUpdateNode.setArg(2, graphObject.getTotalDegree());
-	clUpdateNode.setArg(3, fa2Params.getFg() ? 1 : 0);
-	clUpdateNode.setArg(4, fa2Params.getFsg() ? 1 : 0);
-	clUpdateNode.setArg(5, fa2Params.getTau());
-	clUpdateNode.setArg(6, fa2Params.getKs());
-	clUpdateNode.setArg(7, fa2Params.getKsmax());
-	clUpdateNode.setArg(8, centerOfMass);
-	clUpdateNode.setArg(9, globalSwing);
-	clUpdateNode.setArg(10, globalTraction);
-	clUpdateNode.setArg(11, glGraphNode.getOffsetX(), CL_MEM_READ_WRITE);
-	clUpdateNode.setArg(12, glGraphNode.getOffsetY(), CL_MEM_READ_WRITE);
-	clUpdateNode.setArg(13, glGraphNode.getOffsetZ(), CL_MEM_READ_WRITE);
-	clUpdateNode.setArg(14, glGraphNode.getScale(), CL_MEM_READ_ONLY);
+	if (init)
+	{
+		clUpdateNode.setWorkSize(graphObject.getNumOfNodes());
+		clUpdateNode.setArg(0, graphObject.getNumOfNodes());
+		clUpdateNode.setArg(1, fa2Params.getKg());
+		clUpdateNode.setArg(2, graphObject.getTotalDegree());
+		clUpdateNode.setArg(3, fa2Params.getFg() ? 1 : 0);
+		clUpdateNode.setArg(4, fa2Params.getFsg() ? 1 : 0);
+		clUpdateNode.setArg(5, fa2Params.getTau());
+		clUpdateNode.setArg(6, fa2Params.getKs());
+		clUpdateNode.setArg(7, fa2Params.getKsmax());
+		clUpdateNode.setArg(8, centerOfMass);
+		clUpdateNode.setArg(9, globalSwing);
+		clUpdateNode.setArg(10, globalTraction);
+		clUpdateNode.setArg(11, glGraphNode.getOffsetX(), CL_MEM_READ_WRITE);
+		clUpdateNode.setArg(12, glGraphNode.getOffsetY(), CL_MEM_READ_WRITE);
+		clUpdateNode.setArg(13, glGraphNode.getOffsetZ(), CL_MEM_READ_WRITE);
+		clUpdateNode.setArg(14, glGraphNode.getScale(), CL_MEM_READ_ONLY);
+	}
+
 	clUpdateNode.setArg(15, fx[forceFront]);
 	clUpdateNode.setArg(16, fy[forceFront]);
 	clUpdateNode.setArg(17, fz[forceFront]);
@@ -134,21 +158,24 @@ void ForceAtlas2Sim::setCLUpdateNodeArgs()
 	clUpdateNode.setArg(20, fz[forceFront == 1 ? 0 : 1]);
 }
 
-void ForceAtlas2Sim::setCLUpdateEdgeArgs()
+void ForceAtlas2Sim::setCLUpdateEdgeArgs(bool init)
 {
-	clUpdateEdge.setWorkSize(graphObject.getNumOfEdges());
-	clUpdateEdge.setArg(0, graphObject.getNumOfEdges());
-	clUpdateEdge.setArg(1, glGraphNode.getOffsetX(), CL_MEM_READ_ONLY);
-	clUpdateEdge.setArg(2, glGraphNode.getOffsetY(), CL_MEM_READ_ONLY);
-	clUpdateEdge.setArg(3, glGraphNode.getOffsetZ(), CL_MEM_READ_ONLY);
-	clUpdateEdge.setArg(4, sourceId);
-	clUpdateEdge.setArg(5, glGraphEdge.getSourceX(), CL_MEM_READ_WRITE);
-	clUpdateEdge.setArg(6, glGraphEdge.getSourceY(), CL_MEM_READ_WRITE);
-	clUpdateEdge.setArg(7, glGraphEdge.getSourceZ(), CL_MEM_READ_WRITE);
-	clUpdateEdge.setArg(8, targetId);
-	clUpdateEdge.setArg(9, glGraphEdge.getTargetX(), CL_MEM_READ_WRITE);
-	clUpdateEdge.setArg(10, glGraphEdge.getTargetY(), CL_MEM_READ_WRITE);
-	clUpdateEdge.setArg(11, glGraphEdge.getTargetZ(), CL_MEM_READ_WRITE);
+	if (init)
+	{
+		clUpdateEdge.setWorkSize(graphObject.getNumOfEdges());
+		clUpdateEdge.setArg(0, graphObject.getNumOfEdges());
+		clUpdateEdge.setArg(1, glGraphNode.getOffsetX(), CL_MEM_READ_ONLY);
+		clUpdateEdge.setArg(2, glGraphNode.getOffsetY(), CL_MEM_READ_ONLY);
+		clUpdateEdge.setArg(3, glGraphNode.getOffsetZ(), CL_MEM_READ_ONLY);
+		clUpdateEdge.setArg(4, sourceId);
+		clUpdateEdge.setArg(5, glGraphEdge.getSourceX(), CL_MEM_READ_WRITE);
+		clUpdateEdge.setArg(6, glGraphEdge.getSourceY(), CL_MEM_READ_WRITE);
+		clUpdateEdge.setArg(7, glGraphEdge.getSourceZ(), CL_MEM_READ_WRITE);
+		clUpdateEdge.setArg(8, targetId);
+		clUpdateEdge.setArg(9, glGraphEdge.getTargetX(), CL_MEM_READ_WRITE);
+		clUpdateEdge.setArg(10, glGraphEdge.getTargetY(), CL_MEM_READ_WRITE);
+		clUpdateEdge.setArg(11, glGraphEdge.getTargetZ(), CL_MEM_READ_WRITE);
+	}
 }
 
 void ForceAtlas2Sim::setCLSumArgs(unsigned int n, unsigned int workGroupSize, cl::Buffer graphGlobal)
@@ -247,6 +274,15 @@ void ForceAtlas2Sim::init()
 	clForceRepl.init();
 	clUpdateNode.init();
 	clUpdateEdge.init();
+
+	// Sets CL kernels initial arguments
+	setCLGlobalSwingArgs(true);
+	setCLGlobalTractionArgs(true);
+	setCLGraphCenterArgs(true);
+	setCLForceAttrArgs(true);
+	setCLForceReplArgs(true);
+	setCLUpdateNodeArgs(true);
+	setCLUpdateEdgeArgs(true);
 }
 
 void ForceAtlas2Sim::run()
@@ -254,33 +290,33 @@ void ForceAtlas2Sim::run()
 	// Calculates graph center of mass
 	if (fa2Params.getFg() || fa2Params.getFsg())
 	{
-		setCLGraphCenterArgs();
+		setCLGraphCenterArgs(false);
 		clGraphCenter.run();
 		sum(graphObject.getNumOfNodes(), centerOfMass);
 	}
 
 	// Runs n-body
-	setCLForceAttr();
+	setCLForceAttrArgs(false);
 	clForceAttr.run();
 
-	setCLForceRepl();
+	setCLForceReplArgs(false);
 	clForceRepl.run();
 
 	// Calculates global swing
-	setCLGlobalSwingArgs();
+	setCLGlobalSwingArgs(false);
 	clGlobalSwing.run();
 	sum(graphObject.getNumOfNodes(), globalSwing);
 
 	// Calculates global traction
-	setCLGlobalTractionArgs();
+	setCLGlobalTractionArgs(false);
 	clGlobalTraction.run();
 	sum(graphObject.getNumOfNodes(), globalTraction);
 
 	// Updates graph
-	setCLUpdateNodeArgs();
+	setCLUpdateNodeArgs(false);
 	clUpdateNode.run();
 
-	setCLUpdateEdgeArgs();
+	setCLUpdateEdgeArgs(false);
 	clUpdateEdge.run();
 
 	// Switches force buffers

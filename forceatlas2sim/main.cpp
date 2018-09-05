@@ -14,8 +14,8 @@
 #include "glgraphnode.h"
 #include "graphobject.h"
 
-const int SCREEN_WIDTH = 800;
-const int SCREEN_HIGHT = 600;
+const int SCREEN_WIDTH = 1920;
+const int SCREEN_HEIGHT = 1080;
 
 double deltaTime = 0.0f;
 double lastFrame = 0.0f;
@@ -26,7 +26,7 @@ std::unique_ptr<ForceAtlas2Sim> fa2Sim;
 
 bool isValueArg(std::string argName)
 {
-	return 
+	return
 		argName == std::string("-i")		||
 		argName == std::string("-kr")		||
 		argName == std::string("-krp")		||
@@ -93,6 +93,11 @@ void processInput(GLFWwindow* window)
 		camera->move(MoveDirection::RIGHT, deltaTime);
 	else if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
 		fa2Sim->run();
+}
+
+void framebufferSizeCallback(GLFWwindow* window, int width, int height)
+{
+	glViewport(0, 0, width, height);
 }
 
 void mouseCallback(GLFWwindow* window, double posX, double posY)
@@ -169,7 +174,7 @@ int main(int argc, char** argv)
 				std::cout << "Can't specify '-h' with other arguments.\n\n" << usage;
 				return 1;
 			}
-			else 
+			else
 			{
 				std::cout << "Invalid argument: '" << argv[i] << "'.\n\n" << usage;
 				return 1;
@@ -193,7 +198,7 @@ int main(int argc, char** argv)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HIGHT, "ForceAtlas2Sim", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "ForceAtlas2Sim", NULL, NULL);
 
 	if (window == NULL)
 	{
@@ -211,11 +216,12 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	glViewport(0, 0, 800, 600);
+	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	glEnable(GL_DEPTH_TEST);
 
 	// Sets callbacks for the GLFW window
+	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetCursorPosCallback(window, mouseCallback);
 	glfwSetScrollCallback(window, scrollCallback);
@@ -231,8 +237,9 @@ int main(int argc, char** argv)
 
 	// Initializes camera
 	camera = std::make_unique<Camera>(
-		glm::vec3(0.0f, 0.0f, graphObject.getInitPosition()), 
-		glm::vec3(0.0f, 0.0f, -1.0f), 
+		SCREEN_WIDTH, SCREEN_HEIGHT,
+		glm::vec3(0.0f, 0.0f, graphObject.getInitPosition()),
+		glm::vec3(0.0f, 0.0f, -1.0f),
 		glm::vec3(0.0f, 1.0f, 0.0f));
 
 	// Initializes graph node

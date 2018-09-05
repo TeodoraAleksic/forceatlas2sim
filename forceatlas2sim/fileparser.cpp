@@ -71,7 +71,7 @@ void FileParser::processGEXFEdgeAttr(xmlAttr* attr, std::string* source, std::st
 			if (std::strcmp((const char*)attr->name, "target") == 0)
 				*target = (const char*)attr->children->content;
 
-			if (std::strcmp((const char*)attr->name, "weight") == 0)
+			if (std::strcmp((const char*)attr->name, "cardinal") == 0)
 				*weight = std::stof((const char*)attr->children->content);
 		}
 
@@ -339,6 +339,10 @@ GraphObject FileParser::parse(std::string fileName)
 		parseGML(fileName, &graphObject);
 	else 
 		throw "Unsupported file extension";
+
+	std::cout << fileName << std::endl;
+	std::cout << "Number of nodes: " << graphObject.getNumOfNodes() << std::endl;
+	std::cout << "Number of edges: " << graphObject.getNumOfEdges() << std::endl << std::endl;
 
 	graphObject.postprocessing();
 

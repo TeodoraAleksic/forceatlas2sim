@@ -11,7 +11,7 @@ private:
 
 	unsigned int numOfNodes, numOfEdges;
 
-	bool initedGraphics;
+	bool initedX, initedY, initedZ;
 
 	std::unordered_map<std::string, unsigned int> nodeIds;
 
@@ -27,6 +27,9 @@ private:
 
 	std::vector<int> edgeOffset;
 	std::vector<float> edgeWeight;
+
+	void initNode(std::string node);
+	unsigned int getNodeId(std::string node);
 
 	int findSource(unsigned int source);
 	int findTarget(int index, unsigned int source, unsigned int target);

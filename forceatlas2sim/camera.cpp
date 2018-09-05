@@ -1,7 +1,10 @@
 #include "camera.h"
 
-Camera::Camera(glm::vec3 cameraPos_, glm::vec3 cameraFront_, glm::vec3 cameraUp_) :
-	cameraPos(cameraPos_), cameraFront(cameraFront_), cameraUp(cameraUp_), cameraPitch(0.0f), cameraYaw(-90.0f), fov(45.0f)
+Camera::Camera(int screenWidth_, int screenHeight_, glm::vec3 cameraPos_, glm::vec3 cameraFront_, glm::vec3 cameraUp_) :
+	screenWidth(screenWidth_), screenHeight(screenHeight_),
+	cameraPos(cameraPos_), cameraFront(cameraFront_), cameraUp(cameraUp_), 
+	cameraPitch(0.0f), cameraYaw(-90.0f), fov(45.0f),
+	nearPlain(0.1), farPlain(5000)
 {
 }
 
@@ -30,14 +33,14 @@ glm::mat4 Camera::getPosition() const
 	return glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 }
 
-double Camera::getFOV() const
+glm::mat4 Camera::getPerspective() const
 {
-	return fov;
+	return glm::perspective((float)glm::radians(fov), (float)(screenWidth / screenHeight), 0.1f, 5000.0f);
 }
 
 void Camera::move(MoveDirection direction, double deltaTime)
 {
-	float cameraSpeed = (float)(5.0f * deltaTime);
+	float cameraSpeed = (float)(100.0f * deltaTime);
 
 	// Moves camera in given direction
 	switch (direction)

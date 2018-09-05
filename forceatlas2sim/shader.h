@@ -121,6 +121,71 @@ namespace shader
 		outColor = vec4(0.85, 0.85, 0.85, 1.0); \n\
 	} \n\
 	";
+
+	const std::string selectVert =
+		" \
+	#version 330 core \n\
+	\n\
+	layout(location = 0) in vec3 position; \n\
+	layout(location = 1) in float offsetX; \n\
+	layout(location = 2) in float offsetY; \n\
+	layout(location = 3) in float offsetZ; \n\
+	layout(location = 4) in uint scale; \n\
+	\n\
+	uniform mat4 projection; \n\
+	uniform mat4 view; \n\
+	uniform mat4 model; \n\
+	\n\
+	uniform mat3 normalMatrix; \n\
+	\n\
+	out vec3 vertPos; \n\
+	out vec3 vertNormal; \n\
+	\n\
+	void main() \n\
+	{ \n\
+		vertPos = vec3(model * vec4(position, 1.0f)); \n\
+		vertNormal = normalMatrix * normalize(position); \n\
+		\n\
+		vec3 offset = vec3(offsetX, offsetY, offsetZ); \n\
+		vec3 newPos = position * (float(scale) * 0.5 + 0.5) + offset; \n\
+		gl_Position = projection * view * model * vec4(newPos, 1); \n\
+	} \n\
+	";
+
+	const std::string selectFrag =
+		" \
+	#version 330 core \n\
+	\n\
+	in vec3 vertPos; \n\
+	in vec3 vertNormal; \n\
+	\n\
+	uniform vec3 cameraPos; \n\
+	\n\
+	out vec4 outColor; \n\
+	\n\
+	void main() { \n\
+		vec3 nodeColor = vec3(0.95, 0.7, 0.25); \n\
+		vec3 lightPos = cameraPos + vec3(1.0, 1.0, 1.0); \n\
+		vec3 lightColor = vec3(1.0, 1.0, 1.0); \n\
+		\n\
+		float ambientStrength = 0.1; \n\
+		vec3 ambient = ambientStrength * lightColor; \n\
+		\n\
+		vec3 normal = normalize(vertNormal); \n\
+		vec3 lightDir = normalize(lightPos - vertPos); \n\
+		vec3 diffuse = max(dot(normal, lightDir), 0.0) * lightColor; \n\
+		\n\
+		vec3 viewDir = normalize(cameraPos - vertPos); \n\
+		vec3 reflectDir = reflect(-lightDir, vertNormal); \n\
+		\n\
+		float specularStrength = 0.1; \n\
+		float spec = pow(max(dot(viewDir, reflectDir), 0.0), 256); \n\
+		vec3 specular = specularStrength * spec * lightColor; \n\
+		\n\
+		vec3 color = (ambient + diffuse + specular) * nodeColor; \n\
+		outColor = vec4(color, 1.0); \n\
+	} \n\
+	";
 }
 
 #endif

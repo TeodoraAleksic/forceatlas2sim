@@ -20,6 +20,9 @@ const int SCREEN_HEIGHT = 1080;
 double deltaTime = 0.0f;
 double lastFrame = 0.0f;
 
+bool runSim = false;
+int oldPKeyState = GLFW_RELEASE;
+
 std::unique_ptr<Camera> camera;
 
 std::unique_ptr<ForceAtlas2Sim> fa2Sim;
@@ -81,6 +84,8 @@ void setFlagArg(ForceAtlas2Params* fa2Params, std::string argName)
 
 void processInput(GLFWwindow* window)
 {
+	int newPKeyState = glfwGetKey(window, GLFW_KEY_P);
+
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE))
 		glfwSetWindowShouldClose(window, true);
 	else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -91,8 +96,10 @@ void processInput(GLFWwindow* window)
 		camera->move(MoveDirection::LEFT, deltaTime);
 	else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		camera->move(MoveDirection::RIGHT, deltaTime);
-	else if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
-		fa2Sim->run();
+	else if (newPKeyState == GLFW_PRESS && oldPKeyState == GLFW_RELEASE)
+		runSim = runSim ? false : true;
+
+	oldPKeyState = newPKeyState;
 }
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
@@ -265,6 +272,8 @@ int main(int argc, char** argv)
 		glfwPollEvents();
 
 		processInput(window);
+
+		if (runSim) fa2Sim->run();
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

@@ -14,13 +14,15 @@ private:
 	const Camera& camera;
 	const GraphObject& graphObject;
 
+	unsigned int selectedNode;
+
 	bool isInited;
 
 	unsigned int vao;
 	unsigned int vboVertex, vboIndex, vboOffsetX, vboOffsetY, vboOffsetZ, vboScale;
 	
 	unsigned int program;
-	unsigned int uniformProjection, uniformView, uniformModel, uniformNormalMatrix, uniformCameraPos;
+	unsigned int uniformProjection, uniformView, uniformModel, uniformNormalMatrix, uniformSelectedNode, uniformCameraPos;
 
 	void initNode(std::vector<float>* vertices, std::vector<unsigned int>* indices);
 
@@ -32,6 +34,8 @@ public:
 	void init();
 	void draw();
 	void cleanup();
+
+	void setSelectedNode(unsigned int selectedNode_);
 
 	unsigned int getNumOfNodes() const;
 	unsigned int getVertices() const;

@@ -21,11 +21,13 @@ namespace shader
 	\n\
 	uniform mat3 normalMatrix; \n\
 	\n\
+	flat out int instanceId; \n\
 	out vec3 vertPos; \n\
 	out vec3 vertNormal; \n\
 	\n\
 	void main() \n\
 	{ \n\
+		instanceId = gl_InstanceID; \n\
 		vertPos = vec3(model * vec4(position, 1.0f)); \n\
 		vertNormal = normalMatrix * normalize(position); \n\
 		\n\
@@ -39,15 +41,20 @@ namespace shader
 	" \
 	#version 330 core \n\
 	\n\
+	flat in int instanceId; \n\
 	in vec3 vertPos; \n\
 	in vec3 vertNormal; \n\
 	\n\
+	uniform uint selectedNode; \n\
 	uniform vec3 cameraPos; \n\
 	\n\
 	out vec4 outColor; \n\
 	\n\
 	void main() { \n\
-		vec3 nodeColor = vec3(0.95, 0.7, 0.25); \n\
+		vec3 unselectedColor = vec3(0.95, 0.7, 0.25); \n\
+		vec3 selectedColor = vec3(0.8, 0.3, 0.4); \n\
+		\n\
+		vec3 nodeColor = (instanceId == int(selectedNode)) ? selectedColor : unselectedColor; \n\
 		vec3 lightPos = cameraPos + vec3(1.0, 1.0, 1.0); \n\
 		vec3 lightColor = vec3(1.0, 1.0, 1.0); \n\
 		\n\

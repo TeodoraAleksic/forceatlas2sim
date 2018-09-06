@@ -12,6 +12,7 @@
 #include "forceatlas2params.h"
 #include "glgraphedge.h"
 #include "glgraphnode.h"
+#include "glselect.h"
 #include "graphobject.h"
 
 const int SCREEN_WIDTH = 1920;
@@ -290,6 +291,18 @@ int main(int argc, char** argv)
 	// Initializes graph edge
 	GLGraphEdge graphEdge(*camera, graphObject);
 	graphEdge.init();
+
+	// Initializes object for node selection
+	GLSelect nodeSelection(*camera, graphObject);
+
+	nodeSelection.setVboVertex(graphNode.getVertices());
+	nodeSelection.setVboIndex(graphNode.getIndices());
+	nodeSelection.setVboOffsetX(graphNode.getOffsetX());
+	nodeSelection.setVboOffsetY(graphNode.getOffsetY());
+	nodeSelection.setVboOffsetZ(graphNode.getOffsetZ());
+	nodeSelection.setVboScale(graphNode.getScale());
+
+	nodeSelection.init();
 
 	// Initializes ForceAtlas2 simulation
 	fa2Sim = std::make_unique<ForceAtlas2Sim>(fa2Params, graphObject, graphNode, graphEdge);

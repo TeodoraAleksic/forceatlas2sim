@@ -234,6 +234,16 @@ unsigned int GLGraphNode::getNumOfNodes() const
 	return graphObject.getNumOfNodes();
 }
 
+unsigned int GLGraphNode::getVertices() const
+{
+	return vboVertex;
+}
+
+unsigned int GLGraphNode::getIndices() const
+{
+	return vboIndex;
+}
+
 unsigned int GLGraphNode::getOffsetX() const
 {
 	return vboOffsetX;

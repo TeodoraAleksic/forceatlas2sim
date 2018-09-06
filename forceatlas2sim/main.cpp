@@ -293,16 +293,16 @@ int main(int argc, char** argv)
 	graphEdge.init();
 
 	// Initializes object for node selection
-	GLSelect nodeSelection(*camera, graphObject);
+	GLSelect graphSelection(*camera, graphObject);
 
-	nodeSelection.setVboVertex(graphNode.getVertices());
-	nodeSelection.setVboIndex(graphNode.getIndices());
-	nodeSelection.setVboOffsetX(graphNode.getOffsetX());
-	nodeSelection.setVboOffsetY(graphNode.getOffsetY());
-	nodeSelection.setVboOffsetZ(graphNode.getOffsetZ());
-	nodeSelection.setVboScale(graphNode.getScale());
+	graphSelection.setVboVertex(graphNode.getVertices());
+	graphSelection.setVboIndex(graphNode.getIndices());
+	graphSelection.setVboOffsetX(graphNode.getOffsetX());
+	graphSelection.setVboOffsetY(graphNode.getOffsetY());
+	graphSelection.setVboOffsetZ(graphNode.getOffsetZ());
+	graphSelection.setVboScale(graphNode.getScale());
 
-	nodeSelection.init();
+	graphSelection.init();
 
 	// Initializes ForceAtlas2 simulation
 	fa2Sim = std::make_unique<ForceAtlas2Sim>(fa2Params, graphObject, graphNode, graphEdge);
@@ -320,9 +320,22 @@ int main(int argc, char** argv)
 
 		processInput(window);
 
+		// Runs ForceAtlas2
 		if (runSim) fa2Sim->run();
 
-		// TODO get selected node
+		// Gets selected node on screen
+		if (getSelectedNode)
+		{
+			glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			graphSelection.draw();
+
+			unsigned char data[4];
+			glReadPixels(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+			selectedNode = data[0] * 265 * 265 + data[1] * 256 + data[2];
+		}
 
 		getSelectedNode = false;
 

@@ -123,7 +123,7 @@ namespace shader
 	";
 
 	const std::string selectVert =
-		" \
+	" \
 	#version 330 core \n\
 	\n\
 	layout(location = 0) in vec3 position; \n\
@@ -138,11 +138,13 @@ namespace shader
 	\n\
 	uniform mat3 normalMatrix; \n\
 	\n\
+	flat out int instanceId; \n\
 	out vec3 vertPos; \n\
 	out vec3 vertNormal; \n\
 	\n\
 	void main() \n\
 	{ \n\
+		instanceId = gl_InstanceID; \n\
 		vertPos = vec3(model * vec4(position, 1.0f)); \n\
 		vertNormal = normalMatrix * normalize(position); \n\
 		\n\
@@ -153,9 +155,10 @@ namespace shader
 	";
 
 	const std::string selectFrag =
-		" \
+	" \
 	#version 330 core \n\
 	\n\
+	flat in int instanceId; \n\
 	in vec3 vertPos; \n\
 	in vec3 vertNormal; \n\
 	\n\
@@ -164,26 +167,11 @@ namespace shader
 	out vec4 outColor; \n\
 	\n\
 	void main() { \n\
-		vec3 nodeColor = vec3(0.95, 0.7, 0.25); \n\
-		vec3 lightPos = cameraPos + vec3(1.0, 1.0, 1.0); \n\
-		vec3 lightColor = vec3(1.0, 1.0, 1.0); \n\
+		float r = (instanceId / (256 * 256)) / 255.0f; \n\
+		float g = (mod(instanceId, 256 * 256) / 256) / 255.0f; \n\
+		float b = (mod(mod(instanceId, 256), 256)) / 255.0f; \n\
 		\n\
-		float ambientStrength = 0.1; \n\
-		vec3 ambient = ambientStrength * lightColor; \n\
-		\n\
-		vec3 normal = normalize(vertNormal); \n\
-		vec3 lightDir = normalize(lightPos - vertPos); \n\
-		vec3 diffuse = max(dot(normal, lightDir), 0.0) * lightColor; \n\
-		\n\
-		vec3 viewDir = normalize(cameraPos - vertPos); \n\
-		vec3 reflectDir = reflect(-lightDir, vertNormal); \n\
-		\n\
-		float specularStrength = 0.1; \n\
-		float spec = pow(max(dot(viewDir, reflectDir), 0.0), 256); \n\
-		vec3 specular = specularStrength * spec * lightColor; \n\
-		\n\
-		vec3 color = (ambient + diffuse + specular) * nodeColor; \n\
-		outColor = vec4(color, 1.0); \n\
+		outColor = vec4(r, g, b, 1.0); \n\
 	} \n\
 	";
 }

@@ -26,6 +26,13 @@ int oldPKeyState = GLFW_RELEASE;
 bool drawEdges = true;
 int oldEKeyState = GLFW_RELEASE;
 
+bool ctrlPressed = false;
+int oldCtrlKeyState = GLFW_RELEASE;
+
+unsigned int selectedNode = -1;
+bool getSelectedNode = false;
+int oldLeftMouseState = GLFW_RELEASE;
+
 std::unique_ptr<Camera> camera;
 
 std::unique_ptr<ForceAtlas2Sim> fa2Sim;
@@ -89,6 +96,7 @@ void processInput(GLFWwindow* window)
 {
 	int newPKeyState = glfwGetKey(window, GLFW_KEY_P);
 	int newEKeyState = glfwGetKey(window, GLFW_KEY_E);
+	int newCtrlKeyState = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL);
 
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE))
 		glfwSetWindowShouldClose(window, true);
@@ -104,9 +112,14 @@ void processInput(GLFWwindow* window)
 		runSim = runSim ? false : true;
 	else if (newEKeyState == GLFW_PRESS && oldEKeyState == GLFW_RELEASE)
 		drawEdges = drawEdges ? false : true;
+	else if (newCtrlKeyState == GLFW_PRESS && oldCtrlKeyState == GLFW_RELEASE)
+		ctrlPressed = true;
+	else if (newCtrlKeyState == GLFW_RELEASE && oldCtrlKeyState == GLFW_PRESS)
+		ctrlPressed = false;
 
 	oldPKeyState = newPKeyState;
 	oldEKeyState = newEKeyState;
+	oldCtrlKeyState = newCtrlKeyState;
 }
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
@@ -114,7 +127,20 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-void mouseCallback(GLFWwindow* window, double posX, double posY)
+void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+{
+	if (button == GLFW_MOUSE_BUTTON_LEFT)
+	{
+		int newLeftMouseState = action;
+
+		if (ctrlPressed && newLeftMouseState == GLFW_PRESS && oldLeftMouseState == GLFW_RELEASE)
+			getSelectedNode = true;
+
+		oldLeftMouseState = newLeftMouseState;
+	}
+}
+
+void cursorCallback(GLFWwindow* window, double posX, double posY)
 {
 	camera->turn(posX, posY, deltaTime);
 }
@@ -237,7 +263,8 @@ int main(int argc, char** argv)
 	// Sets callbacks for the GLFW window
 	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	glfwSetCursorPosCallback(window, mouseCallback);
+	glfwSetMouseButtonCallback(window, mouseButtonCallback);
+	glfwSetCursorPosCallback(window, cursorCallback);
 	glfwSetScrollCallback(window, scrollCallback);
 
 	// Gets info about selected OpenGL device
@@ -281,6 +308,10 @@ int main(int argc, char** argv)
 		processInput(window);
 
 		if (runSim) fa2Sim->run();
+
+		// TODO get selected node
+
+		getSelectedNode = false;
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

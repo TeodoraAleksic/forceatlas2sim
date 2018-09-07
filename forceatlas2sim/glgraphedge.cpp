@@ -272,6 +272,16 @@ unsigned int GLGraphEdge::getNumOfEdges() const
 	return graphObject.getNumOfEdges();
 }
 
+unsigned int GLGraphEdge::getSourceId() const
+{
+	return vboSourceId;
+}
+
+unsigned int GLGraphEdge::getTargetId() const
+{
+	return vboTargetId;
+}
+
 unsigned int GLGraphEdge::getSourceX() const
 {
 	return vboSourceX;

@@ -36,6 +36,8 @@ public:
 	void setSelectedNode(unsigned int selectedNode_);
 
 	unsigned int getNumOfEdges() const;
+	unsigned int getSourceId() const;
+	unsigned int getTargetId() const;
 	unsigned int getSourceX() const;
 	unsigned int getSourceY() const;
 	unsigned int getSourceZ() const;

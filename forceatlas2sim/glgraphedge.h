@@ -12,13 +12,17 @@ private:
 	const Camera& camera;
 	const GraphObject& graphObject;
 
+	unsigned int selectedNode;
+
 	bool isInited;
 
 	unsigned int vao;
-	unsigned int vboVertex, vboIndex, vboSourceX, vboSourceY, vboSourceZ, vboTargetX, vboTargetY, vboTargetZ;
+	unsigned int vboVertex, vboIndex;
+	unsigned int vboSourceId, vboTargetId;
+	unsigned int vboSourceX, vboSourceY, vboSourceZ, vboTargetX, vboTargetY, vboTargetZ;
 
 	unsigned int program;
-	unsigned int uniformProjection, uniformView, uniformModel;
+	unsigned int uniformProjection, uniformView, uniformModel, uniformSelectedNode;
 
 public:
 
@@ -28,6 +32,8 @@ public:
 	void init();
 	void draw();
 	void cleanup();
+
+	void setSelectedNode(unsigned int selectedNode_);
 
 	unsigned int getNumOfEdges() const;
 	unsigned int getSourceX() const;

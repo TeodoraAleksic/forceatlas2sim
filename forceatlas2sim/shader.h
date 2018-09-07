@@ -82,19 +82,27 @@ namespace shader
 	#version 330 core \n\
 	\n\
 	layout(location = 0) in vec3 position; \n\
-	layout(location = 1) in float sourceX; \n\
-	layout(location = 2) in float sourceY; \n\
-	layout(location = 3) in float sourceZ; \n\
-	layout(location = 4) in float targetX; \n\
-	layout(location = 5) in float targetY; \n\
-	layout(location = 6) in float targetZ; \n\
+	layout(location = 1) in uint sourceId; \n\
+	layout(location = 2) in uint targetId; \n\
+	layout(location = 3) in float sourceX; \n\
+	layout(location = 4) in float sourceY; \n\
+	layout(location = 5) in float sourceZ; \n\
+	layout(location = 6) in float targetX; \n\
+	layout(location = 7) in float targetY; \n\
+	layout(location = 8) in float targetZ; \n\
 	\n\
 	uniform mat4 projection; \n\
 	uniform mat4 view; \n\
 	uniform mat4 model; \n\
 	\n\
+	flat out uint edgeId1; \n\
+	flat out uint edgeId2; \n\
+	\n\
 	void main() \n\
 	{ \n\
+		edgeId1 = sourceId; \n\
+		edgeId2 = targetId; \n\
+		\n\
 		vec3 source = vec3(sourceX, sourceY, sourceZ); \n\
 		vec3 target = vec3(targetX, targetY, targetZ); \n\
 		\n\
@@ -121,11 +129,19 @@ namespace shader
 	const std::string edgeFrag =
 	" \
 	#version 330 core \n\
+	flat in uint edgeId1; \n\
+	flat in uint edgeId2; \n\
+	\n\
+	\n\
+	uniform uint selectedNode; \n\
 	\n\
 	out vec4 outColor; \
 	\n\
 	void main() { \n\
-		outColor = vec4(0.85, 0.85, 0.85, 1.0); \n\
+		vec4 unselectedColor = vec4(0.85, 0.85, 0.85, 1.0); \n\
+		vec4 selectedColor = vec4(0.8, 0.3, 0.4, 1.0); \n\
+		\n\
+		outColor = (edgeId1 == selectedNode || edgeId2 == selectedNode) ? selectedColor : unselectedColor; \n\
 	} \n\
 	";
 

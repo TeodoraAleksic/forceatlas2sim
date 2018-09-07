@@ -324,7 +324,7 @@ int main(int argc, char** argv)
 		if (runSim) fa2Sim->run();
 
 		// Gets selected node on screen
-		if (getSelectedNode)
+		if (getSelectedNode && !runSim)
 		{
 			glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

@@ -334,7 +334,7 @@ int main(int argc, char** argv)
 			unsigned char data[4];
 			glReadPixels(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
-			selectedNode = data[0] * 265 * 265 + data[1] * 256 + data[2];
+			selectedNode = data[0] + data[1] * 256 + data[2] * 265 * 265;
 
 			graphEdge.setSelectedNode(selectedNode);
 			graphNode.setSelectedNode(selectedNode);

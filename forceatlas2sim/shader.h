@@ -193,9 +193,9 @@ namespace shader
 	out vec4 outColor; \n\
 	\n\
 	void main() { \n\
-		float r = (instanceId / (256 * 256)) / 255.0f; \n\
-		float g = (mod(instanceId, 256 * 256) / 256) / 255.0f; \n\
-		float b = (mod(mod(instanceId, 256), 256)) / 255.0f; \n\
+		float r = ((instanceId & 0x000000FF) >> 0) / 255.0f; \n\
+		float g = ((instanceId & 0x0000FF00) >> 8) / 255.0f; \n\
+		float b = ((instanceId & 0x00FF0000) >> 16) / 255.0f; \n\
 		\n\
 		outColor = vec4(r, g, b, 1.0); \n\
 	} \n\

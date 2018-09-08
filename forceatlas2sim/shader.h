@@ -104,7 +104,7 @@ namespace shader
 		edgeId1 = sourceId; \n\
 		edgeId2 = targetId; \n\
 		\n\
-		int thickness = (edgeId1 == selectedNode || edgeId2 == selectedNode) ? 3 : 1;\n\
+		float thickness = (edgeId1 == selectedNode || edgeId2 == selectedNode) ? 4 : 2;\n\
 		\n\
 		vec3 source = vec3(sourceX, sourceY, sourceZ); \n\
 		vec3 target = vec3(targetX, targetY, targetZ); \n\

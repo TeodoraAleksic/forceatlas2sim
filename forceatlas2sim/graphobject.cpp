@@ -31,6 +31,7 @@ void GraphObject::initNode(std::string node)
 	nodeY.push_back(0);
 	nodeZ.push_back(0);
 	degree.push_back(0);
+	nodeLabel.push_back("");
 }
 
 unsigned int GraphObject::getNodeId(std::string node)
@@ -108,7 +109,7 @@ int GraphObject::insertEdgeSorted(unsigned int source, unsigned int target)
 	}
 }
 
-void GraphObject::addNode(std::string node, float x, float y, float z)
+void GraphObject::addNode(std::string node, std::string label, float x, float y, float z)
 {
 	unsigned int nodeId = getNodeId(node);
 
@@ -120,6 +121,8 @@ void GraphObject::addNode(std::string node, float x, float y, float z)
 	nodeX[nodeId] = x;
 	nodeY[nodeId] = y;
 	nodeZ[nodeId] = z;
+
+	nodeLabel[nodeId] = label;
 }
 
 void GraphObject::addEdge(std::string source, std::string target, float weight)
@@ -267,6 +270,14 @@ std::vector<float> GraphObject::getNodeZ() const
 std::vector<unsigned int> GraphObject::getNodeDegree() const
 {
 	return degree;
+}
+
+std::string GraphObject::getNodeLabel(unsigned int id) const
+{
+	if (id >= 0 && id < nodeLabel.size())
+		return nodeLabel[id];
+	else
+		return "";
 }
 
 std::vector<unsigned int> GraphObject::getSourceId() const

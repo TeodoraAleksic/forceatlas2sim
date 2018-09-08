@@ -21,6 +21,8 @@ private:
 
 	std::vector<unsigned int> degree;
 
+	std::vector<std::string> nodeLabel;
+
 	std::vector<unsigned int> sourceId, targetId;
 	std::vector<float> sourceX, sourceY, sourceZ;
 	std::vector<float> targetX, targetY, targetZ;
@@ -44,7 +46,7 @@ public:
 	GraphObject();
 	~GraphObject();
 
-	void addNode(std::string node, float x = 0.0, float y = 0.0, float z = 0.0);
+	void addNode(std::string node, std::string label = "", float x = 0.0, float y = 0.0, float z = 0.0);
 	void addEdge(std::string source, std::string target, float weight);
 
 	void postprocessing();
@@ -61,6 +63,8 @@ public:
 	std::vector<float> getNodeZ() const;
 
 	std::vector<unsigned int> getNodeDegree() const;
+
+	std::string getNodeLabel(unsigned int id) const;
 
 	std::vector<unsigned int> getSourceId() const;
 	std::vector<unsigned int> getTargetId() const;

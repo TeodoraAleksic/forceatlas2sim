@@ -131,9 +131,9 @@ void GLText::draw()
 	glBindVertexArray(vao);
 	glActiveTexture(GL_TEXTURE0);
 
-	float xBase = 100.0;
-	float yBase = 100.0;
-	float scale = 0.5;
+	float xBase = 20.0f;
+	float yBase = 20.0f;
+	float scale = 0.45f;
 
 	// Draws text
 	for (auto textIter = text.begin(); textIter != text.end(); ++textIter)
@@ -192,4 +192,5 @@ void GLText::cleanup()
 void GLText::setSelectedNode(unsigned int selectedNode)
 {
 	text = graphObject.getNodeLabel(selectedNode);
+	text = text.size() > 0 ? "Node: " + text : text;
 }

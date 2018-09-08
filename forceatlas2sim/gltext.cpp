@@ -9,6 +9,8 @@
 GLText::GLText(const Camera& camera_, const GraphObject& graphObject_) : camera(camera_), graphObject(graphObject_)
 {
 	isInited = false;
+	vao = 0;
+	vboVertex = 0;
 	program = 0;
 }
 
@@ -100,6 +102,19 @@ void GLText::init()
 	// Gets uniform variable locations
 	uniformProjection = glGetUniformLocation(program, "projection");
 	uniformText = glGetUniformLocation(program, "text");
+
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	// Allocates buffer for drawing one character
+	glGenBuffers(1, &vboVertex);
+	glBindBuffer(GL_ARRAY_BUFFER, vboVertex);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 4, nullptr, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
+
+	isInited = true;
 }
 
 void GLText::draw()
@@ -111,9 +126,17 @@ void GLText::cleanup()
 	if (!isInited)
 		return;
 
+	if (vboVertex)
+		glDeleteBuffers(1, &vboVertex);
+
+	if (vao)
+		glDeleteVertexArrays(1, &vao);
+
 	if (program)
 		glDeleteProgram(program);
 
 	isInited = false;
+	vao = 0;
+	vboVertex = 0;
 	program = 0;
 }

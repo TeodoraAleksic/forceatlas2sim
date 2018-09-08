@@ -24,10 +24,13 @@ private:
 
 	bool isInited;
 
-	std::map<GLchar, Character> characters;
+	unsigned int vao;
+	unsigned int vboVertex;
 
 	unsigned int program;
 	unsigned int uniformProjection, uniformText;
+
+	std::map<GLchar, Character> characters;
 
 	void initCharacters();
 

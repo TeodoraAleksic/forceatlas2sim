@@ -13,6 +13,7 @@
 #include "glgraphedge.h"
 #include "glgraphnode.h"
 #include "glselect.h"
+#include "gltext.h"
 #include "graphobject.h"
 
 const int SCREEN_WIDTH = 1920;
@@ -303,6 +304,10 @@ int main(int argc, char** argv)
 	graphSelection.setVboScale(graphNode.getScale());
 
 	graphSelection.init();
+
+	// Initializes object for text drawing
+	GLText graphLabels(*camera, graphObject);
+	graphLabels.init();
 
 	// Initializes ForceAtlas2 simulation
 	fa2Sim = std::make_unique<ForceAtlas2Sim>(fa2Params, graphObject, graphNode, graphEdge);

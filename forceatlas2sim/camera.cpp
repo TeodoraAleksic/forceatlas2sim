@@ -74,8 +74,8 @@ void Camera::turn(double posX, double posY, double deltaTime, bool reset)
 	}
 
 	// Calculates camera movement since last position
-	double xoffset = posX - lastX;
-	double yoffset = lastY - posY;
+	double xoffset = lastX - posX;
+	double yoffset = posY - lastY;
 	lastX = posX;
 	lastY = posY;
 

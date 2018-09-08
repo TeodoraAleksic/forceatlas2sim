@@ -35,6 +35,12 @@ unsigned int selectedNode = -1;
 bool getSelectedNode = false;
 int oldLeftMouseState = GLFW_RELEASE;
 
+bool leftMousePressed = false;
+bool resetMouseCoords = false;
+
+GLFWcursor* arrowCursor;
+GLFWcursor* handCursor;
+
 std::unique_ptr<Camera> camera;
 
 std::unique_ptr<ForceAtlas2Sim> fa2Sim;
@@ -138,13 +144,25 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 		if (ctrlPressed && newLeftMouseState == GLFW_PRESS && oldLeftMouseState == GLFW_RELEASE)
 			getSelectedNode = true;
 
+		if (newLeftMouseState == GLFW_PRESS)
+			glfwSetCursor(window, handCursor);
+		else
+			glfwSetCursor(window, arrowCursor);
+
+		leftMousePressed = (newLeftMouseState == GLFW_PRESS);
+		resetMouseCoords = (newLeftMouseState == GLFW_PRESS) && (oldLeftMouseState == GLFW_RELEASE);
+
 		oldLeftMouseState = newLeftMouseState;
 	}
 }
 
 void cursorCallback(GLFWwindow* window, double posX, double posY)
 {
-	camera->turn(posX, posY, deltaTime);
+	if (leftMousePressed)
+	{
+		camera->turn(posX, posY, deltaTime, resetMouseCoords);
+		resetMouseCoords = false;
+	}
 }
 
 void scrollCallback(GLFWwindow* window, double offsetX, double offsetY)
@@ -266,10 +284,14 @@ int main(int argc, char** argv)
 
 	// Sets callbacks for the GLFW window
 	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwSetMouseButtonCallback(window, mouseButtonCallback);
 	glfwSetCursorPosCallback(window, cursorCallback);
 	glfwSetScrollCallback(window, scrollCallback);
+
+	// Creates cursors
+	arrowCursor = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
+	handCursor = glfwCreateStandardCursor(GLFW_HAND_CURSOR);
+
 
 	// Gets info about selected OpenGL device
 	std::string glVendor = (const char*)glGetString(GL_VENDOR);
@@ -338,8 +360,11 @@ int main(int argc, char** argv)
 
 			graphSelection.draw();
 
+			double cursorX, cursorY;
+			glfwGetCursorPos(window, &cursorX, &cursorY);
+
 			unsigned char data[4];
-			glReadPixels(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
+			glReadPixels((GLint)cursorX, SCREEN_HEIGHT - (GLint)cursorY, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
 			selectedNode = data[0] + data[1] * 256 + data[2] * 265 * 265;
 
@@ -360,6 +385,9 @@ int main(int argc, char** argv)
 
 		glfwSwapBuffers(window);
 	}
+
+	glfwDestroyCursor(arrowCursor);
+	glfwDestroyCursor(handCursor);
 
 	glfwTerminate();
 

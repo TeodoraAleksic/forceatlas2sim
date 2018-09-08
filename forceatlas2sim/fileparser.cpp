@@ -43,7 +43,7 @@ void FileParser::processGEXFVizAttr(xmlAttr* attr, float* x, float* y, float* z)
 	}
 }
 
-void FileParser::processGEXFNodeAttr(xmlAttr* attr, std::string* id)
+void FileParser::processGEXFNodeAttr(xmlAttr* attr, std::string* id, std::string* label)
 {
 	// Processes node attribute section of GEXF file
 	while (attr != nullptr)
@@ -52,6 +52,9 @@ void FileParser::processGEXFNodeAttr(xmlAttr* attr, std::string* id)
 		{
 			if (std::strcmp((const char*)attr->name, "id") == 0)
 				*id = (const char*)attr->children->content;
+
+			if (std::strcmp((const char*)attr->name, "label") == 0)
+				*label = (const char*)attr->children->content;
 		}
 
 		attr = attr->next;
@@ -87,11 +90,12 @@ void FileParser::processGEXFNode(xmlNode* node, GraphObject* graphObject)
 		if (node->type == XML_ELEMENT_NODE && std::strcmp((const char*)node->name, "node") == 0)
 		{
 			std::string id;
+			std::string label;
 			float x = 0.0;
 			float y = 0.0;
 			float z = 0.0;
 
-			processGEXFNodeAttr(node->properties, &id);
+			processGEXFNodeAttr(node->properties, &id, &label);
 			
 			xmlNode* temp = node->children;
 
@@ -110,7 +114,7 @@ void FileParser::processGEXFNode(xmlNode* node, GraphObject* graphObject)
 				temp = temp->next;
 			}
 
-			graphObject->addNode(id, x, y, z);
+			graphObject->addNode(id, label, x, y, z);
 		}
 
 		node = node->next;
@@ -234,6 +238,7 @@ void FileParser::processGMLGraphics(GML_pair* graphics, float* x, float* y, floa
 void FileParser::processGMLNode(GML_pair* node, GraphObject* graphObject)
 {
 	std::string id;
+	std::string label;
 	float x = 0.0;
 	float y = 0.0;
 	float z = 0.0;
@@ -244,13 +249,16 @@ void FileParser::processGMLNode(GML_pair* node, GraphObject* graphObject)
 		if (std::strcmp(node->key, "id") == 0)
 			id = std::to_string(node->value.integer);
 
+		if (std::strcmp(node->key, "label") == 0)
+			label = std::string(node->value.string);
+
 		if (std::strcmp(node->key, "graphics") == 0)
 			processGMLGraphics(node->value.list, &x, &y, &z);
 
 		node = node->next;
 	}
 
-	graphObject->addNode(id, x, y, z);
+	graphObject->addNode(id, label, x, y, z);
 }
 
 void FileParser::processGMLEdge(GML_pair* edge, GraphObject* graphObject)

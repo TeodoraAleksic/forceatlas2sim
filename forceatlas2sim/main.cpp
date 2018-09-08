@@ -13,6 +13,7 @@
 #include "glgraphedge.h"
 #include "glgraphnode.h"
 #include "glselect.h"
+#include "gltext.h"
 #include "graphobject.h"
 
 const int SCREEN_WIDTH = 1920;
@@ -239,7 +240,7 @@ int main(int argc, char** argv)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "ForceAtlas2Sim", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "ForceAtlas2Sim", glfwGetPrimaryMonitor(), NULL);
 
 	if (window == NULL)
 	{
@@ -260,6 +261,8 @@ int main(int argc, char** argv)
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// Sets callbacks for the GLFW window
 	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
@@ -304,6 +307,10 @@ int main(int argc, char** argv)
 
 	graphSelection.init();
 
+	// Initializes object for text drawing
+	GLText graphText(*camera, graphObject);
+	graphText.init();
+
 	// Initializes ForceAtlas2 simulation
 	fa2Sim = std::make_unique<ForceAtlas2Sim>(fa2Params, graphObject, graphNode, graphEdge);
 	fa2Sim->init();
@@ -338,6 +345,7 @@ int main(int argc, char** argv)
 
 			graphEdge.setSelectedNode(selectedNode);
 			graphNode.setSelectedNode(selectedNode);
+			graphText.setSelectedNode(selectedNode);
 		}
 
 		getSelectedNode = false;
@@ -348,6 +356,7 @@ int main(int argc, char** argv)
 		// Draws graph
 		if (drawEdges) graphEdge.draw();
 		graphNode.draw();
+		graphText.draw();
 
 		glfwSwapBuffers(window);
 	}

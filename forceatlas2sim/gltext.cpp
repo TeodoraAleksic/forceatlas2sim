@@ -4,10 +4,12 @@
 #include FT_FREETYPE_H
 
 #include "gltext.h"
+#include "shader.h"
 
 GLText::GLText(const Camera& camera_, const GraphObject& graphObject_) : camera(camera_), graphObject(graphObject_)
 {
 	isInited = false;
+	program = 0;
 }
 
 GLText::~GLText()
@@ -15,11 +17,8 @@ GLText::~GLText()
 	cleanup();
 }
 
-void GLText::init()
+void GLText::initCharacters()
 {
-	if (isInited)
-		return;
-
 	FT_Library ft;
 	if (FT_Init_FreeType(&ft))
 	{
@@ -80,6 +79,29 @@ void GLText::init()
 	FT_Done_FreeType(ft);
 }
 
+void GLText::init()
+{
+	if (isInited)
+		return;
+
+	initCharacters();
+
+	// Builds shaders
+	std::vector<unsigned int> shaders;
+	shaders.push_back(buildShader(GL_VERTEX_SHADER, shader::textVert));
+	shaders.push_back(buildShader(GL_FRAGMENT_SHADER, shader::textFrag));
+
+	// Builds program
+	program = buildProgram(shaders);
+
+	for (auto iter = shaders.begin(); iter != shaders.end(); ++iter)
+		glDeleteShader(*iter);
+
+	// Gets uniform variable locations
+	uniformProjection = glGetUniformLocation(program, "projection");
+	uniformText = glGetUniformLocation(program, "text");
+}
+
 void GLText::draw()
 {
 }
@@ -89,5 +111,9 @@ void GLText::cleanup()
 	if (!isInited)
 		return;
 
+	if (program)
+		glDeleteProgram(program);
+
 	isInited = false;
+	program = 0;
 }

@@ -7,7 +7,8 @@
 #include "glbase.h"
 #include "graphobject.h"
 
-struct Character {
+struct Character 
+{
 	GLuint textureId;
 	glm::ivec2 size;
 	glm::ivec2 bearing;
@@ -24,6 +25,11 @@ private:
 	bool isInited;
 
 	std::map<GLchar, Character> characters;
+
+	unsigned int program;
+	unsigned int uniformProjection, uniformText;
+
+	void initCharacters();
 
 public:
 

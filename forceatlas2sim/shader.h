@@ -200,6 +200,40 @@ namespace shader
 		outColor = vec4(r, g, b, 1.0); \n\
 	} \n\
 	";
+
+	const std::string textVert = 
+	" \
+	#version 330 core \n\
+	\n\
+	layout(location = 0) in vec4 vertex; \n\
+	\n\
+	uniform mat4 projection; \n\
+	\n\
+	out vec2 textureCoord; \n\
+	\n\
+	void main() \n\
+	{ \n\
+		textureCoord = vertex.zw; \n\
+		gl_Position = projection * vec4(vertex.xy, 0.0, 1.0); \n\
+	} \n\
+	";
+
+	const std::string textFrag = 
+	" \
+	#version 330 core \n\
+	in vec2 textureCoord; \n\
+	\n\
+	uniform sampler2D text; \n\
+	\n\
+	out vec4 outColor; \n\
+	\n\
+	void main() \n\
+	{ \n\
+		vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, textureCoord).r); \n\
+		outColor = vec4(0.0, 0.0, 0.0, 1.0) * sampled; \n\
+	} \n\
+	";
+
 }
 
 #endif

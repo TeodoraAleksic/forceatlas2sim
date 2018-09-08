@@ -51,8 +51,8 @@ namespace shader
 	out vec4 outColor; \n\
 	\n\
 	void main() { \n\
-		vec3 unselectedColor = vec3(0.95, 0.7, 0.25); \n\
-		vec3 selectedColor = vec3(0.8, 0.3, 0.4); \n\
+		vec3 unselectedColor = vec3(0.45, 0.58, 0.82); \n\
+		vec3 selectedColor = vec3(0.96, 0.64, 0.12); \n\
 		\n\
 		vec3 nodeColor = (instanceId == int(selectedNode)) ? selectedColor : unselectedColor; \n\
 		vec3 lightPos = cameraPos + vec3(1.0, 1.0, 1.0); \n\
@@ -104,7 +104,7 @@ namespace shader
 		edgeId1 = sourceId; \n\
 		edgeId2 = targetId; \n\
 		\n\
-		int thickness = (edgeId1 == selectedNode || edgeId2 == selectedNode) ? 3 : 1;\n\
+		float thickness = (edgeId1 == selectedNode || edgeId2 == selectedNode) ? 4 : 2;\n\
 		\n\
 		vec3 source = vec3(sourceX, sourceY, sourceZ); \n\
 		vec3 target = vec3(targetX, targetY, targetZ); \n\
@@ -141,8 +141,8 @@ namespace shader
 	out vec4 outColor; \
 	\n\
 	void main() { \n\
-		vec4 unselectedColor = vec4(0.85, 0.85, 0.85, 1.0); \n\
-		vec4 selectedColor = vec4(0.8, 0.3, 0.4, 1.0); \n\
+		vec4 unselectedColor = vec4(0.45, 0.45, 0.45, 1.0); \n\
+		vec4 selectedColor = vec4(0.96, 0.64, 0.12, 1.0); \n\
 		\n\
 		outColor = (edgeId1 == selectedNode || edgeId2 == selectedNode) ? selectedColor : unselectedColor; \n\
 	} \n\
@@ -230,7 +230,7 @@ namespace shader
 	void main() \n\
 	{ \n\
 		vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, textureCoord).r); \n\
-		outColor = vec4(0.0, 0.0, 0.0, 1.0) * sampled; \n\
+		outColor = vec4(0.25, 0.25, 0.25, 1.0) * sampled; \n\
 	} \n\
 	";
 

@@ -12,6 +12,7 @@
 #include "forceatlas2params.h"
 #include "glgraphedge.h"
 #include "glgraphnode.h"
+#include "glselect.h"
 #include "graphobject.h"
 
 const int SCREEN_WIDTH = 1920;
@@ -19,6 +20,19 @@ const int SCREEN_HEIGHT = 1080;
 
 double deltaTime = 0.0f;
 double lastFrame = 0.0f;
+
+bool runSim = false;
+int oldPKeyState = GLFW_RELEASE;
+
+bool drawEdges = true;
+int oldEKeyState = GLFW_RELEASE;
+
+bool ctrlPressed = false;
+int oldCtrlKeyState = GLFW_RELEASE;
+
+unsigned int selectedNode = -1;
+bool getSelectedNode = false;
+int oldLeftMouseState = GLFW_RELEASE;
 
 std::unique_ptr<Camera> camera;
 
@@ -81,6 +95,10 @@ void setFlagArg(ForceAtlas2Params* fa2Params, std::string argName)
 
 void processInput(GLFWwindow* window)
 {
+	int newPKeyState = glfwGetKey(window, GLFW_KEY_P);
+	int newEKeyState = glfwGetKey(window, GLFW_KEY_E);
+	int newCtrlKeyState = glfwGetKey(window, GLFW_KEY_LEFT_CONTROL);
+
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE))
 		glfwSetWindowShouldClose(window, true);
 	else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -91,8 +109,18 @@ void processInput(GLFWwindow* window)
 		camera->move(MoveDirection::LEFT, deltaTime);
 	else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		camera->move(MoveDirection::RIGHT, deltaTime);
-	else if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
-		fa2Sim->run();
+	else if (newPKeyState == GLFW_PRESS && oldPKeyState == GLFW_RELEASE)
+		runSim = runSim ? false : true;
+	else if (newEKeyState == GLFW_PRESS && oldEKeyState == GLFW_RELEASE)
+		drawEdges = drawEdges ? false : true;
+	else if (newCtrlKeyState == GLFW_PRESS && oldCtrlKeyState == GLFW_RELEASE)
+		ctrlPressed = true;
+	else if (newCtrlKeyState == GLFW_RELEASE && oldCtrlKeyState == GLFW_PRESS)
+		ctrlPressed = false;
+
+	oldPKeyState = newPKeyState;
+	oldEKeyState = newEKeyState;
+	oldCtrlKeyState = newCtrlKeyState;
 }
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
@@ -100,7 +128,20 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-void mouseCallback(GLFWwindow* window, double posX, double posY)
+void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+{
+	if (button == GLFW_MOUSE_BUTTON_LEFT)
+	{
+		int newLeftMouseState = action;
+
+		if (ctrlPressed && newLeftMouseState == GLFW_PRESS && oldLeftMouseState == GLFW_RELEASE)
+			getSelectedNode = true;
+
+		oldLeftMouseState = newLeftMouseState;
+	}
+}
+
+void cursorCallback(GLFWwindow* window, double posX, double posY)
 {
 	camera->turn(posX, posY, deltaTime);
 }
@@ -223,7 +264,8 @@ int main(int argc, char** argv)
 	// Sets callbacks for the GLFW window
 	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	glfwSetCursorPosCallback(window, mouseCallback);
+	glfwSetMouseButtonCallback(window, mouseButtonCallback);
+	glfwSetCursorPosCallback(window, cursorCallback);
 	glfwSetScrollCallback(window, scrollCallback);
 
 	// Gets info about selected OpenGL device
@@ -250,6 +292,18 @@ int main(int argc, char** argv)
 	GLGraphEdge graphEdge(*camera, graphObject);
 	graphEdge.init();
 
+	// Initializes object for node selection
+	GLSelect graphSelection(*camera, graphObject);
+
+	graphSelection.setVboVertex(graphNode.getVertices());
+	graphSelection.setVboIndex(graphNode.getIndices());
+	graphSelection.setVboOffsetX(graphNode.getOffsetX());
+	graphSelection.setVboOffsetY(graphNode.getOffsetY());
+	graphSelection.setVboOffsetZ(graphNode.getOffsetZ());
+	graphSelection.setVboScale(graphNode.getScale());
+
+	graphSelection.init();
+
 	// Initializes ForceAtlas2 simulation
 	fa2Sim = std::make_unique<ForceAtlas2Sim>(fa2Params, graphObject, graphNode, graphEdge);
 	fa2Sim->init();
@@ -266,11 +320,33 @@ int main(int argc, char** argv)
 
 		processInput(window);
 
+		// Runs ForceAtlas2
+		if (runSim) fa2Sim->run();
+
+		// Gets selected node on screen
+		if (getSelectedNode && !runSim)
+		{
+			glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			graphSelection.draw();
+
+			unsigned char data[4];
+			glReadPixels(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+			selectedNode = data[0] + data[1] * 256 + data[2] * 265 * 265;
+
+			graphEdge.setSelectedNode(selectedNode);
+			graphNode.setSelectedNode(selectedNode);
+		}
+
+		getSelectedNode = false;
+
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Draws graph
-		graphEdge.draw();
+		if (drawEdges) graphEdge.draw();
 		graphNode.draw();
 
 		glfwSwapBuffers(window);

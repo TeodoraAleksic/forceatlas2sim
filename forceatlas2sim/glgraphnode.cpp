@@ -13,6 +13,7 @@ const int GLGraphNode::numOfIndices = (lats + 1) * (longs + 1) * 2 + (lats + 1);
 
 GLGraphNode::GLGraphNode(const Camera& camera_, const GraphObject& graphObject_): camera(camera_), graphObject(graphObject_)
 {
+	selectedNode = -1;
 	isInited = false;
 	vao = 0;
 	vboVertex = 0;
@@ -88,6 +89,7 @@ void GLGraphNode::init()
 	uniformView = glGetUniformLocation(program, "view");
 	uniformModel = glGetUniformLocation(program, "model");
 	uniformNormalMatrix = glGetUniformLocation(program, "normalMatrix");
+	uniformSelectedNode = glGetUniformLocation(program, "selectedNode");
 	uniformCameraPos = glGetUniformLocation(program, "cameraPos");
 
 	std::vector<float> vertices;
@@ -176,6 +178,7 @@ void GLGraphNode::draw()
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	glUniformMatrix3fv(uniformNormalMatrix, 1, GL_FALSE, glm::value_ptr(normalMatrix));
+	glUniform1ui(uniformSelectedNode, selectedNode);
 	glUniform3f(uniformCameraPos, cameraPos.x, cameraPos.y, cameraPos.z);
 
 	// Binds buffers
@@ -229,9 +232,24 @@ void GLGraphNode::cleanup()
 	program = 0;
 }
 
+void GLGraphNode::setSelectedNode(unsigned int selectedNode_)
+{
+	selectedNode = selectedNode_;
+}
+
 unsigned int GLGraphNode::getNumOfNodes() const
 {
 	return graphObject.getNumOfNodes();
+}
+
+unsigned int GLGraphNode::getVertices() const
+{
+	return vboVertex;
+}
+
+unsigned int GLGraphNode::getIndices() const
+{
+	return vboIndex;
 }
 
 unsigned int GLGraphNode::getOffsetX() const

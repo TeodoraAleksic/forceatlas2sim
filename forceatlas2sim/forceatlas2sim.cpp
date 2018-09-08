@@ -98,8 +98,8 @@ void ForceAtlas2Sim::setCLForceAttrArgs(bool init)
 		clForceAttr.setArg(4, glGraphNode.getOffsetY(), CL_MEM_READ_ONLY);
 		clForceAttr.setArg(5, glGraphNode.getOffsetZ(), CL_MEM_READ_ONLY);
 		clForceAttr.setArg(6, glGraphNode.getScale(), CL_MEM_READ_ONLY);
-		clForceAttr.setArg(10, sourceId);
-		clForceAttr.setArg(11, targetId);
+		clForceAttr.setArg(10, glGraphEdge.getSourceId(), CL_MEM_READ_ONLY);
+		clForceAttr.setArg(11, glGraphEdge.getTargetId(), CL_MEM_READ_ONLY);
 		clForceAttr.setArg(12, edgeOffset);
 		clForceAttr.setArg(13, edgeWeight);
 	}
@@ -167,11 +167,11 @@ void ForceAtlas2Sim::setCLUpdateEdgeArgs(bool init)
 		clUpdateEdge.setArg(1, glGraphNode.getOffsetX(), CL_MEM_READ_ONLY);
 		clUpdateEdge.setArg(2, glGraphNode.getOffsetY(), CL_MEM_READ_ONLY);
 		clUpdateEdge.setArg(3, glGraphNode.getOffsetZ(), CL_MEM_READ_ONLY);
-		clUpdateEdge.setArg(4, sourceId);
+		clUpdateEdge.setArg(4, glGraphEdge.getSourceId(), CL_MEM_READ_ONLY);
 		clUpdateEdge.setArg(5, glGraphEdge.getSourceX(), CL_MEM_READ_WRITE);
 		clUpdateEdge.setArg(6, glGraphEdge.getSourceY(), CL_MEM_READ_WRITE);
 		clUpdateEdge.setArg(7, glGraphEdge.getSourceZ(), CL_MEM_READ_WRITE);
-		clUpdateEdge.setArg(8, targetId);
+		clUpdateEdge.setArg(8, glGraphEdge.getTargetId(), CL_MEM_READ_ONLY);
 		clUpdateEdge.setArg(9, glGraphEdge.getTargetX(), CL_MEM_READ_WRITE);
 		clUpdateEdge.setArg(10, glGraphEdge.getTargetY(), CL_MEM_READ_WRITE);
 		clUpdateEdge.setArg(11, glGraphEdge.getTargetZ(), CL_MEM_READ_WRITE);
@@ -229,10 +229,6 @@ void ForceAtlas2Sim::init()
 	}
 
 	// Allocates buffers for values used for calculation
-	sourceId = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, 
-		sizeof(cl_uint) * graphObject.getNumOfEdges(), &(graphObject.getSourceId())[0]);
-	targetId = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
-		sizeof(cl_uint) * graphObject.getNumOfEdges(), &(graphObject.getTargetId())[0]);
 	edgeOffset = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
 		sizeof(cl_int) * graphObject.getNumOfNodes(), &(graphObject.getEdgeOffset())[0]);
 	edgeWeight = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,

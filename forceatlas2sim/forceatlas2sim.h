@@ -37,7 +37,7 @@ private:
 
 	cl::Buffer centerOfMass, globalSwing, globalTraction;
 
-	cl::Buffer sourceId, targetId, edgeOffset, edgeWeight;
+	cl::Buffer edgeOffset, edgeWeight;
 
 	int forceFront;
 	cl::Buffer fx[2], fy[2], fz[2];

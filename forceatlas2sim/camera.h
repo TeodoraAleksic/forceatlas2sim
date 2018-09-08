@@ -43,7 +43,7 @@ public:
 	glm::mat4 getPerspective() const;
 
 	void move(MoveDirection direction, double deltaTime);
-	void turn(double posX, double posY, double deltaTime);
+	void turn(double posX, double posY, double deltaTime, bool reset);
 	void zoom(double offsetX, double offsetY);
 
 };

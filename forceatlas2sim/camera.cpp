@@ -64,16 +64,13 @@ void Camera::move(MoveDirection direction, double deltaTime)
 	update();
 }
 
-void Camera::turn(double posX, double posY, double deltaTime)
+void Camera::turn(double posX, double posY, double deltaTime, bool reset)
 {
-	static bool firstMouse = true;
-
 	// Initializes camera position
-	if (firstMouse)
+	if (reset)
 	{
 		lastX = posX;
 		lastY = posY;
-		firstMouse = false;
 	}
 
 	// Calculates camera movement since last position

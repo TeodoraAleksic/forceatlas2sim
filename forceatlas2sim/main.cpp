@@ -36,6 +36,7 @@ bool getSelectedNode = false;
 int oldLeftMouseState = GLFW_RELEASE;
 
 bool leftMousePressed = false;
+bool resetMouseCoords = false;
 
 GLFWcursor* arrowCursor;
 GLFWcursor* handCursor;
@@ -148,7 +149,8 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 		else
 			glfwSetCursor(window, arrowCursor);
 
-		leftMousePressed = newLeftMouseState == GLFW_PRESS;
+		leftMousePressed = (newLeftMouseState == GLFW_PRESS);
+		resetMouseCoords = (newLeftMouseState == GLFW_PRESS) && (oldLeftMouseState == GLFW_RELEASE);
 
 		oldLeftMouseState = newLeftMouseState;
 	}
@@ -157,7 +159,10 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 void cursorCallback(GLFWwindow* window, double posX, double posY)
 {
 	if (leftMousePressed)
-		camera->turn(posX, posY, deltaTime);
+	{
+		camera->turn(posX, posY, deltaTime, resetMouseCoords);
+		resetMouseCoords = false;
+	}
 }
 
 void scrollCallback(GLFWwindow* window, double offsetX, double offsetY)

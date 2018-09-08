@@ -262,6 +262,9 @@ int main(int argc, char** argv)
 
 	glEnable(GL_DEPTH_TEST);
 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	// Sets callbacks for the GLFW window
 	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -306,8 +309,8 @@ int main(int argc, char** argv)
 	graphSelection.init();
 
 	// Initializes object for text drawing
-	GLText graphLabels(*camera, graphObject);
-	graphLabels.init();
+	GLText graphText(*camera, graphObject);
+	graphText.init();
 
 	// Initializes ForceAtlas2 simulation
 	fa2Sim = std::make_unique<ForceAtlas2Sim>(fa2Params, graphObject, graphNode, graphEdge);
@@ -353,6 +356,8 @@ int main(int argc, char** argv)
 		// Draws graph
 		if (drawEdges) graphEdge.draw();
 		graphNode.draw();
+
+		graphText.draw();
 
 		glfwSwapBuffers(window);
 	}

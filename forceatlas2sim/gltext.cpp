@@ -8,6 +8,7 @@
 
 GLText::GLText(const Camera& camera_, const GraphObject& graphObject_) : camera(camera_), graphObject(graphObject_)
 {
+	text = "text";
 	isInited = false;
 	vao = 0;
 	vboVertex = 0;
@@ -35,7 +36,7 @@ void GLText::initCharacters()
 		throw std::runtime_error("Could not load font");
 	}
 
-	FT_Set_Pixel_Sizes(face, 0, 18);
+	FT_Set_Pixel_Sizes(face, 0, 48);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
@@ -119,6 +120,53 @@ void GLText::init()
 
 void GLText::draw()
 {
+	if (!isInited)
+		return;
+
+	glUseProgram(program);
+
+	glm::mat4 projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f);
+	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
+
+	glBindVertexArray(vao);
+	glActiveTexture(GL_TEXTURE0);
+
+	float xBase = 100.0;
+	float yBase = 100.0;
+	float scale = 0.5;
+
+	// Draws text
+	for (auto textIter = text.begin(); textIter != text.end(); ++textIter)
+	{
+		Character character = characters[*textIter];
+
+		GLfloat x = xBase + character.bearing.x * scale;
+		GLfloat y = yBase - (character.size.y - character.bearing.y) * scale;
+
+		GLfloat w = character.size.x * scale;
+		GLfloat h = character.size.y * scale;
+
+		GLfloat vertices[6][4] = 
+		{
+			{ x,     y + h,   0.0, 0.0 },
+			{ x,     y,       0.0, 1.0 },
+			{ x + w, y,       1.0, 1.0 },
+			{ x,     y + h,   0.0, 0.0 },
+			{ x + w, y,       1.0, 1.0 },
+			{ x + w, y + h,   1.0, 0.0 }
+		};
+
+		glBindTexture(GL_TEXTURE_2D, character.textureId);
+
+		glBindBuffer(GL_ARRAY_BUFFER, vboVertex);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		xBase += (character.advance >> 6) * scale;
+	}
+
+	glFinish();
 }
 
 void GLText::cleanup()

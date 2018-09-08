@@ -2,6 +2,7 @@
 #define _GLTEXT_H_
 
 #include <map>
+#include <string>
 
 #include "camera.h"
 #include "glbase.h"
@@ -18,6 +19,8 @@ struct Character
 class GLText : public GLBase
 {
 private:
+
+	std::string text;
 
 	const Camera& camera;
 	const GraphObject& graphObject;

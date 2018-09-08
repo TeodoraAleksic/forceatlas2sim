@@ -346,6 +346,7 @@ int main(int argc, char** argv)
 
 			graphEdge.setSelectedNode(selectedNode);
 			graphNode.setSelectedNode(selectedNode);
+			graphText.setSelectedNode(selectedNode);
 		}
 
 		getSelectedNode = false;
@@ -356,7 +357,6 @@ int main(int argc, char** argv)
 		// Draws graph
 		if (drawEdges) graphEdge.draw();
 		graphNode.draw();
-
 		graphText.draw();
 
 		glfwSwapBuffers(window);

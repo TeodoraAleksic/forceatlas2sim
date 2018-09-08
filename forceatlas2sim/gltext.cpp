@@ -8,7 +8,7 @@
 
 GLText::GLText(const Camera& camera_, const GraphObject& graphObject_) : camera(camera_), graphObject(graphObject_)
 {
-	text = "text";
+	text = "";
 	isInited = false;
 	vao = 0;
 	vboVertex = 0;
@@ -187,4 +187,9 @@ void GLText::cleanup()
 	vao = 0;
 	vboVertex = 0;
 	program = 0;
+}
+
+void GLText::setSelectedNode(unsigned int selectedNode)
+{
+	text = graphObject.getNodeLabel(selectedNode);
 }

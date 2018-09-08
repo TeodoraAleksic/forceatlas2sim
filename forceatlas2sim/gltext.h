@@ -46,6 +46,8 @@ public:
 	void draw();
 	void cleanup();
 
+	void setSelectedNode(unsigned int selectedNode);
+
 };
 
 #endif

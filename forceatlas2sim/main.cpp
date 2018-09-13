@@ -173,8 +173,9 @@ void scrollCallback(GLFWwindow* window, double offsetX, double offsetY)
 int main(int argc, char** argv)
 {
 	std::string usage = \
-		"Usage: forceatlas2sim.exe (-i INPUT) [-kr FLOAT] [-krp FLOAT]\n"\
-		"                          [-fg] [-fsg] [-kg FLOAT] [-nw] [-h]\n\n"\
+		"Usage: forceatlas2sim.exe (-i INPUT) [-kr FLOAT] [-krp FLOAT] [-fg]\n"
+		"                          [-fsg] [-kg FLOAT] [-tau FLOAT] [-ks FLOAT]\n"
+		"                          [-ksmax FLOAT] [-delta INT] [-h]\n\n"
 		"GPU-based parallelization and graphical simulation of the ForceAtlas2 algorithm.\n\n"\
 		"Options:\n"\
 		"-i INPUT      Input GEFX or GML graph file. Required.\n"\

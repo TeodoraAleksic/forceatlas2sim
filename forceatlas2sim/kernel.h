@@ -175,7 +175,7 @@ namespace kernel
 		{ \n\
 			int i = findEdge(e, n1Id, n2Id, sid, tid, offset); \n\
 			i = (i == -1) ? findEdge(e, n2Id, n1Id, sid, tid, offset) : i; \n\
-			return weight[i]; \n\
+			return (i != -1) ? weight[i] : 1; \n\
 		} \n\
 		\n\
 		float size(uint degree) \n\

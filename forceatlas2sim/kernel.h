@@ -175,7 +175,7 @@ namespace kernel
 		{ \n\
 			int i = findEdge(e, n1Id, n2Id, sid, tid, offset); \n\
 			i = (i == -1) ? findEdge(e, n2Id, n1Id, sid, tid, offset) : i; \n\
-			return (i != -1) ? weight[i] : 1; \n\
+			return i; \n\
 		} \n\
 		\n\
 		float size(uint degree) \n\
@@ -226,9 +226,9 @@ namespace kernel
 				{ \n\
 					float ew = findWeight(e, id, i, sid, tid, offset, weight); \n\
 					\n\
-					fx[id] += fa(delta, x[id], x[i], degree[id], degree[i], ew); \n\
-					fy[id] += fa(delta, y[id], y[i], degree[id], degree[i], ew); \n\
-					fz[id] += fa(delta, z[id], z[i], degree[id], degree[i], ew); \n\
+					fx[id] += (ew > 0) ? fa(delta, x[id], x[i], degree[id], degree[i], ew) : 0; \n\
+					fy[id] += (ew > 0) ? fa(delta, y[id], y[i], degree[id], degree[i], ew) : 0; \n\
+					fz[id] += (ew > 0) ? fa(delta, z[id], z[i], degree[id], degree[i], ew) : 0; \n\
 					\n\
 					i = (i + 1) < n ? (i + 1) : 0; \n\
 				} \n\

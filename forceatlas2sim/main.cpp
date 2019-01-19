@@ -60,7 +60,10 @@ bool isValueArg(std::string argName)
 
 bool isFlagArg(std::string argName)
 {
-	return argName == std::string("-fg") || argName == std::string("-fsg");
+	return 
+		argName == std::string("-fg")	|| 
+		argName == std::string("-fsg")	||
+		argName == std::string("-debug");
 }
 
 bool isNotArg(std::string argName)
@@ -96,6 +99,8 @@ void setFlagArg(ForceAtlas2Params* fa2Params, std::string argName)
 		fa2Params->setFg(true);
 	else if (argName == std::string("-fsg"))
 		fa2Params->setFsg(true);
+	else if (argName == std::string("-debug"))
+		fa2Params->setDebug(true);
 	else
 		throw "Invalid flag argument " + argName;
 }
@@ -188,6 +193,7 @@ int main(int argc, char** argv)
 		"-ks FLOAT     Global speed coefficient. Default: 0.1.\n"\
 		"-ksmax FLOAT  Max global speed coefficient. Default: 10.\n"\
 		"-delta INT    Edge weight influence coefficient. Default: 1.\n"\
+		"-debug        Turns on debug mode.\n"\
 		"-h            Prints usage.\n";
 
 	ForceAtlas2Params fa2Params;

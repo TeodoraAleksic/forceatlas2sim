@@ -344,6 +344,11 @@ int main(int argc, char** argv)
 	fa2Sim = std::make_unique<ForceAtlas2Sim>(fa2Params, graphObject, graphNode, graphEdge);
 	fa2Sim->init();
 
+	std::cout << "Starting simulation" << std::endl;
+
+	unsigned int numOfRunLoops = 0;
+	std::vector<double> deltaRunTime;
+
 	// Runs rendering loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -356,8 +361,17 @@ int main(int argc, char** argv)
 
 		processInput(window);
 
+		double currentRunFrame = glfwGetTime();
+
 		// Runs ForceAtlas2
 		if (runSim) fa2Sim->run();
+
+		// Saves time of run loop if debug mode is on
+		if (runSim && fa2Params.getDebug())
+		{
+			++numOfRunLoops;
+			deltaRunTime.push_back(glfwGetTime() - currentRunFrame);
+		}
 
 		// Gets selected node on screen
 		if (getSelectedNode && !runSim)
@@ -392,6 +406,13 @@ int main(int argc, char** argv)
 
 		glfwSwapBuffers(window);
 	}
+
+	double deltaRunSum = 0;
+	for (unsigned int i = 0; i < deltaRunTime.size(); ++i)
+		deltaRunSum += deltaRunTime[i];
+
+	if (numOfRunLoops > 0)
+		std::cout << "Delta run time [ms]: " << deltaRunSum * 1000 / numOfRunLoops << std::endl;
 
 	glfwDestroyCursor(arrowCursor);
 	glfwDestroyCursor(handCursor);

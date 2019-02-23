@@ -1,6 +1,6 @@
 #include "clkernel.h"
 
-CLKernel::CLKernel(const cl::Device& device_, const cl::Context& context_): 
+CLKernel::CLKernel(const cl::Device& device_, const cl::Context& context_):
 	device(device_), context(context_)
 {
 	isInited = false;
@@ -12,53 +12,42 @@ CLKernel::~CLKernel()
 {
 }
 
-void CLKernel::build()
-{
-	try
-	{
-		// Builds CL kernel from source and initializes command queue
-		cl::Program::Sources sources(1, std::make_pair(kernelBody.c_str(), kernelBody.length()));
-		program = cl::Program(context, sources);
-		program.build({ device });	
-		kernel = cl::Kernel(program, kernelName.c_str());
-		queue = cl::CommandQueue(context, device);
-	}
-	catch (cl::Error error) {
-		// Handles build error
-		std::cout << kernelName << " " << getErrorCode(error.err()) << " " << error.what() << "\n";
-  		std::string strDirect = program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device);
-		std::cout << strDirect << "\n";
-	}
-}
-
 void CLKernel::init()
 {
 	if (isInited)
 		return;
 
-	build();
+	try
+	{
+		// Builds CL kernel from source
+		cl::Program::Sources sources(1, std::make_pair(kernelBody.c_str(), kernelBody.length()));
+		program = cl::Program(context, sources);
+		program.build({ device });
+		kernel = cl::Kernel(program, kernelName.c_str());
+	}
+	catch (cl::Error error) {
+		// Handles build error
+		std::cout << kernelName << " " << getErrorCode(error.err()) << " " << error.what() << "\n";
+		std::string strDirect = program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device);
+		std::cout << strDirect << "\n";
+	}
 
 	isInited = true;
 }
 
-void CLKernel::run()
+const cl::Kernel& CLKernel::getKernel() const
 {
-	if (!isInited)
-		return;
+	return kernel;
+}
 
-	queue.enqueueAcquireGLObjects(&glBuffers);
+int CLKernel::getLocalWorkSize() const
+{
+	return localWorkSize;
+}
 
-	try
-	{
-		// Runs kernel
-		queue.enqueueNDRangeKernel(kernel, cl::NDRange(), cl::NDRange(globalWorkSize), cl::NDRange(localWorkSize));
-	}
-	catch (cl::Error error) {
-		std::cout << getErrorCode(error.err()) << " " << error.what() << "\n";
-	}
-
-	queue.enqueueReleaseGLObjects(&glBuffers);
-	queue.finish();
+int CLKernel::getGlobalWorkSize() const
+{
+	return globalWorkSize;
 }
 
 void CLKernel::setWorkSize(unsigned int ndRange)
@@ -67,12 +56,10 @@ void CLKernel::setWorkSize(unsigned int ndRange)
 	localWorkSize = 64;
 }
 
-void CLKernel::setArg(unsigned int argId, GLuint glBufferId, cl_mem_flags memFlags)
+void CLKernel::setArg(unsigned int argId, const cl::BufferGL& glBuffer)
 {
 	try
 	{
-		cl::BufferGL glBuffer = cl::BufferGL(context, memFlags, glBufferId, nullptr);
-		glBuffers.push_back(glBuffer);
 		kernel.setArg(argId, glBuffer);
 	}
 	catch (cl::Error error)
@@ -81,7 +68,7 @@ void CLKernel::setArg(unsigned int argId, GLuint glBufferId, cl_mem_flags memFla
 	}
 }
 
-void CLKernel::setArg(unsigned int argId, cl::Buffer clBuffer)
+void CLKernel::setArg(unsigned int argId, const cl::Buffer& clBuffer)
 {
 	try
 	{

@@ -230,9 +230,17 @@ namespace kernel
 		 \n\
 			if (id < numOfNodes) \n\
 			{ \n\
-				fx[id] = 0; \n\
-				fy[id] = 0; \n\
-				fz[id] = 0; \n\
+				// Gets current node properties \n\
+				float currx = x[id]; \n\
+				float curry = y[id]; \n\
+				float currz = z[id]; \n\
+				 \n\
+				float currNodeDegree = nodeDegree[id]; \n\
+				 \n\
+				// Initializes variables for force sum \n\
+				float sumfx = 0; \n\
+				float sumfy = 0; \n\
+				float sumfz = 0; \n\
 			 \n\
 				uint i = (id + 1) < numOfNodes ? (id + 1) : 0; \n\
 			 \n\
@@ -243,12 +251,17 @@ namespace kernel
 					float weight = findWeight(numOfEdges, id, i, sourceNodeId, targetNodeId, sourceNodeOffset, edgeWeight); \n\
 				 \n\
 					// Calculates force of attraction for all three axes \n\
-					fx[id] += fa(delta, x[id], x[i], nodeDegree[id], nodeDegree[i], weight); \n\
-					fy[id] += fa(delta, y[id], y[i], nodeDegree[id], nodeDegree[i], weight); \n\
-					fz[id] += fa(delta, z[id], z[i], nodeDegree[id], nodeDegree[i], weight); \n\
+					sumfx += fa(delta, currx, x[i], currNodeDegree, nodeDegree[i], weight); \n\
+					sumfy += fa(delta, curry, y[i], currNodeDegree, nodeDegree[i], weight); \n\
+					sumfz += fa(delta, currz, z[i], currNodeDegree, nodeDegree[i], weight); \n\
 				 \n\
 					i = (i + 1) < numOfNodes ? (i + 1) : 0; \n\
 				} \n\
+				 \n\
+				// Applies force sum to global variables \n\
+				fx[id] = sumfx; \n\
+				fy[id] = sumfy; \n\
+				fz[id] = sumfz; \n\
 			} \n\
 		} \n\
 		";
@@ -296,18 +309,35 @@ namespace kernel
 		 \n\
 			if (id < numOfNodes) \n\
 			{ \n\
+				// Gets current node properties \n\
+				float currx = x[id]; \n\
+				float curry = y[id]; \n\
+				float currz = z[id]; \n\
+				 \n\
+				float currNodeDegree = nodeDegree[id]; \n\
+				 \n\
+				// Initializes variables for force sum \n\
+				float sumfx = 0; \n\
+				float sumfy = 0; \n\
+				float sumfz = 0; \n\
+				 \n\
 				uint i = (id + 1) < numOfNodes ? (id + 1) : 0; \n\
 			 \n\
 				// Calculates force of repulsion between the current node and all other nodes \n\
 				while (i != id) \n\
 				{ \n\
 					// Calculates force of repulsion for all three axes \n\
-					fx[id] += fr(kr, krp, x[id], x[i], nodeDegree[id], nodeDegree[i]); \n\
-					fy[id] += fr(kr, krp, y[id], y[i], nodeDegree[id], nodeDegree[i]); \n\
-					fz[id] += fr(kr, krp, z[id], z[i], nodeDegree[id], nodeDegree[i]); \n\
+					sumfx += fr(kr, krp, currx, x[i], currNodeDegree, nodeDegree[i]); \n\
+					sumfy += fr(kr, krp, curry, y[i], currNodeDegree, nodeDegree[i]); \n\
+					sumfz += fr(kr, krp, currz, z[i], currNodeDegree, nodeDegree[i]); \n\
 				 \n\
 					i = (i + 1) < numOfNodes ? (i + 1) : 0; \n\
 				} \n\
+				 \n\
+				// Applies force sum to global variables \n\
+				fx[id] += sumfx; \n\
+				fy[id] += sumfy; \n\
+				fz[id] += sumfz; \n\
 			} \n\
 		} \n\
 		";

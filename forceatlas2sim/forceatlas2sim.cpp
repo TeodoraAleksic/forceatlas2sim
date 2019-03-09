@@ -124,9 +124,16 @@ void ForceAtlas2Sim::setCLForceReplArgs(bool init)
 		clForceRepl.setArg(6, glNodeScale);
 	}
 
+	float* localFloat = nullptr;
+	unsigned int* localUInt = nullptr;
+
 	clForceRepl.setArg(7, fx[forceFront]);
 	clForceRepl.setArg(8, fy[forceFront]);
 	clForceRepl.setArg(9, fz[forceFront]);
+	clForceRepl.setArg(10, clForceRepl.getLocalWorkSize(), localFloat);
+	clForceRepl.setArg(11, clForceRepl.getLocalWorkSize(), localFloat);
+	clForceRepl.setArg(12, clForceRepl.getLocalWorkSize(), localFloat);
+	clForceRepl.setArg(13, clForceRepl.getLocalWorkSize(), localUInt);
 }
 
 void ForceAtlas2Sim::setCLUpdateNodeArgs(bool init)

@@ -214,54 +214,81 @@ namespace kernel
 			__const uint numOfNodes, \n\
 			__const uint numOfEdges, \n\
 			__const int delta, \n\
-			__global float* x, \n\
-			__global float* y, \n\
-			__global float* z, \n\
-			__global uint* nodeDegree, \n\
+			__global float* globalX, \n\
+			__global float* globalY, \n\
+			__global float* globalZ, \n\
+			__global uint* globalDegree, \n\
 			__global float* fx, \n\
 			__global float* fy, \n\
 			__global float* fz, \n\
 			__global uint* sourceNodeId, \n\
 			__global uint* targetNodeId, \n\
 			__global int* sourceNodeOffset, \n\
-			__global float* edgeWeight) \n\
+			__global float* edgeWeight, \n\
+			__local float* localX, \n\
+			__local float* localY, \n\
+			__local float* localZ, \n\
+			__local uint* localDegree) \n\
 		{ \n\
-			uint id = get_global_id(0); \n\
+			uint globalId = get_global_id(0); \n\
+			uint localId = get_local_id(0); \n\
+			uint groupSize = get_local_size(0); \n\
+			uint numOfGroups = get_num_groups(0); \n\
 		 \n\
-			if (id < numOfNodes) \n\
+			// Gets current node properties \n\
+			float currx = globalId < numOfNodes ? globalX[globalId] : 0; \n\
+			float curry = globalId < numOfNodes ? globalY[globalId] : 0; \n\
+			float currz = globalId < numOfNodes ? globalZ[globalId] : 0; \n\
+			 \n\
+			uint currDegree = globalId < numOfNodes ? globalDegree[globalId] : 0; \n\
+			 \n\
+			// Initializes variables for force sum \n\
+			float sumfx = 0; \n\
+			float sumfy = 0; \n\
+			float sumfz = 0; \n\
+			 \n\
+			for (uint i = 0; i < numOfGroups; ++i) \n\
 			{ \n\
-				// Gets current node properties \n\
-				float currx = x[id]; \n\
-				float curry = y[id]; \n\
-				float currz = z[id]; \n\
+				// Copies data to local memory \n\
+				localX[localId] = (i * groupSize + localId) < numOfNodes ? globalX[i * groupSize + localId] : 0; \n\
+				localY[localId] = (i * groupSize + localId) < numOfNodes ? globalY[i * groupSize + localId] : 0; \n\
+				localZ[localId] = (i * groupSize + localId) < numOfNodes ? globalZ[i * groupSize + localId] : 0; \n\
 				 \n\
-				float currNodeDegree = nodeDegree[id]; \n\
+				localDegree[localId] = (i * groupSize + localId) < numOfNodes ? globalDegree[i * groupSize + localId] : 0; \n\
 				 \n\
-				// Initializes variables for force sum \n\
-				float sumfx = 0; \n\
-				float sumfy = 0; \n\
-				float sumfz = 0; \n\
-			 \n\
-				uint i = (id + 1) < numOfNodes ? (id + 1) : 0; \n\
-			 \n\
-				// Calculates force of attraction between the current node and all other nodes \n\
-				while (i != id) \n\
+				// Waits for all work items to copy data \n\
+				barrier(CLK_LOCAL_MEM_FENCE); \n\
+				 \n\
+				uint j = localId; \n\
+				 \n\
+				for (uint count = 0; count < groupSize; ++count) \n\
 				{ \n\
-					// Finds weight of edge between two nodes (if they share an edge) \n\
-					float weight = findWeight(numOfEdges, id, i, sourceNodeId, targetNodeId, sourceNodeOffset, edgeWeight); \n\
-				 \n\
-					// Calculates force of attraction for all three axes \n\
-					sumfx += fa(delta, currx, x[i], currNodeDegree, nodeDegree[i], weight); \n\
-					sumfy += fa(delta, curry, y[i], currNodeDegree, nodeDegree[i], weight); \n\
-					sumfz += fa(delta, currz, z[i], currNodeDegree, nodeDegree[i], weight); \n\
-				 \n\
-					i = (i + 1) < numOfNodes ? (i + 1) : 0; \n\
+					if (i * groupSize + j != globalId && 	// Checks that the nodes are not the same \n\
+						globalId < numOfNodes &&			// and that the work item's Id is not larger than the number of nodes \n\
+						i * groupSize + j < numOfNodes)		// and that the local data does not surpass the global data \n\
+					{ \n\
+						// Finds weight of edge between two nodes (if they share an edge) \n\
+						float weight = findWeight(numOfEdges, globalId, i * groupSize + j, sourceNodeId, targetNodeId, sourceNodeOffset, edgeWeight); \n\
+					 \n\
+						// Calculates force of attraction for all three axes \n\
+						sumfx += fa(delta, currx, globalX[j], currDegree, localDegree[j], weight); \n\
+						sumfy += fa(delta, curry, globalY[j], currDegree, localDegree[j], weight); \n\
+						sumfz += fa(delta, currz, globalZ[j], currDegree, localDegree[j], weight); \n\
+					} \n\
+					 \n\
+					j = (j + 1) < groupSize ? (j + 1) : 0; \n\
 				} \n\
 				 \n\
-				// Applies force sum to global variables \n\
-				fx[id] = sumfx; \n\
-				fy[id] = sumfy; \n\
-				fz[id] = sumfz; \n\
+				// Waits for all work items to complete calculation \n\
+				barrier(CLK_LOCAL_MEM_FENCE); \n\
+			} \n\
+			 \n\
+			// Applies force sum to global variables \n\
+			if (globalId < numOfNodes) \n\
+			{ \n\
+				fx[globalId] = sumfx; \n\
+				fy[globalId] = sumfy; \n\
+				fz[globalId] = sumfz; \n\
 			} \n\
 		} \n\
 		";

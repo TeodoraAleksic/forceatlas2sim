@@ -20,6 +20,9 @@ protected:
 	cl::Program program;
 	cl::Kernel kernel;
 
+	const unsigned int minWorkGroupSize;
+	const unsigned int maxWorkGroupSize;
+
 	int localWorkSize, globalWorkSize;
 
 public:
@@ -30,6 +33,9 @@ public:
 	const cl::Kernel& getKernel() const;
 
 	void init();
+
+	unsigned int getMinWorkGroupSize() const;
+	unsigned int getMaxWorkGroupSize() const;
 
 	int getLocalWorkSize() const;
 	int getGlobalWorkSize() const;

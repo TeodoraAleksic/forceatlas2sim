@@ -1,7 +1,7 @@
 #include "clkernel.h"
 
 CLKernel::CLKernel(const cl::Device& device_, const cl::Context& context_):
-	device(device_), context(context_)
+	device(device_), context(context_), minWorkGroupSize(64), maxWorkGroupSize(device.getInfo<CL_DEVICE_MAX_WORK_GROUP_SIZE>())
 {
 	isInited = false;
 	localWorkSize = 0;
@@ -40,6 +40,16 @@ const cl::Kernel& CLKernel::getKernel() const
 	return kernel;
 }
 
+unsigned int CLKernel::getMinWorkGroupSize() const
+{
+	return minWorkGroupSize;
+}
+
+unsigned int CLKernel::getMaxWorkGroupSize() const
+{
+	return maxWorkGroupSize;
+}
+
 int CLKernel::getLocalWorkSize() const
 {
 	return localWorkSize;
@@ -52,8 +62,9 @@ int CLKernel::getGlobalWorkSize() const
 
 void CLKernel::setWorkSize(unsigned int ndRange)
 {
-	globalWorkSize = (ndRange % 64) > 0 ? 64 * ((int)std::ceil(ndRange / 64) + 1) : ndRange;
-	localWorkSize = 64;
+	globalWorkSize = (ndRange % minWorkGroupSize) > 0 ? 
+		minWorkGroupSize * ((int)std::ceil(ndRange / minWorkGroupSize) + 1) : ndRange;
+	localWorkSize = minWorkGroupSize;
 }
 
 void CLKernel::setArg(unsigned int argId, const cl::BufferGL& glBuffer)

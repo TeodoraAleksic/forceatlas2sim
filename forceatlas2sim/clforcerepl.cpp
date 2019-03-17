@@ -10,3 +10,10 @@ CLForceRepl::CLForceRepl(const cl::Device& device_, const cl::Context& context_)
 CLForceRepl::~CLForceRepl()
 {
 }
+
+void CLForceRepl::setWorkSize(unsigned int ndRange)
+{
+	globalWorkSize = (ndRange % maxWorkGroupSize) > 0 ?
+		maxWorkGroupSize * ((int)std::ceil(ndRange / maxWorkGroupSize) + 1) : ndRange;
+	localWorkSize = maxWorkGroupSize;
+}

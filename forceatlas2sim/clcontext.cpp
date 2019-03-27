@@ -58,6 +58,12 @@ void CLContext::init()
 			device = cl::Device(deviceId);
 			context = cl::Context(device , properties);
 
+			// Gets device information
+			numOfCUs = device.getInfo<CL_DEVICE_MAX_COMPUTE_UNITS>();
+			minWorkGroupSize = device.getInfo<CL_DEVICE_ADDRESS_BITS>();
+			maxWorkGroupSize = device.getInfo<CL_DEVICE_MAX_WORK_GROUP_SIZE>();
+			localMemSize = (unsigned long)device.getInfo<CL_DEVICE_LOCAL_MEM_SIZE>();
+
 			return;
 		}
 	}
@@ -74,4 +80,24 @@ const cl::Device& CLContext::getDevice() const
 const cl::Context& CLContext::getContext() const
 {
 	return context;
+}
+
+unsigned int CLContext::getNumOfCUs() const
+{
+	return numOfCUs;
+}
+
+unsigned int CLContext::getMinWorkGroupSize() const
+{
+	return minWorkGroupSize;
+}
+
+unsigned int CLContext::getMaxWorkGroupSize() const
+{
+	return maxWorkGroupSize;
+}
+
+unsigned long CLContext::getLocalMemSize() const
+{
+	return localMemSize;
 }

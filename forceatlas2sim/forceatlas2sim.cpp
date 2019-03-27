@@ -213,7 +213,7 @@ void ForceAtlas2Sim::setCLSumArgs(unsigned int n, unsigned int workGroupSize, cl
 
 void ForceAtlas2Sim::sum(unsigned int n, cl::Buffer graphGlobal)
 {
-	unsigned int workGroupSize = clSum.getMaxWorkGroupSize();
+	unsigned int workGroupSize = clContext.getMaxWorkGroupSize();
 
 	setCLSumArgs(n, workGroupSize, graphGlobal);
 	clQueue.runKernel(clSum);

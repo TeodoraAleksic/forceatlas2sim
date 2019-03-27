@@ -1,11 +1,16 @@
 import argparse
-from subprocess import Popen, PIPE
+from dateutil import parser as date_parser
+import re
+from subprocess import Popen, PIPE, check_output, STDOUT
 import time
 
 import keyboard
 
 FA2_START_FLAG = 'Starting simulation'
 BENCH_RESULTS = 'Delta run time'
+
+PATTERN_COMMIT_DATE = r'(Date:)([a-zA-Z0-9\ \:])*'
+PATTERN_COMMIT_MSG = r'(    )([a-zA-Z\ ])*'
 
 
 def read_input(input_name):
@@ -49,6 +54,32 @@ def get_result(stdout):
     return 0
 
 
+def get_commit_info(commit):
+    """
+    Gets information about specified commit
+    :param commit: commit hash
+    :return: commit date and message
+    """
+
+    # Gets commit date and message using Git
+    cmd = ['git', 'show', '--shortstat', '--format=medium', commit]
+    output = check_output(cmd, stderr=STDOUT)
+    output = str(output)
+
+    re_commit_date = re.compile(PATTERN_COMMIT_DATE)
+    re_commit_msg = re.compile(PATTERN_COMMIT_MSG)
+
+    # Extracts commit date and message
+    commit_date = re_commit_date.search(output).group(0)
+    commit_msg = re_commit_msg.search(output).group(0)
+
+    commit_date = commit_date.replace('Date:', '').strip()
+    commit_date = date_parser.parse(commit_date)
+    commit_msg = commit_msg.strip()
+
+    return commit_date, commit_msg
+
+
 def write_results(results, input_name, commit):
     """
     Writes benchmark results to file
@@ -57,13 +88,19 @@ def write_results(results, input_name, commit):
     :param commit: hash of ForceAtlas2 commit
     :return:
     """
+
+    commit_date, commit_message = get_commit_info(commit)
+
     output_name = input_name.split('.')
-    output_name[0] = '{}-{}'.format(output_name[0], commit)
+    output_name[0] = '{}-{}'.format(
+        output_name[0], commit_date.strftime("%Y-%m-%d-%H-%M-%S"))
     output_name[-1] = 'csv'
     output_name = '.'.join(output_name)
 
     with open(output_name, 'w') as output_file:
-        output_file.write('# Commit {}\n'.format(commit))
+        output_file.write('# Commit: {}\n'.format(commit))
+        output_file.write('# Date: {}\n'.format(commit_date.strftime("%d/%m/%Y %H:%M:%S")))
+        output_file.write('# Message: {}\n'.format(commit_message))
         output_file.write('Graph File,Delta Run Time\n')
         for key, value in results.items():
             output_file.write('{},{}\n'.format(key, value))

@@ -17,31 +17,30 @@ protected:
 
 	std::string kernelName, kernelBody;
 
-	cl::CommandQueue queue;
 	cl::Program program;
 	cl::Kernel kernel;
 
 	int localWorkSize, globalWorkSize;
-
-	std::vector<cl::Memory> glBuffers;
-
-	void build();
 
 public:
 
 	CLKernel(const cl::Device& device_, const cl::Context& context_);
 	~CLKernel();
 
+	const cl::Kernel& getKernel() const;
+
 	void init();
-	void run();
+
+	int getLocalWorkSize() const;
+	int getGlobalWorkSize() const;
 
 	void setWorkSize(unsigned int ndRange);
 
 	template <class T> void setArg(unsigned int argId, T data);
 	template <class T> void setArg(unsigned int argId, unsigned int size, T* data);
 
-	void setArg(unsigned int argId, GLuint glBufferId, cl_mem_flags memFlags);
-	void setArg(unsigned int argId, cl::Buffer clBuffer);
+	void setArg(unsigned int argId, const cl::BufferGL& glBuffer);
+	void setArg(unsigned int argId, const cl::Buffer& clBuffer);
 
 };
 

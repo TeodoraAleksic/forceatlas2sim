@@ -16,6 +16,8 @@ ForceAtlas2Params::ForceAtlas2Params()
 	ksmax = 10.0f;
 
 	delta = 1;
+
+	debug = false;
 }
 
 ForceAtlas2Params::~ForceAtlas2Params()
@@ -106,6 +108,11 @@ float ForceAtlas2Params::getKsmax() const
 int ForceAtlas2Params::getDelta() const
 {
 	return delta;
+}
+
+bool ForceAtlas2Params::getDebug() const
+{
+	return debug;
 }
 
 void ForceAtlas2Params::setInput(std::string input_)
@@ -254,4 +261,9 @@ void ForceAtlas2Params::setDelta(int delta_)
 void ForceAtlas2Params::setDelta(std::string delta_)
 {
 	setDelta(stringToInt(delta_));
+}
+
+void ForceAtlas2Params::setDebug(bool debug_)
+{
+	debug = debug_;
 }

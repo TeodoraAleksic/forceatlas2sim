@@ -23,6 +23,8 @@ private:
 
 	std::vector<std::string> nodeLabel;
 
+	std::vector<int> sourceNodeCount;
+
 	std::vector<unsigned int> sourceId, targetId;
 	std::vector<float> sourceX, sourceY, sourceZ;
 	std::vector<float> targetX, targetY, targetZ;
@@ -40,6 +42,8 @@ private:
 
 	void postprocessGraphics();
 	void postprocessEdges();
+
+	void swap(unsigned int* a, unsigned int* b);
 
 public:
 

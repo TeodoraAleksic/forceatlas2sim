@@ -28,11 +28,13 @@ namespace shader
 	void main() \n\
 	{ \n\
 		instanceId = gl_InstanceID; \n\
-		vertPos = vec3(model * vec4(position, 1.0f)); \n\
-		vertNormal = normalMatrix * normalize(position); \n\
 		\n\
 		vec3 offset = vec3(offsetX, offsetY, offsetZ); \n\
 		vec3 newPos = position * (float(scale) * 0.5 + 0.5) + offset; \n\
+		\n\
+		vertPos = vec3(model * vec4(newPos, 1.0f)); \n\
+		vertNormal = normalMatrix * normalize(position); \n\
+		\n\
 		gl_Position = projection * view * model * vec4(newPos, 1); \n\
 	} \n\
 	";

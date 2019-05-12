@@ -21,6 +21,13 @@ GraphObject::~GraphObject()
 {
 }
 
+void GraphObject::swap(unsigned int* a, unsigned int* b)
+{
+	unsigned int c = *a;
+	*a = *b;
+	*b = c;
+}
+
 void GraphObject::initNode(std::string node)
 {
 	// Generates new node Id
@@ -32,6 +39,7 @@ void GraphObject::initNode(std::string node)
 	nodeZ.push_back(0);
 	degree.push_back(0);
 	nodeLabel.push_back("");
+	sourceNodeCount.push_back(0);
 }
 
 unsigned int GraphObject::getNodeId(std::string node)
@@ -134,6 +142,10 @@ void GraphObject::addEdge(std::string source, std::string target, float weight)
 	unsigned int targetIndex = getNodeId(target);
 	++degree[targetIndex];
 
+	// If the first node appears as the source node more often, switch the nodes
+	if (sourceNodeCount[sourceIndex] > sourceNodeCount[targetIndex])
+		swap(&sourceIndex, &targetIndex);
+
 	// Inserts ans sorts edge
 	int i = insertEdgeSorted(sourceIndex, targetIndex);
 
@@ -148,6 +160,7 @@ void GraphObject::addEdge(std::string source, std::string target, float weight)
 	edgeWeight.insert(edgeWeight.begin() + i, weight);
 
 	++numOfEdges;
+	++sourceNodeCount[sourceIndex];
 }	
 
 void GraphObject::postprocessGraphics()

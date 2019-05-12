@@ -7,6 +7,7 @@
 #include "clforceattr.h"
 #include "clforcerepl.h"
 #include "clgraphcenter.h"
+#include "clqueue.h"
 #include "clsum.h"
 #include "clupdateedge.h"
 #include "clupdatenode.h"
@@ -25,6 +26,7 @@ private:
 	const GLGraphEdge& glGraphEdge;
 
 	CLContext clContext;
+	CLQueue clQueue;
 
 	CLGlobalSwing clGlobalSwing;
 	CLGlobalTraction clGlobalTraction;
@@ -44,6 +46,15 @@ private:
 
 	int tmpFront;
 	cl::Buffer tmpX[2], tmpY[2], tmpZ[2];
+
+	std::vector<cl::Memory> sharedBuffers;
+
+	cl::BufferGL glNodeX, glNodeY, glNodeZ;
+	cl::BufferGL glNodeScale;
+	cl::BufferGL glEdgeSourceId;
+	cl::BufferGL glEdgeSourceX, glEdgeSourceY, glEdgeSourceZ;
+	cl::BufferGL glEdgeTargetId;
+	cl::BufferGL glEdgeTargetX, glEdgeTargetY, glEdgeTargetZ;
 
 	void setCLGlobalSwingArgs(bool init);
 	void setCLGlobalTractionArgs(bool init);

@@ -10,6 +10,8 @@ public:
 	CLForceAttr(const cl::Device& device_, const cl::Context& context_);
 	~CLForceAttr();
 
+	void setWorkSize(unsigned int ndRange);
+
 };
 
 #endif

@@ -18,6 +18,8 @@ private:
 
 	int delta;
 
+	bool debug;
+
 	int stringToInt(std::string str);
 	float stringToFloat(std::string str);
 
@@ -42,6 +44,8 @@ public:
 	float getKsmax() const;
 
 	int getDelta() const;
+
+	bool getDebug() const;
 
 	// Setters
 
@@ -70,6 +74,8 @@ public:
 
 	void setDelta(int delta_);
 	void setDelta(std::string delta_);
+
+	void setDebug(bool debug_);
 
 };
 

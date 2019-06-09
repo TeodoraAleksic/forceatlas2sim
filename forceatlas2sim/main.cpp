@@ -291,7 +291,6 @@ int main(int argc, char** argv)
 	spdlog::info(msg::INFO_START_SIMULATION);
 
 	// Initializes variables for calculating the delta run time
-	unsigned int numOfRunLoops = 0;
 	std::vector<double> deltaRunTime;
 
 	// Runs rendering loop
@@ -313,10 +312,7 @@ int main(int argc, char** argv)
 
 		// Saves time of run loop if debug mode is on
 		if (runSim && fa2Params.getDebug())
-		{
-			++numOfRunLoops;
 			deltaRunTime.push_back(glfwGetTime() - currentRunFrame);
-		}
 
 		// Gets selected node on screen
 		if (getSelectedNode && !runSim)
@@ -357,8 +353,8 @@ int main(int argc, char** argv)
 	for (unsigned int i = 0; i < deltaRunTime.size(); ++i)
 		deltaRunSum += deltaRunTime[i];
 
-	if (numOfRunLoops > 0)
-		spdlog::debug(fmt::format(msg::DEBUG_DELTA_RUN_TIME, deltaRunSum * 1000 / numOfRunLoops));
+	if (deltaRunTime.size() > 0)
+		spdlog::debug(fmt::format(msg::DEBUG_DELTA_RUN_TIME, deltaRunSum * 1000 / deltaRunTime.size()));
 
 	glfwDestroyCursor(arrowCursor);
 	glfwDestroyCursor(handCursor);

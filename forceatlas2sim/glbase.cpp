@@ -1,6 +1,11 @@
 #include <iostream>
 
+#include <spdlog/fmt/fmt.h>
+#include <spdlog/spdlog.h>
+
 #include "glbase.h"
+#include "message.h"
+#include "utility.h"
 
 GLBase::GLBase()
 {
@@ -49,7 +54,8 @@ unsigned int GLBase::buildShader(GLenum shaderType, std::string shaderBody)
 	{
 		char infoLog[512];
 		glGetShaderInfoLog(shader, 512, NULL, infoLog);
-		std::cout << "ERROR::" << getShaderName(shaderType) << "::COMPILATION_FAILED\n" << infoLog << "\n";
+		spdlog::error(fmt::format(msg::ERR_GL_SHADER_BUILD, getShaderName(shaderType)));
+		logAndThrow(infoLog);
 	}
 
 	return shader;
@@ -75,7 +81,8 @@ unsigned int GLBase::buildProgram(std::vector<unsigned int> shaders)
 	{
 		char infoLog[512];
 		glGetProgramInfoLog(program, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << "\n";
+		spdlog::error(fmt::format(msg::ERR_GL_PROGRAM_BUILD));
+		logAndThrow(infoLog);
 	}
 
 	return program;

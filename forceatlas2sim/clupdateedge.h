@@ -3,6 +3,9 @@
 
 #include "clkernel.h"
 
+/**
+* Kernel for updating the graph's edges
+*/
 class CLUpdateEdge : public CLKernel
 {
 public:

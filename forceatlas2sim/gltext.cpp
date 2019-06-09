@@ -2,17 +2,23 @@
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#include <spdlog/fmt/fmt.h>
 
 #include "gltext.h"
+#include "message.h"
 #include "shader.h"
+#include "utility.h"
 
-GLText::GLText(const Camera& camera_, const GraphObject& graphObject_) : camera(camera_), graphObject(graphObject_)
+GLText::GLText(const Camera& camera_, const GraphObject& graphObject_): 
+	camera(camera_), graphObject(graphObject_),
+	text(""),
+	isInited(false),
+	vao(0),
+	vboVertex(0),
+	program(0),
+	uniformProjection(0),
+	uniformText(0)
 {
-	text = "";
-	isInited = false;
-	vao = 0;
-	vboVertex = 0;
-	program = 0;
 }
 
 GLText::~GLText()
@@ -24,17 +30,11 @@ void GLText::initCharacters()
 {
 	FT_Library ft;
 	if (FT_Init_FreeType(&ft))
-	{
-		std::cout << "Could not initialize FreeType" << std::endl;
-		throw std::runtime_error("Could not initialize FreeType");
-	}
+		logAndThrow(msg::ERR_FT_INIT);
 
 	FT_Face face;
 	if (FT_New_Face(ft, "fonts/arial.ttf", 0, &face))
-	{
-		std::cout << "Could not load font" << std::endl;
-		throw std::runtime_error("Could not load font");
-	}
+		logAndThrow(fmt::format(msg::ERR_FT_LOAD_FONT, "fonts/arial.ttf"));
 
 	FT_Set_Pixel_Sizes(face, 0, 48);
 
@@ -43,10 +43,7 @@ void GLText::initCharacters()
 	for (GLubyte c = 0; c < 128; c++)
 	{
 		if (FT_Load_Char(face, c, FT_LOAD_RENDER))
-		{
-			std::cout << "Could not load character " << c << std::endl;
-			throw std::runtime_error("Could not load character");
-		}
+			logAndThrow(fmt::format(msg::ERR_FT_LOAD_CHR, c));
 
 		GLuint texture;
 		glGenTextures(1, &texture);

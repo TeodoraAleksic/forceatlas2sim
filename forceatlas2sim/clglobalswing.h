@@ -3,6 +3,9 @@
 
 #include "clkernel.h"
 
+/**
+* Kernel for calculating the global graph swing
+*/
 class CLGlobalSwing : public CLKernel
 {
 public:

@@ -2,8 +2,12 @@
 #include <stdio.h>
 
 #include <libxml/parser.h>
+#include <spdlog/fmt/fmt.h>
+#include <spdlog/spdlog.h>
 
 #include "fileparser.h"
+#include "message.h"
+#include "utility.h"
 
 FileParser::FileParser()
 {
@@ -22,7 +26,7 @@ bool FileParser::endsWith(std::string str, std::string ending)
 		return false;
 }
 
-void FileParser::processGEXFVizAttr(xmlAttr* attr, float* x, float* y, float* z)
+void FileParser::parseGEXFVizAttr(xmlAttr* attr, float* x, float* y, float* z)
 {
 	// Processes visualization attribute section of GEXF file
 	while (attr != nullptr)
@@ -43,7 +47,7 @@ void FileParser::processGEXFVizAttr(xmlAttr* attr, float* x, float* y, float* z)
 	}
 }
 
-void FileParser::processGEXFNodeAttr(xmlAttr* attr, std::string* id, std::string* label)
+void FileParser::parseGEXFNodeAttr(xmlAttr* attr, std::string* id, std::string* label)
 {
 	// Processes node attribute section of GEXF file
 	while (attr != nullptr)
@@ -61,7 +65,7 @@ void FileParser::processGEXFNodeAttr(xmlAttr* attr, std::string* id, std::string
 	}
 }
 
-void FileParser::processGEXFEdgeAttr(xmlAttr* attr, std::string* source, std::string* target, float* weight)
+void FileParser::parseGEXFEdgeAttr(xmlAttr* attr, std::string* source, std::string* target, float* weight)
 {
 	// Processes edge attribute section of GEXF file
 	while (attr != nullptr)
@@ -82,7 +86,7 @@ void FileParser::processGEXFEdgeAttr(xmlAttr* attr, std::string* source, std::st
 	}
 }
 
-void FileParser::processGEXFNode(xmlNode* node, GraphObject* graphObject)
+void FileParser::parseGEXFNode(xmlNode* node, GraphObject* graphObject)
 {
 	// Processes node section of GEXF file
 	while (node != nullptr)
@@ -95,7 +99,7 @@ void FileParser::processGEXFNode(xmlNode* node, GraphObject* graphObject)
 			float y = 0.0;
 			float z = 0.0;
 
-			processGEXFNodeAttr(node->properties, &id, &label);
+			parseGEXFNodeAttr(node->properties, &id, &label);
 			
 			xmlNode* temp = node->children;
 
@@ -105,10 +109,10 @@ void FileParser::processGEXFNode(xmlNode* node, GraphObject* graphObject)
 				{
 					// Process node hierarchy
 					if (std::strcmp((const char*)temp->name, "nodes") == 0)
-						processGEXFNode(temp->children, graphObject);
+						parseGEXFNode(temp->children, graphObject);
 
 					if (std::strcmp((const char*)temp->name, "position") == 0)
-						processGEXFVizAttr(temp->properties, &x, &y, &z);
+						parseGEXFVizAttr(temp->properties, &x, &y, &z);
 				}
 
 				temp = temp->next;
@@ -121,7 +125,7 @@ void FileParser::processGEXFNode(xmlNode* node, GraphObject* graphObject)
 	}
 }
 
-void FileParser::processGEXFEdge(xmlNode* edge, GraphObject* graphObject)
+void FileParser::parseGEXFEdge(xmlNode* edge, GraphObject* graphObject)
 {
 	// Processes edge section of GEXF file
 	while (edge != nullptr)
@@ -132,7 +136,7 @@ void FileParser::processGEXFEdge(xmlNode* edge, GraphObject* graphObject)
 			std::string target;
 			float weight = 1.0;
 
-			processGEXFEdgeAttr(edge->properties, &source, &target, &weight);
+			parseGEXFEdgeAttr(edge->properties, &source, &target, &weight);
 
 			graphObject->addEdge(source, target, weight);
 		}
@@ -141,33 +145,33 @@ void FileParser::processGEXFEdge(xmlNode* edge, GraphObject* graphObject)
 	}
 }
 
-void FileParser::processGEXFList(xmlNode* list, GraphObject* graphObject)
+void FileParser::parseGEXFList(xmlNode* list, GraphObject* graphObject)
 {
-	xmlNode* tmp = list->children;
+	list = list->children;
 
 	// Finds the graph section of a GEXF file
-	while (tmp != nullptr && 
-		   (tmp->type != XML_ELEMENT_NODE || 
-		    (tmp->type == XML_ELEMENT_NODE && std::strcmp((const char*)tmp->name, "graph") != 0)))
-		tmp = tmp->next;
+	while (list != nullptr && 
+		   (list->type != XML_ELEMENT_NODE || 
+		    (list->type == XML_ELEMENT_NODE && std::strcmp((const char*)list->name, "graph") != 0)))
+		list = list->next;
 
-	if (tmp != nullptr)
+	if (list != nullptr)
 	{
-		tmp = tmp->children;
+		list = list->children;
 
 		// Processes graph section of GEXF file
-		while (tmp != nullptr)
+		while (list != nullptr)
 		{
-			if (tmp->type == XML_ELEMENT_NODE)
+			if (list->type == XML_ELEMENT_NODE)
 			{
-				if (std::strcmp((const char*)tmp->name, "nodes") == 0)
-					processGEXFNode(tmp->children, graphObject);
+				if (std::strcmp((const char*)list->name, "nodes") == 0)
+					parseGEXFNode(list->children, graphObject);
 
-				else if (std::strcmp((const char*)tmp->name, "edges") == 0)
-					processGEXFEdge(tmp->children, graphObject);
+				else if (std::strcmp((const char*)list->name, "edges") == 0)
+					parseGEXFEdge(list->children, graphObject);
 			}
 
-			tmp = tmp->next;
+			list = list->next;
 		}
 	}
 }
@@ -183,16 +187,16 @@ void FileParser::parseGEXF(std::string fileName, GraphObject* graphObject)
 	doc = xmlReadFile(fileName.c_str(), nullptr, 0);
 
 	if (doc == nullptr)
-		throw "Could not parse GEXF file";
+		logAndThrow(msg::ERR_READING_GEXF_FILE);
 
 	rootElement = xmlDocGetRootElement(doc);
 
-	processGEXFList(rootElement, graphObject);
+	parseGEXFList(rootElement, graphObject);
 
 	xmlFreeDoc(doc);
 	xmlCleanupParser();
 #else
-	throw "GEXF tree support not compiled";
+	logAndThrow(msg::ERR_GEXF_TREE_SUPPORT);
 #endif
 }
 
@@ -217,7 +221,7 @@ std::string FileParser::getGMLErrorMessage(GML_error_value error)
 	}
 }
 
-void FileParser::processGMLGraphics(GML_pair* graphics, float* x, float* y, float* z)
+void FileParser::parseGMLGraphics(GML_pair* graphics, float* x, float* y, float* z)
 {
 	// Processes graphics sections of GML file
 	while (graphics != nullptr)
@@ -235,7 +239,7 @@ void FileParser::processGMLGraphics(GML_pair* graphics, float* x, float* y, floa
 	}
 }
 
-void FileParser::processGMLNode(GML_pair* node, GraphObject* graphObject)
+void FileParser::parseGMLNode(GML_pair* node, GraphObject* graphObject)
 {
 	std::string id;
 	std::string label;
@@ -253,7 +257,7 @@ void FileParser::processGMLNode(GML_pair* node, GraphObject* graphObject)
 			label = std::string(node->value.string);
 
 		if (std::strcmp(node->key, "graphics") == 0)
-			processGMLGraphics(node->value.list, &x, &y, &z);
+			parseGMLGraphics(node->value.list, &x, &y, &z);
 
 		node = node->next;
 	}
@@ -261,7 +265,7 @@ void FileParser::processGMLNode(GML_pair* node, GraphObject* graphObject)
 	graphObject->addNode(id, label, x, y, z);
 }
 
-void FileParser::processGMLEdge(GML_pair* edge, GraphObject* graphObject)
+void FileParser::parseGMLEdge(GML_pair* edge, GraphObject* graphObject)
 {
 	std::string source;
 	std::string target;
@@ -286,71 +290,72 @@ void FileParser::processGMLEdge(GML_pair* edge, GraphObject* graphObject)
 	graphObject->addEdge(source, target, weight);
 }
 
-void FileParser::processGMLList(GML_pair* list, GraphObject* graphObject)
+void FileParser::parseGMLList(GML_pair* list, GraphObject* graphObject)
 {
-	GML_pair* tmp = list;
-
 	// Finds the graph section of a GML file
-	while (tmp != nullptr && std::strcmp(tmp->key, "graph") != 0)
-		tmp = tmp->next;
+	while (list != nullptr && std::strcmp(list->key, "graph") != 0)
+		list = list->next;
 
-	if (tmp != nullptr)
+	if (list != nullptr)
 	{
-		tmp = tmp->value.list;
+		list = list->value.list;
 
 		// Processes graph section of GML file
-		while (tmp != nullptr)
+		while (list != nullptr)
 		{
-			if (std::strcmp(tmp->key, "node") == 0)
-				processGMLNode(tmp->value.list, graphObject);
+			if (std::strcmp(list->key, "node") == 0)
+				parseGMLNode(list->value.list, graphObject);
 
-			else if (std::strcmp(tmp->key, "edge") == 0)
-				processGMLEdge(tmp->value.list, graphObject);
+			else if (std::strcmp(list->key, "edge") == 0)
+				parseGMLEdge(list->value.list, graphObject);
 
-			tmp = tmp->next;
+			list = list->next;
 		}
 	}
 }
 
 void FileParser::parseGML(std::string fileName, GraphObject* graphObject)
 {
-	struct GML_pair* list;
-	struct GML_stat* stat = (struct GML_stat*)malloc(sizeof(struct GML_stat));
-	stat->key_list = NULL;
-
+	// Opens input file for reading
 	FILE* file = fopen(fileName.c_str(), "r");
+	if (file == nullptr)
+		logAndThrow(fmt::format(msg::ERR_READING_GRAPH_FILE, std::strerror(errno)));
 
+	// Initializes GML structures
 	GML_init();
-	list = GML_parser(file, stat, 0);
+	GML_stat stat;
+	stat.key_list = NULL;
+	GML_pair* list = GML_parser(file, &stat, 0);
 
+	// Closes input file
 	if (file != nullptr) fclose(file);
 
-	if (stat->err.err_num != GML_OK)
-	{
-		std::cout << getGMLErrorMessage(stat->err.err_num) << "\n";
-		std::cout << "Error reading file line " << stat->err.line << " column " << stat->err.column << "\n";
-	}
+	// Checks for errors during GML initialization
+	if (stat.err.err_num != GML_OK)
+		logAndThrow(fmt::format(msg::ERR_READING_GML_FILE, 
+			stat.err.line, stat.err.column, getGMLErrorMessage(stat.err.err_num)));
+	
+	parseGMLList(list, graphObject);
 
-	processGMLList(list, graphObject);
-
-	GML_free_list(list, stat->key_list);
+	GML_free_list(list, stat.key_list);
 }
 
 GraphObject FileParser::parse(std::string fileName)
 {
 	GraphObject graphObject;
 
+	spdlog::info(fmt::format(msg::INFO_READING_GRAPH_FILE, fileName));
+
 	// Parses input file based on extension
 	if (endsWith(fileName, ".gexf"))
 		parseGEXF(fileName, &graphObject);
 	else if (endsWith(fileName, ".gml"))
 		parseGML(fileName, &graphObject);
-	else 
-		throw "Unsupported file extension";
+	else
+		logAndThrow(fmt::format(msg::ERR_GRAPH_FILE_EXT, fileName));
 
-	std::cout << fileName << std::endl;
-	std::cout << "Number of nodes: " << graphObject.getNumOfNodes() << std::endl;
-	std::cout << "Number of edges: " << graphObject.getNumOfEdges() << std::endl << std::endl;
+	spdlog::info(fmt::format(msg::INFO_NUM_OF_NODES, graphObject.getNumOfNodes()));
+	spdlog::info(fmt::format(msg::INFO_NUM_OF_EDGES, graphObject.getNumOfEdges()));
 
 	graphObject.postprocessing();
 

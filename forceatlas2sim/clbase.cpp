@@ -1,4 +1,8 @@
+#include <spdlog/fmt/fmt.h>
+#include <spdlog/spdlog.h>
+
 #include "clbase.h"
+#include "message.h"
 
 CLBase::CLBase()
 {
@@ -8,7 +12,7 @@ CLBase::~CLBase()
 {
 }
 
-std::string CLBase::getErrorCode(cl_int error)
+std::string CLBase::getErrorMessage(cl_int error)
 {
 	switch (error) {
 	case 0: return "CL_SUCCESS";
@@ -78,18 +82,14 @@ std::string CLBase::getErrorCode(cl_int error)
 
 void CLBase::print(cl::Platform platform)
 {
-	std::cout << "OpenCL Platform" << std::endl;
-	std::cout << "NAME:	" << platform.getInfo<CL_PLATFORM_NAME>() << std::endl;
-	std::cout << "VENDOR: " << platform.getInfo<CL_PLATFORM_VENDOR>() << std::endl;
-	std::cout << "VERSION: " << platform.getInfo<CL_PLATFORM_VERSION>() << std::endl;
-	std::cout << std::endl;
+	spdlog::info(fmt::format(msg::INFO_CL_PLATFORM_NAME, platform.getInfo<CL_PLATFORM_NAME>()));
+	spdlog::info(fmt::format(msg::INFO_CL_PLATFORM_VENDOR, platform.getInfo<CL_PLATFORM_VENDOR>()));
+	spdlog::info(fmt::format(msg::INFO_CL_PLATFORM_VERSION, platform.getInfo<CL_PLATFORM_VERSION>()));
 }
 
 void CLBase::print(cl::Device device)
 {
-	std::cout << "OpenCL Device" << std::endl;
-	std::cout << "NAME: " << device.getInfo<CL_DEVICE_NAME>() << std::endl;
-	std::cout << "VENDOR: " << device.getInfo<CL_DEVICE_VENDOR>() << std::endl;
-	std::cout << "VERSION: " << device.getInfo<CL_DEVICE_VERSION>() << std::endl;
-	std::cout << std::endl;
+	spdlog::info(fmt::format(msg::INFO_CL_DEVICE_NAME, device.getInfo<CL_DEVICE_NAME>()));
+	spdlog::info(fmt::format(msg::INFO_CL_DEVICE_VENDOR, device.getInfo<CL_DEVICE_VENDOR>()));
+	spdlog::info(fmt::format(msg::INFO_CL_DEVICE_VERSION, device.getInfo<CL_DEVICE_VERSION>()));
 }

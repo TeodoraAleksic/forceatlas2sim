@@ -20,10 +20,10 @@ ForceAtlas2Sim::ForceAtlas2Sim(
 	clUpdateNode(clContext.getDevice(), clContext.getContext()),
 	clUpdateEdge(clContext.getDevice(), clContext.getContext()),
 	clQueue(clContext.getDevice(), clContext.getContext()),
-	clContext()
+	clContext(),
+	forceFront(0),
+	tmpFront(0)
 {
-	forceFront = 0;
-	tmpFront = 0;
 }
 
 ForceAtlas2Sim::~ForceAtlas2Sim()
@@ -101,7 +101,7 @@ void ForceAtlas2Sim::setCLForceAttrArgs(bool init)
 		clForceAttr.setArg(6, glNodeScale);
 		clForceAttr.setArg(10, glEdgeSourceId);
 		clForceAttr.setArg(11, glEdgeTargetId);
-		clForceAttr.setArg(12, edgeOffset);
+		clForceAttr.setArg(12, sourceNodeOffset);
 		clForceAttr.setArg(13, edgeWeight);
 	}
 
@@ -244,8 +244,8 @@ void ForceAtlas2Sim::init()
 	}
 
 	// Allocates buffers for values used for calculation
-	edgeOffset = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
-		sizeof(cl_int) * graphObject.getNumOfNodes(), &(graphObject.getEdgeOffset())[0]);
+	sourceNodeOffset = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+		sizeof(cl_int) * graphObject.getNumOfNodes(), &(graphObject.getSourceNodeOffset())[0]);
 	edgeWeight = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
 		sizeof(cl_float) * graphObject.getNumOfEdges(), &(graphObject.getEdgeWeight())[0]);
 	
@@ -277,23 +277,23 @@ void ForceAtlas2Sim::init()
 	tmpZ[1] = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE, sizeof(cl_float) * graphObject.getNumOfNodes());
 
 	// Initialize GL shared buffers
-	glNodeX = cl::BufferGL(clContext.getContext(), CL_MEM_READ_WRITE, glGraphNode.getOffsetX());
-	glNodeY = cl::BufferGL(clContext.getContext(), CL_MEM_READ_WRITE, glGraphNode.getOffsetY());
-	glNodeZ = cl::BufferGL(clContext.getContext(), CL_MEM_READ_WRITE, glGraphNode.getOffsetZ());
+	glNodeX = cl::BufferGL(clContext.getContext(), CL_MEM_READ_WRITE, glGraphNode.getVboOffsetX());
+	glNodeY = cl::BufferGL(clContext.getContext(), CL_MEM_READ_WRITE, glGraphNode.getVboOffsetY());
+	glNodeZ = cl::BufferGL(clContext.getContext(), CL_MEM_READ_WRITE, glGraphNode.getVboOffsetZ());
 
-	glNodeScale = cl::BufferGL(clContext.getContext(), CL_MEM_READ_WRITE, glGraphNode.getScale());
+	glNodeScale = cl::BufferGL(clContext.getContext(), CL_MEM_READ_WRITE, glGraphNode.getVboScale());
 
-	glEdgeSourceId = cl::BufferGL(clContext.getContext(), CL_MEM_READ_WRITE, glGraphEdge.getSourceId());
+	glEdgeSourceId = cl::BufferGL(clContext.getContext(), CL_MEM_READ_WRITE, glGraphEdge.getVboSourceId());
 
-	glEdgeSourceX = cl::BufferGL(clContext.getContext(), CL_MEM_READ_WRITE, glGraphEdge.getSourceX());
-	glEdgeSourceY = cl::BufferGL(clContext.getContext(), CL_MEM_READ_WRITE, glGraphEdge.getSourceY());
-	glEdgeSourceZ = cl::BufferGL(clContext.getContext(), CL_MEM_READ_WRITE, glGraphEdge.getSourceZ());
+	glEdgeSourceX = cl::BufferGL(clContext.getContext(), CL_MEM_READ_WRITE, glGraphEdge.getVboSourceX());
+	glEdgeSourceY = cl::BufferGL(clContext.getContext(), CL_MEM_READ_WRITE, glGraphEdge.getVboSourceY());
+	glEdgeSourceZ = cl::BufferGL(clContext.getContext(), CL_MEM_READ_WRITE, glGraphEdge.getVboSourceZ());
 
-	glEdgeTargetId = cl::BufferGL(clContext.getContext(), CL_MEM_READ_WRITE, glGraphEdge.getTargetId());
+	glEdgeTargetId = cl::BufferGL(clContext.getContext(), CL_MEM_READ_WRITE, glGraphEdge.getVboTargetId());
 
-	glEdgeTargetX = cl::BufferGL(clContext.getContext(), CL_MEM_READ_WRITE, glGraphEdge.getTargetX());
-	glEdgeTargetY = cl::BufferGL(clContext.getContext(), CL_MEM_READ_WRITE, glGraphEdge.getTargetY());
-	glEdgeTargetZ = cl::BufferGL(clContext.getContext(), CL_MEM_READ_WRITE, glGraphEdge.getTargetZ());
+	glEdgeTargetX = cl::BufferGL(clContext.getContext(), CL_MEM_READ_WRITE, glGraphEdge.getVboTargetX());
+	glEdgeTargetY = cl::BufferGL(clContext.getContext(), CL_MEM_READ_WRITE, glGraphEdge.getVboTargetY());
+	glEdgeTargetZ = cl::BufferGL(clContext.getContext(), CL_MEM_READ_WRITE, glGraphEdge.getVboTargetZ());
 
 	// Add GL buffers to vector
 	sharedBuffers.push_back(glNodeX);

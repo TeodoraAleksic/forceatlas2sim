@@ -11,18 +11,22 @@ const int GLGraphNode::lats = 40;
 const int GLGraphNode::longs = 40;
 const int GLGraphNode::numOfIndices = (lats + 1) * (longs + 1) * 2 + (lats + 1);
 
-GLGraphNode::GLGraphNode(const Camera& camera_, const GraphObject& graphObject_): camera(camera_), graphObject(graphObject_)
+GLGraphNode::GLGraphNode(const Camera& camera_, const GraphObject& graphObject_): 
+	camera(camera_), graphObject(graphObject_),
+	selectedNode(-1),
+	isInited(false),
+	vao(0),	
+	vboVertex(0), vboIndex(0), 
+	vboOffsetX(0), vboOffsetY(0), vboOffsetZ(0),
+	vboScale(0),
+	program(0),
+	uniformProjection(0),
+	uniformView(0),
+	uniformModel(0),
+	uniformNormalMatrix(0),
+	uniformSelectedNode(0),
+	uniformCameraPos(0)
 {
-	selectedNode = -1;
-	isInited = false;
-	vao = 0;
-	vboVertex = 0;
-	vboIndex = 0;
-	vboOffsetX = 0;
-	vboOffsetY = 0;
-	vboOffsetZ = 0;
-	vboScale = 0;
-	program = 0;
 }
 
 GLGraphNode::~GLGraphNode()
@@ -36,7 +40,7 @@ void GLGraphNode::initNode(std::vector<float>* vertices, std::vector<unsigned in
 
 	// Calculates vertices and indices for drawing a sphere
 	for (int i = 0; i <= lats; i++) {
-		double lat0 = glm::pi<double>() * (-0.5 + (double)(i - 1) / lats);
+		double lat0 = glm::pi<double>() * (-0.5 + ((double)i - 1) / lats);
 		double z0 = sin(lat0);
 		double zr0 = cos(lat0);
 
@@ -45,7 +49,7 @@ void GLGraphNode::initNode(std::vector<float>* vertices, std::vector<unsigned in
 		double zr1 = cos(lat1);
 
 		for (int j = 0; j <= longs; j++) {
-			double lng = 2 * glm::pi<double>() * (double)(j - 1) / longs;
+			double lng = 2 * glm::pi<double>() * ((double)j - 1) / longs;
 			double x = cos(lng);
 			double y = sin(lng);
 
@@ -167,8 +171,8 @@ void GLGraphNode::draw()
 	const int SCREEN_WIDTH = 800;
 	const int SCREEN_HIGHT = 600;
 
-	glm::mat4 projection = camera.getPerspective();
-	glm::mat4 view = camera.getPosition();
+	glm::mat4 projection = camera.getProjectionMatrix();
+	glm::mat4 view = camera.getViewMatrix();
 	glm::mat4 model(1.0f);
 	glm::mat3 normalMatrix = glm::transpose(glm::inverse(model));
 	glm::vec3 cameraPos = camera.getCameraPos();
@@ -242,32 +246,32 @@ unsigned int GLGraphNode::getNumOfNodes() const
 	return graphObject.getNumOfNodes();
 }
 
-unsigned int GLGraphNode::getVertices() const
+unsigned int GLGraphNode::getVboVertices() const
 {
 	return vboVertex;
 }
 
-unsigned int GLGraphNode::getIndices() const
+unsigned int GLGraphNode::getVboIndices() const
 {
 	return vboIndex;
 }
 
-unsigned int GLGraphNode::getOffsetX() const
+unsigned int GLGraphNode::getVboOffsetX() const
 {
 	return vboOffsetX;
 }
 
-unsigned int GLGraphNode::getOffsetY() const
+unsigned int GLGraphNode::getVboOffsetY() const
 {
 	return vboOffsetY;
 }
 
-unsigned int GLGraphNode::getOffsetZ() const
+unsigned int GLGraphNode::getVboOffsetZ() const
 {
 	return vboOffsetZ;
 }
 
-unsigned int GLGraphNode::getScale() const
+unsigned int GLGraphNode::getVboScale() const
 {
 	return vboScale;
 }

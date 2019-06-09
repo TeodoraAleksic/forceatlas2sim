@@ -3,6 +3,7 @@
 Camera::Camera(int screenWidth_, int screenHeight_, glm::vec3 cameraPos_, glm::vec3 cameraFront_, glm::vec3 cameraUp_) :
 	screenWidth(screenWidth_), screenHeight(screenHeight_),
 	cameraPos(cameraPos_), cameraFront(cameraFront_), cameraUp(cameraUp_), 
+	lastX(0.0), lastY(0.0),
 	cameraPitch(0.0f), cameraYaw(-90.0f), fov(45.0f),
 	nearPlain(0.1), farPlain(5000)
 {
@@ -12,7 +13,7 @@ Camera::~Camera()
 {
 }
 
-void Camera::update()
+void Camera::updateFront()
 {
 	// Updates camera vectors
 	glm::vec3 front;
@@ -28,12 +29,12 @@ glm::vec3 Camera::getCameraPos() const
 	return cameraPos;
 }
 
-glm::mat4 Camera::getPosition() const
+glm::mat4 Camera::getViewMatrix() const
 {
 	return glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 }
 
-glm::mat4 Camera::getPerspective() const
+glm::mat4 Camera::getProjectionMatrix() const
 {
 	return glm::perspective((float)glm::radians(fov), (float)(screenWidth / screenHeight), 0.1f, 5000.0f);
 }
@@ -61,7 +62,7 @@ void Camera::move(MoveDirection direction, double deltaTime)
 		break;
 	}
 
-	update();
+	updateFront();
 }
 
 void Camera::turn(double posX, double posY, double deltaTime, bool reset)
@@ -91,7 +92,7 @@ void Camera::turn(double posX, double posY, double deltaTime, bool reset)
 	if (cameraPitch > 89.0f) cameraPitch = 89.0f;
 	if (cameraPitch < -89.0f) cameraPitch = -89.0f;
 
-	update();
+	updateFront();
 }
 
 void Camera::zoom(double offsetX, double offsetY)

@@ -1,11 +1,10 @@
 #include "clkernel.h"
 
 CLKernel::CLKernel(const cl::Device& device_, const cl::Context& context_):
-	device(device_), context(context_)
+	isInited(false),
+	device(device_), context(context_),
+	localWorkSize(0), globalWorkSize(0)
 {
-	isInited = false;
-	localWorkSize = 0;
-	globalWorkSize = 0;
 }
 
 CLKernel::~CLKernel()
@@ -26,13 +25,18 @@ void CLKernel::init()
 		kernel = cl::Kernel(program, kernelName.c_str());
 	}
 	catch (cl::Error error) {
-		// Handles build error
-		std::cout << kernelName << " " << getErrorCode(error.err()) << " " << error.what() << "\n";
-		std::string strDirect = program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device);
-		std::cout << strDirect << "\n";
+		spdlog::error(fmt::format(msg::ERR_CL_KERNEL_BUILD, kernelName, getErrorMessage(error.err())));
+		spdlog::error(error.what());
+		spdlog::error(program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device));
+		throw;
 	}
 
 	isInited = true;
+}
+
+std::string CLKernel::getKernelName() const
+{
+	return kernelName;
 }
 
 const cl::Kernel& CLKernel::getKernel() const
@@ -52,6 +56,7 @@ int CLKernel::getGlobalWorkSize() const
 
 void CLKernel::setWorkSize(unsigned int ndRange)
 {
+	// Gets device's minimum workgroup size
 	unsigned int minWorkGroupSize = device.getInfo<CL_DEVICE_ADDRESS_BITS>();
 
 	globalWorkSize = (ndRange % minWorkGroupSize) > 0 ? 
@@ -67,7 +72,10 @@ void CLKernel::setArg(unsigned int argId, const cl::BufferGL& glBuffer)
 	}
 	catch (cl::Error error)
 	{ 
-		std::cout << getErrorCode(error.err()) << " " << error.what() << std::endl;
+		spdlog::error(fmt::format(msg::ERR_CL_KERNEL_ARG, 
+			argId, kernelName, getErrorMessage(error.err())));
+		spdlog::error(error.what());
+		throw;
 	}
 }
 
@@ -79,6 +87,9 @@ void CLKernel::setArg(unsigned int argId, const cl::Buffer& clBuffer)
 	}
 	catch (cl::Error error)
 	{
-		std::cout << getErrorCode(error.err()) << " " << error.what() << std::endl;
+		spdlog::error(fmt::format(msg::ERR_CL_KERNEL_ARG, 
+			argId, kernelName, getErrorMessage(error.err())));
+		spdlog::error(error.what());
+		throw;
 	}
 }

@@ -3,8 +3,10 @@
 #include <memory>
 #include <string>
 
+#include <spdlog\fmt\fmt.h>
 #include <glad\glad.h>
 #include <GLFW\glfw3.h>
+#include <spdlog\spdlog.h>
 
 #include "camera.h"
 #include "fileparser.h"
@@ -15,6 +17,8 @@
 #include "glselect.h"
 #include "gltext.h"
 #include "graphobject.h"
+#include "message.h"
+#include "utility.h"
 
 const int SCREEN_WIDTH = 1920;
 const int SCREEN_HEIGHT = 1080;
@@ -44,66 +48,6 @@ GLFWcursor* handCursor;
 std::unique_ptr<Camera> camera;
 
 std::unique_ptr<ForceAtlas2Sim> fa2Sim;
-
-bool isValueArg(std::string argName)
-{
-	return
-		argName == std::string("-i")		||
-		argName == std::string("-kr")		||
-		argName == std::string("-krp")		||
-		argName == std::string("-kg")		||
-		argName == std::string("-tau")		||
-		argName == std::string("-ks")		||
-		argName == std::string("-ksmax")	||
-		argName == std::string("-delta");
-}
-
-bool isFlagArg(std::string argName)
-{
-	return 
-		argName == std::string("-fg")	|| 
-		argName == std::string("-fsg")	||
-		argName == std::string("-debug");
-}
-
-bool isNotArg(std::string argName)
-{
-	return !isValueArg(argName) && !isFlagArg(argName) && argName != std::string("-h");
-}
-
-void setValueArg(ForceAtlas2Params* fa2Params, std::string argName, std::string argValue)
-{
-	if (argName == std::string("-i"))
-		fa2Params->setInput(argValue);
-	else if (argName == std::string("-kr"))
-		fa2Params->setKr(argValue);
-	else if (argName == std::string("-krp"))
-		fa2Params->setKrp(argValue);
-	else if (argName == std::string("-kg"))
-		fa2Params->setKg(argValue);
-	else if (argName == std::string("-tau"))
-		fa2Params->setTau(argValue);
-	else if (argName == std::string("-ks"))
-		fa2Params->setKs(argValue);
-	else if (argName == std::string("-ksmax"))
-		fa2Params->setKsmax(argValue);
-	else if (argName == std::string("-delta"))
-		fa2Params->setDelta(argValue);
-	else
-		throw "Invalid value argument " + argName;
-}
-
-void setFlagArg(ForceAtlas2Params* fa2Params, std::string argName)
-{
-	if (argName == std::string("-fg"))
-		fa2Params->setFg(true);
-	else if (argName == std::string("-fsg"))
-		fa2Params->setFsg(true);
-	else if (argName == std::string("-debug"))
-		fa2Params->setDebug(true);
-	else
-		throw "Invalid flag argument " + argName;
-}
 
 void processInput(GLFWwindow* window)
 {
@@ -218,12 +162,12 @@ int main(int argc, char** argv)
 		// Parses script arguments
 		for (int i = 1; i < argc; ++i)
 		{
-			if (isValueArg(argv[i]))
+			if (fa2Params.isValueArg(argv[i]))
 			{
 				// Looks for value after value argument
-				if ((i + 1) < argc && isNotArg(argv[i + 1]))
+				if ((i + 1) < argc && fa2Params.isNotArg(argv[i + 1]))
 				{
-					setValueArg(&fa2Params, argv[i], argv[i + 1]);
+					fa2Params.setValueArg(argv[i], argv[i + 1]);
 					++i;
 				}
 				else
@@ -232,9 +176,9 @@ int main(int argc, char** argv)
 					return 1;
 				}
 			}
-			else if (isFlagArg(argv[i]))
+			else if (fa2Params.isFlagArg(argv[i]))
 			{
-				setFlagArg(&fa2Params, argv[i]);
+				fa2Params.setFlagArg(argv[i]);
 			}
 			else if (argv[i] == std::string("-h"))
 			{
@@ -255,6 +199,9 @@ int main(int argc, char** argv)
 		}
 	}
 
+	if (fa2Params.getDebug()) 
+		spdlog::set_level(spdlog::level::debug);
+
 	FileParser fileParser;
 	GraphObject graphObject = fileParser.parse(fa2Params.getInput());
 
@@ -269,7 +216,7 @@ int main(int argc, char** argv)
 
 	if (window == NULL)
 	{
-		std::cout << "Failed to create GLFW window\n";
+		spdlog::error(msg::ERR_GLFW_WINDOW);
 		glfwTerminate();
 		return -1;
 	}
@@ -279,7 +226,7 @@ int main(int argc, char** argv)
 	// Addresses OS specific OpenGL functions
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
-		std::cout << "Failed to initialize GLAD\n";
+		spdlog::error(msg::ERR_GLAD_INIT);
 		return -1;
 	}
 
@@ -299,15 +246,12 @@ int main(int argc, char** argv)
 	arrowCursor = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
 	handCursor = glfwCreateStandardCursor(GLFW_HAND_CURSOR);
 
-
 	// Gets info about selected OpenGL device
 	std::string glVendor = (const char*)glGetString(GL_VENDOR);
 	std::string glRenderer = (const char*)glGetString(GL_RENDERER);
 
-	std::cout << "OpenGL Device" << std::endl;
-	std::cout << "VENDOR: " << glVendor << std::endl;
-	std::cout << "RENDERER: " << glRenderer << std::endl;
-	std::cout << std::endl;
+	spdlog::info(fmt::format(msg::INFO_GL_VENDOR, glVendor));
+	spdlog::info(fmt::format(msg::INFO_GL_RENDERER, glRenderer));
 
 	// Initializes camera
 	camera = std::make_unique<Camera>(
@@ -327,12 +271,12 @@ int main(int argc, char** argv)
 	// Initializes object for node selection
 	GLSelect graphSelection(*camera, graphObject);
 
-	graphSelection.setVboVertex(graphNode.getVertices());
-	graphSelection.setVboIndex(graphNode.getIndices());
-	graphSelection.setVboOffsetX(graphNode.getOffsetX());
-	graphSelection.setVboOffsetY(graphNode.getOffsetY());
-	graphSelection.setVboOffsetZ(graphNode.getOffsetZ());
-	graphSelection.setVboScale(graphNode.getScale());
+	graphSelection.setVboVertex(graphNode.getVboVertices());
+	graphSelection.setVboIndex(graphNode.getVboIndices());
+	graphSelection.setVboOffsetX(graphNode.getVboOffsetX());
+	graphSelection.setVboOffsetY(graphNode.getVboOffsetY());
+	graphSelection.setVboOffsetZ(graphNode.getVboOffsetZ());
+	graphSelection.setVboScale(graphNode.getVboScale());
 
 	graphSelection.init();
 
@@ -344,8 +288,9 @@ int main(int argc, char** argv)
 	fa2Sim = std::make_unique<ForceAtlas2Sim>(fa2Params, graphObject, graphNode, graphEdge);
 	fa2Sim->init();
 
-	std::cout << "Starting simulation" << std::endl;
+	spdlog::info(msg::INFO_START_SIMULATION);
 
+	// Initializes variables for calculating the delta run time
 	unsigned int numOfRunLoops = 0;
 	std::vector<double> deltaRunTime;
 
@@ -407,12 +352,13 @@ int main(int argc, char** argv)
 		glfwSwapBuffers(window);
 	}
 
+	// Calculates the delta run time of the simulation
 	double deltaRunSum = 0;
 	for (unsigned int i = 0; i < deltaRunTime.size(); ++i)
 		deltaRunSum += deltaRunTime[i];
 
 	if (numOfRunLoops > 0)
-		std::cout << "Delta run time [ms]: " << deltaRunSum * 1000 / numOfRunLoops << std::endl;
+		spdlog::debug(fmt::format(msg::DEBUG_DELTA_RUN_TIME, deltaRunSum * 1000 / numOfRunLoops));
 
 	glfwDestroyCursor(arrowCursor);
 	glfwDestroyCursor(handCursor);

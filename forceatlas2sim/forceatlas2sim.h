@@ -16,56 +16,169 @@
 #include "glgraphnode.h"
 #include "graphobject.h"
 
+/**
+* ForceAtlas2 simulation
+*
+* Initializes all simulation objects.
+*/
 class ForceAtlas2Sim
 {
 private:
 
+	// ForceAtlas2 parameters
 	const ForceAtlas2Params& fa2Params;
+	// Object containing graph data
 	const GraphObject& graphObject;
+	// OpenGL graph nodes
 	const GLGraphNode& glGraphNode;
+	// OpenGL graph edges
 	const GLGraphEdge& glGraphEdge;
 
+	// OpenCL context
 	CLContext clContext;
+	// OpenCL command queue
 	CLQueue clQueue;
 
+	// Kernel for calculating the global graph swing
 	CLGlobalSwing clGlobalSwing;
+	// Kernel for calculating the global graph traction
 	CLGlobalTraction clGlobalTraction;
+	// Kernel for calculating the center of the graph
 	CLGraphCenter clGraphCenter;
+	// Kernel for calculating a generic sum
 	CLSum clSum;
+	// Kernel for calculating the force of attraction
 	CLForceAttr clForceAttr;
+	// Kernel for calculating the force of repulsion
 	CLForceRepl clForceRepl;
+	// Kernel for updating the graph's nodes
 	CLUpdateNode clUpdateNode;
+	// Kernel for updating the graph's edges
 	CLUpdateEdge clUpdateEdge;
 
-	cl::Buffer centerOfMass, globalSwing, globalTraction;
+	// Buffer for the graph's center of mass
+	cl::Buffer centerOfMass;
+	// Buffer for the graph's global swing
+	cl::Buffer globalSwing;
+	// Buffer for the graph's global traction
+	cl::Buffer globalTraction;
 
-	cl::Buffer edgeOffset, edgeWeight;
+	// Buffer for the offsets of nodes in the edge source node array
+	cl::Buffer sourceNodeOffset;
+	// Buffer for the edge weights
+	cl::Buffer edgeWeight;
 
+	// Id of the currently used force buffer
 	int forceFront;
-	cl::Buffer fx[2], fy[2], fz[2];
+	// Switchable force buffers for the x axis
+	cl::Buffer fx[2];
+	// Switchable force buffers for the y axis
+	cl::Buffer fy[2];
+	// Switchable force buffers for the z axis
+	cl::Buffer fz[2];
 
+	// Id of the currently used temporary buffer
 	int tmpFront;
-	cl::Buffer tmpX[2], tmpY[2], tmpZ[2];
+	// Switchable temporary buffers for the x axis
+	cl::Buffer tmpX[2];
+	// Switchable temporary buffers for the y axis
+	cl::Buffer tmpY[2];
+	// Switchable temporary buffers for the z axis
+	cl::Buffer tmpZ[2];
 
+	// Array of buffers shared between OpenCL and OpenGL
 	std::vector<cl::Memory> sharedBuffers;
 
-	cl::BufferGL glNodeX, glNodeY, glNodeZ;
+	// Shared buffer for the node x axes
+	cl::BufferGL glNodeX;
+	// Shared buffer for the node y axes
+	cl::BufferGL glNodeY;
+	// Shared buffer for the node z axes
+	cl::BufferGL glNodeZ;
+	// Shared buffer for the node degrees
 	cl::BufferGL glNodeScale;
+	// Shared buffer for the edge source node Ids
 	cl::BufferGL glEdgeSourceId;
-	cl::BufferGL glEdgeSourceX, glEdgeSourceY, glEdgeSourceZ;
+	// Shared buffer for the edge source node x axes
+	cl::BufferGL glEdgeSourceX;
+	// Shared buffer for the edge source node y axes
+	cl::BufferGL glEdgeSourceY;
+	// Shared buffer for the edge source node z axes
+	cl::BufferGL glEdgeSourceZ;
+	// Shared buffer for the edge target node Ids
 	cl::BufferGL glEdgeTargetId;
-	cl::BufferGL glEdgeTargetX, glEdgeTargetY, glEdgeTargetZ;
+	// Shared buffer for the edge target node x axes
+	cl::BufferGL glEdgeTargetX;
+	// Shared buffer for the edge target node y axes
+	cl::BufferGL glEdgeTargetY;
+	// Shared buffer for the edge target node z axes
+	cl::BufferGL glEdgeTargetZ;
 
+	/**
+	* Sets the arguments for the global graph swing kernel
+	*
+	* @param init Indicates if the kernel arguments are being set for the first time
+	*/
 	void setCLGlobalSwingArgs(bool init);
+
+	/**
+	* Sets the arguments for the global graph traction kernel
+	*
+	* @param init Indicates if the kernel arguments are being set for the first time
+	*/
 	void setCLGlobalTractionArgs(bool init);
+
+	/**
+	* Sets the arguments for the graph center swing kernel
+	*
+	* @param init Indicates if the kernel arguments are being set for the first time
+	*/
 	void setCLGraphCenterArgs(bool init);
+
+	/**
+	* Sets the arguments for the force of attraction kernel
+	*
+	* @param init Indicates if the kernel arguments are being set for the first time
+	*/
 	void setCLForceAttrArgs(bool init);
+
+	/**
+	* Sets the arguments for the force of repulsion kernel
+	*
+	* @param init Indicates if the kernel arguments are being set for the first time
+	*/
 	void setCLForceReplArgs(bool init);
+
+	/**
+	* Sets the arguments for the update nodes kernel
+	*
+	* @param init Indicates if the kernel arguments are being set for the first time
+	*/
 	void setCLUpdateNodeArgs(bool init);
+
+	/**
+	* Sets the arguments for the update edges kernel
+	*
+	* @param init Indicates if the kernel arguments are being set for the first time
+	*/
 	void setCLUpdateEdgeArgs(bool init);
 
+	/**
+	* Sets the arguments for the generic sum kernel
+	*
+	* @param n				Size of the buffer whose sum is calculated
+	* @param workGroupSize	Size of the workgroup
+	* @param global			Buffer containing the simulation's global variables
+	*/
 	void setCLSumArgs(unsigned int n, unsigned int workGroupSize, cl::Buffer global);
 
+	/**
+	* Calculates the sum of elements stored in the current temporary buffer.
+	* Writes the result in the buffer containing the simulation's global variables.
+	*
+	* @param n		Size of the buffer whose sum is calculated
+	* @param global	Buffer containing the simulation's global variables
+	*/
 	void sum(unsigned int n, cl::Buffer global);
 
 public:
@@ -77,7 +190,9 @@ public:
 		const GLGraphEdge& glGraphEdge_);
 	~ForceAtlas2Sim();
 
+	// Initializes all simulation objects
 	void init();
+	// Runs the simulation
 	void run();
 
 };

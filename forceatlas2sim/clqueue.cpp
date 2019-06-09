@@ -1,4 +1,8 @@
+#include <spdlog/fmt/fmt.h>
+#include <spdlog/spdlog.h>
+
 #include "clqueue.h"
+#include "message.h"
 
 CLQueue::CLQueue(const cl::Device& device_, const cl::Context& context_):
 	device(device_), context(context_)
@@ -8,7 +12,8 @@ CLQueue::CLQueue(const cl::Device& device_, const cl::Context& context_):
 		queue = cl::CommandQueue(context, device);
 	}
 	catch (cl::Error error) {
-		std::cout << getErrorCode(error.err()) << " " << error.what() << "\n";
+		spdlog::error(fmt::format(msg::ERR_CL_CMD_QUEUE_INIT, getErrorMessage(error.err())));
+		spdlog::error(error.what());
 		throw;
 	}
 }
@@ -24,7 +29,15 @@ const cl::CommandQueue& CLQueue::getQueue() const
 
 void CLQueue::acquireGLBuffers(const std::vector<cl::Memory>& sharedBuffers)
 {
-	queue.enqueueAcquireGLObjects(&sharedBuffers);
+	try
+	{
+		queue.enqueueAcquireGLObjects(&sharedBuffers);
+	}
+	catch (cl::Error error) {
+		spdlog::error(fmt::format(msg::ERR_CL_ACQ_BUFFER, getErrorMessage(error.err())));
+		spdlog::error(error.what());
+		throw;
+	}
 }
 
 void CLQueue::releaseGLBuffers(const std::vector<cl::Memory>& sharedBuffers)
@@ -35,7 +48,9 @@ void CLQueue::releaseGLBuffers(const std::vector<cl::Memory>& sharedBuffers)
 		queue.finish();
 	}
 	catch (cl::Error error) {
-		std::cout << getErrorCode(error.err()) << " " << error.what() << "\n";
+		spdlog::error(fmt::format(msg::ERR_CL_RLS_BUFFER, getErrorMessage(error.err())));
+		spdlog::error(error.what());
+		throw;
 	}
 }
 
@@ -50,6 +65,9 @@ void CLQueue::runKernel(const CLKernel& kernel)
 			cl::NDRange(kernel.getLocalWorkSize()));
 	}
 	catch (cl::Error error) {
-		std::cout << getErrorCode(error.err()) << " " << error.what() << "\n";
+		spdlog::error(fmt::format(msg::ERR_CL_KERNEL_RUN, 
+			kernel.getKernelName(), getErrorMessage(error.err())));
+		spdlog::error(error.what());
+		throw;
 	}
 }

@@ -11,17 +11,20 @@ const int GLSelect::lats = 40;
 const int GLSelect::longs = 40;
 const int GLSelect::numOfIndices = (lats + 1) * (longs + 1) * 2 + (lats + 1);
 
-GLSelect::GLSelect(const Camera& camera_, const GraphObject& graphObject_) : camera(camera_), graphObject(graphObject_)
+GLSelect::GLSelect(const Camera& camera_, const GraphObject& graphObject_):
+	camera(camera_), graphObject(graphObject_),
+	isInited(false),
+	vao(0),
+	vboVertex(0), vboIndex(0),
+	vboOffsetX(0), vboOffsetY(0), vboOffsetZ(0),
+	vboScale(0),
+	program(0),
+	uniformProjection(0),
+	uniformView(0),
+	uniformModel(0),
+	uniformNormalMatrix(0),
+	uniformCameraPos(0)
 {
-	isInited = false;
-	vao = 0;
-	vboVertex = 0;
-	vboIndex = 0;
-	vboOffsetX = 0;
-	vboOffsetY = 0;
-	vboOffsetZ = 0;
-	vboScale = 0;
-	program = 0;
 }
 
 GLSelect::~GLSelect()
@@ -100,8 +103,8 @@ void GLSelect::draw()
 
 	glUseProgram(program);
 
-	glm::mat4 projection = camera.getPerspective();
-	glm::mat4 view = camera.getPosition();
+	glm::mat4 projection = camera.getProjectionMatrix();
+	glm::mat4 view = camera.getViewMatrix();
 	glm::mat4 model(1.0f);
 	glm::mat3 normalMatrix = glm::transpose(glm::inverse(model));
 	glm::vec3 cameraPos = camera.getCameraPos();

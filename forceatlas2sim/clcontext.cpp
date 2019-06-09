@@ -4,8 +4,13 @@
 #include <GLFW/glfw3.h>
 
 #include "clcontext.h"
+#include "message.h"
+#include "utility.h"
 
-CLContext::CLContext()
+CLContext::CLContext():
+	numOfCUs(0),
+	minWorkGroupSize(0), maxWorkGroupSize(0),
+	localMemSize(0)
 {
 	init();
 }
@@ -21,10 +26,7 @@ void CLContext::init()
 	clGetPlatformIDs(0, nullptr, &numOfPlatforms);
 
 	if (numOfPlatforms == 0)
-	{
-		std::cout << "Could not find OpenCL platform" << std::endl;
-		throw "Could not find OpenCL platform";
-	}
+		logAndThrow(msg::ERR_CL_NO_PLATFORM);
 
 	// Gets all available OpenCL platforms
 	std::vector<cl_platform_id> platformIds;
@@ -46,7 +48,7 @@ void CLContext::init()
 
 		cl_device_id deviceId;
 
-		// Gets Id of the device associated with the current OpenGL context
+		// Tries to get the Id of the device associated with the current OpenGL context
 		cl_int errorCode = clGetGLContextInfoKHR(
 			properties, CL_CURRENT_DEVICE_FOR_GL_CONTEXT_KHR, sizeof(cl_device_id), &deviceId, nullptr);
 
@@ -68,8 +70,7 @@ void CLContext::init()
 		}
 	}
 
-	std::cout << "Could not find CL/GL interoperable device" << std::endl;
-	throw "Could not find CL/GL interoperable device";
+	logAndThrow(msg::ERR_CL_NO_DEVICE);
 }
 
 const cl::Device& CLContext::getDevice() const

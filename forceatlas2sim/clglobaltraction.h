@@ -3,6 +3,9 @@
 
 #include "clkernel.h"
 
+/**
+* Kernel for calculating the global graph traction
+*/
 class CLGlobalTraction : public CLKernel
 {
 public:

@@ -3,6 +3,9 @@
 
 #include "clkernel.h"
 
+/**
+* Kernel for calculating the center of the graph
+*/
 class CLGraphCenter : public CLKernel
 {
 public:

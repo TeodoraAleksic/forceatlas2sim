@@ -7,22 +7,21 @@
 #include "glgraphedge.h"
 #include "shader.h"
 
-GLGraphEdge::GLGraphEdge(const Camera& camera_, const GraphObject& graphObject_) : camera(camera_), graphObject(graphObject_)
+GLGraphEdge::GLGraphEdge(const Camera& camera_, const GraphObject& graphObject_):
+	camera(camera_), graphObject(graphObject_),
+	selectedNode(-1),
+	isInited(false),
+	vao(0),
+	vboVertex(0), vboIndex(0),
+	vboSourceId(0), vboTargetId(0),
+	vboSourceX(0), vboSourceY(0), vboSourceZ(0),
+	vboTargetX(0), vboTargetY(0), vboTargetZ(0),
+	program(0),
+	uniformProjection(0),
+	uniformView(0),
+	uniformModel(0),
+	uniformSelectedNode(0)
 {
-	selectedNode = -1;
-	isInited = false;
-	vao = 0;
-	vboVertex = 0;
-	vboIndex = 0;
-	vboSourceId = 0;
-	vboTargetId = 0;
-	vboSourceX = 0;
-	vboSourceY = 0;
-	vboSourceZ = 0;
-	vboTargetX = 0;
-	vboTargetY = 0;
-	vboTargetZ = 0;
-	program = 0;
 }
 
 GLGraphEdge::~GLGraphEdge()
@@ -187,8 +186,8 @@ void GLGraphEdge::draw()
 	const int SCREEN_WIDTH = 800;
 	const int SCREEN_HIGHT = 600;
 
-	glm::mat4 projection = camera.getPerspective();
-	glm::mat4 view = camera.getPosition();
+	glm::mat4 projection = camera.getProjectionMatrix();
+	glm::mat4 view = camera.getViewMatrix();
 	glm::mat4 model(1.0f);
 
 	// Sets uniforms for camera position
@@ -272,42 +271,42 @@ unsigned int GLGraphEdge::getNumOfEdges() const
 	return graphObject.getNumOfEdges();
 }
 
-unsigned int GLGraphEdge::getSourceId() const
+unsigned int GLGraphEdge::getVboSourceId() const
 {
 	return vboSourceId;
 }
 
-unsigned int GLGraphEdge::getTargetId() const
+unsigned int GLGraphEdge::getVboTargetId() const
 {
 	return vboTargetId;
 }
 
-unsigned int GLGraphEdge::getSourceX() const
+unsigned int GLGraphEdge::getVboSourceX() const
 {
 	return vboSourceX;
 }
 
-unsigned int GLGraphEdge::getSourceY() const
+unsigned int GLGraphEdge::getVboSourceY() const
 {
 	return vboSourceY;
 }
 
-unsigned int GLGraphEdge::getSourceZ() const
+unsigned int GLGraphEdge::getVboSourceZ() const
 {
 	return vboSourceZ;
 }
 
-unsigned int GLGraphEdge::getTargetX() const
+unsigned int GLGraphEdge::getVboTargetX() const
 {
 	return vboTargetX;
 }
 
-unsigned int GLGraphEdge::getTargetY() const
+unsigned int GLGraphEdge::getVboTargetY() const
 {
 	return vboTargetY;
 }
 
-unsigned int GLGraphEdge::getTargetZ() const
+unsigned int GLGraphEdge::getVboTargetZ() const
 {
 	return vboTargetZ;
 }

@@ -3,6 +3,9 @@
 
 #include "clkernel.h"
 
+/**
+* Kernel for updating the graph's nodes
+*/
 class CLUpdateNode: public CLKernel
 {
 public:

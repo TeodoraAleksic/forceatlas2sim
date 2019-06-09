@@ -10,13 +10,36 @@
 #include <CL/cl.h>
 #include <CL/cl.hpp>
 
+/**
+* Base OpenCL class
+*
+* Contains functionalities used by
+* all other OpenCL classes.
+*/
 class CLBase
 {
 protected:
 
-	std::string getErrorCode(cl_int error);
+	/**
+	* Gets message corresponding to OpenCL error code
+	*
+	* @param error OpenCL error code
+	* @return OpenCL error message
+	*/
+	std::string getErrorMessage(cl_int error);
 
+	/**
+	* Prints information about an OpenCL platform
+	*
+	* @param platform OpenCL platform
+	*/
 	void print(cl::Platform platform);
+
+	/**
+	* Prints information about an OpenCL device
+	*
+	* @param device OpenCL device
+	*/
 	void print(cl::Device device);
 
 public:

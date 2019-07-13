@@ -1,0 +1,9 @@
+os: windows
+language: cpp
+branches:
+  only:
+  - build
+install:
+  - echo "Test install"
+script:
+- echo "Test script"

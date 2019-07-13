@@ -6,4 +6,5 @@ branches:
 install:
   - echo "Test install"
 script:
-- echo "Test script"
+ - echo "Test script"
+ - wmic path win32_VideoController

@@ -3,8 +3,14 @@ language: cpp
 branches:
   only:
   - build
-install:
-  - echo "Test install"
-script:
- - echo "Test script"
- - wmic path win32_VideoController
+matrix:
+  include:
+    - os: windows
+      install:
+        - echo "Test install"
+      script:
+       - echo "Test script"
+       - wmic path win32_VideoController
+    - os: linux
+      script:
+        - lspci | grep -i nvidia

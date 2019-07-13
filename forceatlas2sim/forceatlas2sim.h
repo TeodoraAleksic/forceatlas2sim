@@ -1,6 +1,10 @@
 #ifndef _FORCEATLAS2SIM_H_
 #define _FORCEATLAS2SIM_H_
 
+#include <glad\glad.h>
+#include <GLFW\glfw3.h>
+
+#include "camera.h"
 #include "clcontext.h"
 #include "clglobalswing.h"
 #include "clglobaltraction.h"
@@ -14,6 +18,8 @@
 #include "forceatlas2params.h"
 #include "glgraphedge.h"
 #include "glgraphnode.h"
+#include "glselect.h"
+#include "gltext.h"
 #include "graphobject.h"
 
 /**
@@ -29,10 +35,17 @@ private:
 	const ForceAtlas2Params& fa2Params;
 	// Object containing graph data
 	const GraphObject& graphObject;
+	// Simulation camera
+	const Camera& camera;
+
 	// OpenGL graph nodes
-	const GLGraphNode& glGraphNode;
+	GLGraphNode glGraphNode;
 	// OpenGL graph edges
-	const GLGraphEdge& glGraphEdge;
+	GLGraphEdge glGraphEdge;
+	// OpenGL graph node selection
+	GLSelect glGraphSelect;
+	// OpenGL text
+	GLText glGraphText;
 
 	// OpenCL context
 	CLContext clContext;
@@ -181,17 +194,37 @@ private:
 	*/
 	void sum(unsigned int n, cl::Buffer global);
 
+	// Initializes OpenGL objects
+	void initGL();
+	// Initializes OpenCL objects
+	void initCL();
+
 public:
 
 	ForceAtlas2Sim(
 		const ForceAtlas2Params& fa2Params_, 
 		const GraphObject& graphObject_, 
-		const GLGraphNode& glGraphNode_, 
-		const GLGraphEdge& glGraphEdge_);
+		const Camera& camera_);
 	~ForceAtlas2Sim();
+
+	/**
+	* Sets the node currently selected in the simulation
+	*
+	* @param window GLFW window
+	* @param height Window height
+	*/
+	void setSelectedNode(GLFWwindow* window, int height);
 
 	// Initializes all simulation objects
 	void init();
+	
+	/**
+	* Draws the graph
+	*
+	* @param drawEdges True if the graph edges should be drawn
+	*/
+	void draw(bool drawEdges);
+	
 	// Runs the simulation
 	void run();
 

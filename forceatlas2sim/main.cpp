@@ -35,7 +35,6 @@ int oldEKeyState = GLFW_RELEASE;
 bool ctrlPressed = false;
 int oldCtrlKeyState = GLFW_RELEASE;
 
-unsigned int selectedNode = -1;
 bool getSelectedNode = false;
 int oldLeftMouseState = GLFW_RELEASE;
 
@@ -260,32 +259,8 @@ int main(int argc, char** argv)
 		glm::vec3(0.0f, 0.0f, -1.0f),
 		glm::vec3(0.0f, 1.0f, 0.0f));
 
-	// Initializes graph node
-	GLGraphNode graphNode(*camera, graphObject);
-	graphNode.init();
-
-	// Initializes graph edge
-	GLGraphEdge graphEdge(*camera, graphObject);
-	graphEdge.init();
-
-	// Initializes object for node selection
-	GLSelect graphSelection(*camera, graphObject);
-
-	graphSelection.setVboVertex(graphNode.getVboVertices());
-	graphSelection.setVboIndex(graphNode.getVboIndices());
-	graphSelection.setVboOffsetX(graphNode.getVboOffsetX());
-	graphSelection.setVboOffsetY(graphNode.getVboOffsetY());
-	graphSelection.setVboOffsetZ(graphNode.getVboOffsetZ());
-	graphSelection.setVboScale(graphNode.getVboScale());
-
-	graphSelection.init();
-
-	// Initializes object for text drawing
-	GLText graphText(*camera, graphObject);
-	graphText.init();
-
 	// Initializes ForceAtlas2 simulation
-	fa2Sim = std::make_unique<ForceAtlas2Sim>(fa2Params, graphObject, graphNode, graphEdge);
+	fa2Sim = std::make_unique<ForceAtlas2Sim>(fa2Params, graphObject, *camera);
 	fa2Sim->init();
 
 	spdlog::info(msg::INFO_START_SIMULATION);
@@ -316,34 +291,14 @@ int main(int argc, char** argv)
 
 		// Gets selected node on screen
 		if (getSelectedNode && !runSim)
-		{
-			glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-			graphSelection.draw();
-
-			double cursorX, cursorY;
-			glfwGetCursorPos(window, &cursorX, &cursorY);
-
-			unsigned char data[4];
-			glReadPixels((GLint)cursorX, SCREEN_HEIGHT - (GLint)cursorY, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
-
-			selectedNode = data[0] + data[1] * 256 + data[2] * 265 * 265;
-
-			graphEdge.setSelectedNode(selectedNode);
-			graphNode.setSelectedNode(selectedNode);
-			graphText.setSelectedNode(selectedNode);
-		}
+			fa2Sim->setSelectedNode(window, SCREEN_HEIGHT);
 
 		getSelectedNode = false;
 
 		glClearColor(0.95f, 0.95f, 0.95f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// Draws graph
-		if (drawEdges) graphEdge.draw();
-		graphNode.draw();
-		graphText.draw();
+		fa2Sim->draw(drawEdges);
 
 		glfwSwapBuffers(window);
 	}

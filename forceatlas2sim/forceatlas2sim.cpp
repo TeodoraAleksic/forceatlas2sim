@@ -3,14 +3,16 @@
 #include "forceatlas2sim.h"
 
 ForceAtlas2Sim::ForceAtlas2Sim(
-	const ForceAtlas2Params& fa2Params_, 
-	const GraphObject& graphObject_, 
-	const GLGraphNode& glGraphNode_, 
-	const GLGraphEdge& glGraphEdge_):
+	const ForceAtlas2Params& fa2Params_,
+	const GraphObject& graphObject_,
+	const Camera& camera_) :
 	fa2Params(fa2Params_),
 	graphObject(graphObject_),
-	glGraphNode(glGraphNode_),
-	glGraphEdge(glGraphEdge_),
+	camera(camera_),
+	glGraphNode(camera_, graphObject_),
+	glGraphEdge(camera_, graphObject_),
+	glGraphSelect(camera_, graphObject_),
+	glGraphText(camera_, graphObject_),
 	clGlobalSwing(clContext.getDevice(), clContext.getContext()),
 	clGlobalTraction(clContext.getDevice(), clContext.getContext()),
 	clGraphCenter(clContext.getDevice(), clContext.getContext()),
@@ -229,17 +231,59 @@ void ForceAtlas2Sim::sum(unsigned int n, cl::Buffer graphGlobal)
 	}
 }
 
-void ForceAtlas2Sim::init()
+void ForceAtlas2Sim::setSelectedNode(GLFWwindow* window, int height)
+{
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glGraphSelect.draw();
+
+	double cursorX, cursorY;
+	glfwGetCursorPos(window, &cursorX, &cursorY);
+
+	unsigned char data[4];
+	glReadPixels((GLint)cursorX, height - (GLint)cursorY, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+	int selectedNode = data[0] + data[1] * 256 + data[2] * 265 * 265;
+
+	glGraphEdge.setSelectedNode(selectedNode);
+	glGraphNode.setSelectedNode(selectedNode);
+	glGraphText.setSelectedNode(selectedNode);
+}
+
+void ForceAtlas2Sim::initGL()
+{
+	// Initializes graph node
+	glGraphNode.init();
+
+	// Initializes graph edge
+	glGraphEdge.init();
+
+	// Initializes object for node selection
+	glGraphSelect.setVboVertex(glGraphNode.getVboVertices());
+	glGraphSelect.setVboIndex(glGraphNode.getVboIndices());
+	glGraphSelect.setVboOffsetX(glGraphNode.getVboOffsetX());
+	glGraphSelect.setVboOffsetY(glGraphNode.getVboOffsetY());
+	glGraphSelect.setVboOffsetZ(glGraphNode.getVboOffsetZ());
+	glGraphSelect.setVboScale(glGraphNode.getVboScale());
+
+	glGraphSelect.init();
+
+	// Initializes object for text drawing
+	glGraphText.init();
+}
+
+void ForceAtlas2Sim::initCL()
 {
 	{
 		std::vector<int> zeros(3, 0);
 
 		// Allocates buffers for global variables
-		centerOfMass = cl::Buffer(clContext.getContext(), 
+		centerOfMass = cl::Buffer(clContext.getContext(),
 			CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(cl_float) * 3, &zeros[0]);
-		globalSwing = cl::Buffer(clContext.getContext(), 
+		globalSwing = cl::Buffer(clContext.getContext(),
 			CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(cl_float) * 3, &zeros[0]);
-		globalTraction = cl::Buffer(clContext.getContext(), 
+		globalTraction = cl::Buffer(clContext.getContext(),
 			CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(cl_float) * 3, &zeros[0]);
 	}
 
@@ -248,21 +292,21 @@ void ForceAtlas2Sim::init()
 		sizeof(cl_int) * graphObject.getNumOfNodes(), &(graphObject.getSourceNodeOffset())[0]);
 	edgeWeight = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
 		sizeof(cl_float) * graphObject.getNumOfEdges(), &(graphObject.getEdgeWeight())[0]);
-	
+
 	{
 		std::vector<int> zeros(graphObject.getNumOfNodes(), 0);
 
 		// Allocates force buffers shared by CL objects
 		fx[0] = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE, sizeof(cl_float) * graphObject.getNumOfNodes());
-		fx[1] = cl::Buffer(clContext.getContext(), 
+		fx[1] = cl::Buffer(clContext.getContext(),
 			CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(cl_float) * graphObject.getNumOfNodes(), &zeros[0]);
 
 		fy[0] = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE, sizeof(cl_float) * graphObject.getNumOfNodes());
-		fy[1] = cl::Buffer(clContext.getContext(), 
+		fy[1] = cl::Buffer(clContext.getContext(),
 			CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(cl_float) * graphObject.getNumOfNodes(), &zeros[0]);
 
 		fz[0] = cl::Buffer(clContext.getContext(), CL_MEM_READ_WRITE, sizeof(cl_float) * graphObject.getNumOfNodes());
-		fz[1] = cl::Buffer(clContext.getContext(), 
+		fz[1] = cl::Buffer(clContext.getContext(),
 			CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(cl_float) * graphObject.getNumOfNodes(), &zeros[0]);
 	}
 
@@ -327,6 +371,20 @@ void ForceAtlas2Sim::init()
 	setCLForceReplArgs(true);
 	setCLUpdateNodeArgs(true);
 	setCLUpdateEdgeArgs(true);
+}
+
+void ForceAtlas2Sim::init()
+{
+	initGL();
+	initCL();
+}
+
+void ForceAtlas2Sim::draw(bool drawEdges)
+{
+	// Draws graph
+	if (drawEdges) glGraphEdge.draw();
+	glGraphNode.draw();
+	glGraphText.draw();
 }
 
 void ForceAtlas2Sim::run()
